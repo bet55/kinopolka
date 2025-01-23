@@ -1,0 +1,69 @@
+.modal-content {
+    background-color: var(--white-color);
+}
+
+
+#rate-poster {
+    img {
+        height: 10em;
+    }
+}
+
+#rate-comment-field {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        padding: 1em;
+        font-size: 1.2em;
+    }
+
+    textarea {
+        resize: none;
+        font-size: 2em;
+        height: 5em;
+
+    }
+}
+
+#stars-hint {
+    visibility: hidden;
+}
+
+.rate-btn-save {
+    color: black;
+    background-color: var(--green-color);
+
+    &:hover {
+        cursor: pointer;
+        background-color: #3c763d;
+    }
+}
+
+
+#rate-stars {
+    display: inline-block;
+
+    input {
+        display: none;
+    }
+
+    label {
+        float: right;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+}
+
+
+#rate-stars label:before {
+    content: "\2605";
+    font-size: 30px;
+}
+
+#rate-stars input:checked ~ label,
+#rate-stars label:hover,
+#rate-stars label:hover ~ label {
+    color: rgb(238, 161, 13);
+    transition: color 0.3s;
+}

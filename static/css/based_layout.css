@@ -1,0 +1,247 @@
+body {
+    background-image: url('../../static/img/background.jpg');
+    background-size: 100%;
+    overflow: scroll;
+}
+
+/* 1 row =====================================================  */
+.first-row {
+    height: 20vh;
+    align-items: center;
+}
+
+
+.title {
+    font-size: 3.5rem;
+    color: var(--red-color);
+    font-weight: bold;
+
+    @media (min-width: 2500px) {
+        font-size: 6em;
+
+    }
+    @media (min-width: 3000px) {
+        font-size: 9em;
+
+    }
+}
+
+.header-img {
+    height: 100%;
+}
+
+.header-options {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+#users-panel {
+    height: 28%;
+    width: 25%;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    background-color: var(--black-color);
+    border-radius: var(--bs-border-radius);
+
+    .dropdown-toggle {
+        height: 100%;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        color: var(--white-color);
+
+        &:after {
+            content: none;
+        }
+    }
+
+    .dropdown-menu {
+        color: var(--black-color);
+        background-color: var(--white-color);
+    }
+
+    @media (min-width: 2500px) {
+        border-radius: 8%;
+        height: 29%;
+        width: 29%;
+
+        .dropdown-toggle {
+            font-size: 1.5em;
+        }
+
+        .dropdown-item {
+            height: 3em;
+            font-size: 1.5em;
+        }
+    }
+
+    @media (min-width: 3000px) {
+
+        .dropdown-toggle {
+            font-size: 2.5em;
+        }
+
+        .dropdown-item {
+            height: 3em;
+            font-size: 3em;
+        }
+    }
+}
+
+.user-name:nth-child(1) {
+    background-color: var(--red-color);
+}
+
+.user-name:nth-child(2) {
+    background-color: var(--yellow-color);
+}
+
+.user-name:nth-child(3) {
+    background-color: var(--white-color);
+}
+
+.user-name:nth-child(4) {
+    background-color: var(--orange-color);
+}
+
+
+/* Кнопка корзины - выпадающий список с фильмами */
+#cart {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin: 0 1em 0 1em;
+}
+
+#cart-img {
+    height: 40%;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+}
+
+#cart-list {
+    visibility: hidden;
+
+    position: absolute;
+    z-index: 2;
+
+    top: 20vh;
+    right: 6vw;
+    width: 22em;
+    max-height: 60vh;
+    overflow: scroll;
+
+    backdrop-filter: blur(15px);
+
+
+    span {
+        font-weight: bold;
+        font-size: 1em;
+    }
+
+    img {
+        width: 5em;
+        object-fit: contain;
+    }
+
+    .film-remove {
+        visibility: hidden;
+        cursor: pointer;
+    }
+
+    li {
+        padding: 0 10px 0 2px;
+        border-bottom: 2px solid black;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+    }
+
+    li:hover {
+        background-color: var(--black-color);
+        color: var(--white-color);
+        cursor: default;
+
+        .film-remove {
+            visibility: visible;
+        }
+
+    }
+
+    @media (min-width: 2500px) {
+        right: 5vw;
+        width: 33em;
+
+        span {
+            font-size: 1.5em;
+        }
+
+        img {
+            width: 10em;
+        }
+    }
+
+
+    @media (min-width: 3000px) {
+        right: 8vw;
+        width: 41em;
+
+        span {
+            font-size: 2.3em;
+        }
+
+        img {
+            width: 12em;
+        }
+    }
+
+}
+
+
+/* 2 row =====================================================*/
+.second-row {
+    height: 80vh;
+}
+
+.nav-column {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    .nav-link {
+        font-weight: bold;
+        font-size: 2rem;
+        color: var(--black-color);
+
+        @media screen and (min-width: 2500px) {
+            font-size: 3em;
+        }
+
+        @media screen and (min-width: 3000px) {
+            font-size: 4rem;
+        }
+
+        &:hover {
+            color: var(--orange-color);
+
+        }
+
+    }
+
+}
+
+.nav-img {
+    height: 45%;
+}
+
+

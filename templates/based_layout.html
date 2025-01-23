@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% load static %}
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/global_settings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/based_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/toast.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/elements/new_year.css' %}">
+
+    {% block style %} {% endblock %}
+
+    <link rel="icon" href="{% static 'img/icon.png' %}">
+    <title>{% block title %}Киноклуб{% endblock %}</title>
+</head>
+<body>
+
+
+<div class="container-fluid text-center" data-bs-theme="light">
+
+    <div class="row first-row">
+
+        <div class="col-md-3">
+            <h1 class="title">КИНОКЛУБ 2025</h1>
+        </div>
+
+        <div class="col-md-6 header-img">
+            <img class="header-img" src="{% static 'img/new_year/header/header3.png' %}">
+        </div>
+
+        <div class="col-md-3 header-options">
+
+            {% block header-button %} {% endblock %}
+
+            <div id="cart">
+                <img id="cart-img" src="{% static 'img/options_icons/shopping-cart.png' %}" alt=""
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="top"
+                     data-bs-title="Закладки закладок">
+                <ul id="cart-list"></ul>
+            </div>
+
+            <div id="users-panel" class="dropdown">
+                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Кто?
+                </button>
+                <ul id="users-selector" class="dropdown-menu">
+                    {% for u in users %}
+
+                        <li class="user-name">
+                            <button class="dropdown-item" data-user-id="{{ u.id }}">{{ u.first_name }}</button>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row second-row">
+
+        <div class="col-md-3 h-100">
+            <div class="container nav-column">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" aria-current="page" href="/">Церемония</a>
+                    <a class="nav-link" href="/movies">Список</a>
+                    <a class="nav-link" href="/movies/archive">Архив</a>
+                    <a class="nav-link" href="/movies/add">Добавление</a>
+                    <a class="nav-link" href="/statistic">Статистика</a>
+                    <a class="nav-link" href="/features/carousel">Карусель</a>
+                </nav>
+                <img class="align-self-center mt-auto nav-img" src="{{ random.nav }}">
+            </div>
+
+        </div>
+
+        <div class="col-md-6 h-100">
+            {% block center-content %} {% endblock %}
+        </div>
+
+        <div class="col-md-3">
+            {% block right-content %} {% endblock %}
+        </div>
+    </div>
+
+
+</div>
+
+{% block fixed %} {% endblock %}
+
+<div class="gir_1" id="gir"></div>
+
+{% include "elements/toast.html" %}
+
+
+<script type="module" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script type="module" src="{% static 'js/based_layout.js' %}"></script>
+<script type="module" src="{% static 'js/utils/new_year.js' %}"></script>
+
+{% block script %} {% endblock %}
+
+</body>
+</html>

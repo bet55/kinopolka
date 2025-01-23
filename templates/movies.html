@@ -1,0 +1,114 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/movies.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/rating_notes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/rating_modal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/user_requirement_modal.css' %}">
+{% endblock %}
+
+{% block title %}Кино{% endblock %}
+
+{% block header-button %}
+    {% if is_archive %}
+        {% include "elements/rating_notes.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block center-content %}
+
+    <div class="row posters-grid" data-kp-id="{{ i.kp_id }}">
+
+        {% for i in movies %}
+
+            <div class="poster-container" data-kp-id="{{ i.kp_id }}">
+
+                <img class="poster-img " src="{{ i.poster }}" alt="" loading="lazy" data-kp-id="{{ i.kp_id }}">
+
+                <div class="note-container" data-kp-id="{{ i.kp_id }}">
+
+                    {% for note in i.notes %}
+
+                        {% for u in users %}
+                            {% if note.user == u.id %}
+                                <div class="note"
+                                     data-user-id="{{ u.id }}"
+                                     data-bs-toggle="tooltip"
+                                     data-bs-placement="top"
+                                     data-bs-title="{{ u.first_name }}?">
+
+                                    <h2>{{ note.rating }}</h2>
+                                    {# <p>{{ note.rating }}</p>#}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="poster-settings">
+
+                    <img class="opt opt-booked" src="{% static 'img/options_icons/bookmark4.png' %}" alt=""
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-title="Добавить в закладки">
+
+                    {% if is_archive %}
+                        <img class="opt opt-archive" src="{% static 'img/options_icons/archive3.png' %}" alt=""
+                             data-bs-toggle="tooltip"
+                             data-bs-placement="top"
+                             data-bs-title="Убрать из архива">
+                    {% else %}
+                        <img class="opt opt-archive" src="{% static 'img/options_icons/archive4.png' %}" alt=""
+                             data-bs-toggle="tooltip"
+                             data-bs-placement="top"
+                             data-bs-title="В архив">
+                    {% endif %}
+
+                    {% if is_archive %}
+                        <img class="opt opt-rate" src="{% static 'img/options_icons/heart4.png' %}" alt=""
+                             data-bs-toggle="tooltip"
+                             data-bs-placement="top"
+                             data-bs-title="Оценить">
+                    {% endif %}
+
+                    <img class="opt opt-remove" src="{% static 'img/options_icons/boom2.png' %}" alt=""
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-title="Удалить">
+                </div>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
+
+{% block right-content %}
+    <div class="card-container">
+        <img class="card-img" src="{{ random.card }}">
+        <h2 class="card-title"></h2>
+        <p class="card-description card-description-hidden"></p>
+        <h3 class="card-realise"></h3>
+        <p class="card-duration"></p>
+        <p class="card-link"><a href=""></a></p>
+    </div>
+{% endblock %}
+
+
+{% block fixed %}
+    {% include "elements/rating_modal.html" %}
+    {% include "elements/user_requirement_modal.html" %}
+{% endblock %}
+
+{% block script %}
+    <script type="module" src="{% static 'js/movies.js' %}"></script>
+{% endblock %}
+
+

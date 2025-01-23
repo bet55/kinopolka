@@ -1,0 +1,24 @@
+name: kinopolka
+services:
+  web:
+    image: python:3.10-slim
+    working_dir: /app
+    command: >
+      bash -c "pip install uv &&
+      uv venv &&
+      source .venv/bin/activate &&
+      uv sync &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      sh start.sh"
+    volumes:
+      - .:/app
+      - sqlite_data:/app/db
+    ports:
+      - "8001:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=filmoclub.settings
+    restart: unless-stopped
+    
+volumes:
+  sqlite_data:

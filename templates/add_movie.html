@@ -1,0 +1,32 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/add_movie.css' %}">
+{% endblock %}
+
+{% block title %}Фильмы{% endblock %}
+
+{% block center-content %}
+
+    <form id="search-form">
+        <div>
+            <label for="movie-link" class="form-label">Ссылка на фильм</label>
+            <input type="url" class="form-control" id="movie-link" aria-describedby="kpLinkHelp">
+            <div id="kpLinkHelp" class="form-text">https://www.kinopoisk.ru/film/4626783/</div>
+        </div>
+
+        <button id="add-btn" type="button" class="btn">Добавить</button>
+
+    </form>
+
+{% endblock %}
+
+{% block fixed %}{% endblock %}
+
+
+{% block script %}
+    <script type="module" src="{% static 'js/add_movie.js' %}"></script>
+{% endblock %}
+

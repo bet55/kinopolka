@@ -1,0 +1,24 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/statistic.css' %}">
+{% endblock %}
+{% block title %}Фильмы{% endblock %}
+
+{% block center-content %}
+
+    <div id="stats">
+        <ul>
+            <li>Всего посмотренно фильмов: <span>{{ statistic.count }} </span></li>
+            <li>Общая продолжительность: <span>{{ statistic.total_duration }}</span></li>
+            <li>Средняя оценка на кинопоиске: <span>{{ statistic.rating_kp }}</span></li>
+            <li>Средняя оценка на imdb: <span>{{ statistic.rating_imdb }}</span></li>
+        </ul>
+    </div>
+
+    <div class="graph">
+        {{ graph_div|safe }}
+    </div>
+{% endblock %}
