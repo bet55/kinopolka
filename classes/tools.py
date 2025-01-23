@@ -89,9 +89,8 @@ class Tools:
         all_movies = movies + archive_movies
 
         async def export(mv_info):
-            mv = Movie()
             try:
-                await mv.a_download(mv_info.get('id', -1), mv_info)
+                await MovieHandler.a_download(mv_info.get('id', -1), mv_info)
                 return {'success': True, 'id': mv_info.get('id', -1)}
             except Exception as exp:
                 return {'success': False, 'id': mv_info.get('id', -1), 'message': str(exp)}
