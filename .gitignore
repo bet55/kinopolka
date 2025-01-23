@@ -5,7 +5,7 @@ caching
 *caching
 app_cache
 *cache
-*cach*
+
 db.sqlite3
 start.sh
 requests.http
