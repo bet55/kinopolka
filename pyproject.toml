@@ -1,6 +1,6 @@
 [project]
 name = "filmoclub"
-version = "0.0.1"
+version = "0.5.0"
 description = "Cinephiles with tea"
 readme = "README.md"
 requires-python = ">=3.10"

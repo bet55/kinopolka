@@ -1,14 +1,16 @@
-from lists.models import Film
+from lists.models import Movie
 import pandas as pd
 import plotly
 import plotly.express as px
 
 
 class Statistic:
-
+    """
+    Класс для обработки статистики по просмотренным и ожидаемым фильмам из списков
+    """
     @classmethod
     def get_movies_statistic(cls):
-        film_model = Film.mgr.filter(is_archive=True).values()
+        film_model = Movie.mgr.filter(is_archive=True).values()
         df = pd.DataFrame(film_model)
         stats = {
             'total_duration': df['duration'].sum(),
@@ -24,7 +26,7 @@ class Statistic:
 
     @classmethod
     def draw(cls):
-        film_model = Film.mgr.filter(is_archive=True).values()
+        film_model = Movie.mgr.filter(is_archive=True).values()
         df = pd.DataFrame(film_model)
         figure_config = {
             'x': 'rating_kp',

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from classes import Statistic, Tools
 from rest_framework.response import Response
 
-from lists.models import AppUser
+from lists.models import User
 from lists.serializers import UserSerializer
 
 
@@ -21,7 +21,7 @@ def movies_stats(request):
     fig = Statistic.draw()
 
     random_images = Tools.get_random_images()
-    users = AppUser.objects.all()
+    users = User.objects.all()
     us_sr = UserSerializer(users, many=True)
 
     return render(request, template_name='statistic.html', context={

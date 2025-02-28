@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.db import models
 
-from lists.serializers import FilmSerializer
+from lists.serializers import MovieSerializer
 from postcard.models import Postcard
 
 
 class PostcardSerializer(serializers.ModelSerializer):
-    movies = FilmSerializer
+    movies = MovieSerializer
 
     class Meta:
         model = Postcard

@@ -1,40 +1,41 @@
 from classes.exceptions import MoviesError
-from classes.note import Note
 from classes.kp import KP_Movie
-from lists.models import Film as FilmModel, Actor as ActorModel, Writer as WriterModel, Director as DirectorModel, \
-    Genre as GenreModel
-from lists.serializers import FilmSerializer, FilmSmallSerializer
+from lists.models import Movie, Actor, Director, Writer, Genre
+from lists.serializers import MovieSerializer, MovieSmallSerializer
 from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
 from collections import namedtuple
 
 
 class MovieHandler:
+    """
+    Класс для работы с фильмами в базе данных
+    """
     KPEntities = namedtuple('KPEntities', ['movie', 'persons', 'genres'])
 
     @classmethod
     def get_movie(cls, kp_id: int | str) -> dict:
-        film_model = FilmModel.mgr.get(kp_id=kp_id)
-        serialize = FilmSerializer(film_model)
+        film_model = Movie.mgr.get(kp_id=kp_id)
+        serialize = MovieSerializer(film_model)
         return serialize.data
 
     @classmethod
     def get_all_movies(cls, all_info: bool = True, is_archive: bool = False) -> dict | list:
         try:
-            raw_film = FilmModel.mgr.filter(is_archive=is_archive)
-            serialize = FilmSerializer(raw_film, many=True) if all_info else FilmSmallSerializer(raw_film, many=True)
+            raw_film = Movie.mgr.filter(is_archive=is_archive)
+            serialize = MovieSerializer(raw_film, many=True) if all_info else MovieSmallSerializer(raw_film, many=True)
             return serialize.data
         except:
             raise MoviesError
 
     @classmethod
     def change_movie_status(cls, kp_id: int | str, is_archive: bool):
-        film_model = FilmModel.mgr.get(kp_id=kp_id)
+        film_model = Movie.mgr.get(kp_id=kp_id)
         film_model.is_archive = is_archive
         return film_model.save()
 
     @classmethod
     def remove_movie(cls, kp_id: int | str):
-        film_model = FilmModel.mgr.get(kp_id=kp_id)
+        film_model = Movie.mgr.get(kp_id=kp_id)
         return film_model.delete()
 
     @classmethod
@@ -53,13 +54,13 @@ class MovieHandler:
     def _save_movie_to_db(cls, movie_info: KPEntities):
         movie, persons, genres = movie_info
 
-        movie_model, m_status = FilmModel.mgr.update_or_create(**movie)
+        movie_model, m_status = Movie.mgr.update_or_create(**movie)
 
         a, d, w, g = cls._create_models_counstuctor_list(persons, genres)
-        ActorModel.mgr.bulk_create(a, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        DirectorModel.mgr.bulk_create(d, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        WriterModel.mgr.bulk_create(w, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        GenreModel.mgr.bulk_create(g, update_conflicts=True, update_fields=['watch_counter'], unique_fields=['name'])
+        Actor.mgr.bulk_create(a, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
+        Director.mgr.bulk_create(d, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
+        Writer.mgr.bulk_create(w, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
+        Genre.mgr.bulk_create(g, update_conflicts=True, update_fields=['watch_counter'], unique_fields=['name'])
 
         movie_model.actors.set(a)
         movie_model.directors.set(d)
@@ -86,15 +87,15 @@ class MovieHandler:
     @classmethod
     async def _a_save_movie_to_db(cls, movie_info: KPEntities):
         movie, persons, genres = movie_info
-        movie_model, m_status = await FilmModel.mgr.aupdate_or_create(**movie)
+        movie_model, m_status = await Movie.mgr.aupdate_or_create(**movie)
 
         a, d, w, g = cls._create_models_counstuctor_list(persons, genres)
 
-        await ActorModel.mgr.abulk_create(a, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        await DirectorModel.mgr.abulk_create(d, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        await WriterModel.mgr.abulk_create(w, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        await GenreModel.mgr.abulk_create(g, update_conflicts=True, update_fields=['watch_counter'],
-                                          unique_fields=['name'])
+        await Actor.mgr.abulk_create(a, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
+        await Director.mgr.abulk_create(d, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
+        await Writer.mgr.abulk_create(w, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
+        await Genre.mgr.abulk_create(g, update_conflicts=True, update_fields=['watch_counter'],
+                                     unique_fields=['name'])
 
         await movie_model.actors.aset(a)
         await movie_model.directors.aset(d)
@@ -105,10 +106,10 @@ class MovieHandler:
 
     @classmethod
     def _create_models_counstuctor_list(cls, persons: dict[str, list], genres: list) -> tuple[list, list, list, list]:
-        actors = [ActorModel(**pers) for pers in persons['actor']]
-        directors = [DirectorModel(**pers) for pers in persons['director']]
-        writers = [WriterModel(**pers) for pers in persons['writer']]
-        genres = [GenreModel(**gen) for gen in genres]
+        actors = [Actor(**pers) for pers in persons['actor']]
+        directors = [Director(**pers) for pers in persons['director']]
+        writers = [Writer(**pers) for pers in persons['writer']]
+        genres = [Genre(**gen) for gen in genres]
 
         return actors, directors, writers, genres
 

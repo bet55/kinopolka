@@ -10,6 +10,9 @@ import json
 
 @dataclass
 class KP:
+    """
+    Класс для работы с неофициальным api кинопоиска https://kinopoisk.dev
+    """
     cache_duration: int = 60 * 2
     cache: Caching = Caching('app_cache', cache_duration)
     client: ClassVar[httpx.Client] = httpx.Client
@@ -38,6 +41,9 @@ class KP:
 
 @dataclass
 class KP_Movie(KP):
+    """
+    Класс для получения фильмов кинопоиска
+    """
     BASE_URL: ClassVar[str] = KP.BASE_URL + 'movie'
 
     def get_movie_by_id(self, movie_id: str | int) -> dict:

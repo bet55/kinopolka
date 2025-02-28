@@ -5,10 +5,13 @@
 Приложение призванное увековечить киноклубные вечера, а также
 разнообразить их наполнение активностями.
 
+http://185.80.91.29:8000/
 
-Должны быть:
+Реализованно:
 1. Архив просмотренного
 2. Список для просмотра
+3. Именные пользователи
+4. 
 
 Может быть:
 1. Игровой выбор фильмов (рулетка, турнир, квиз по фильмам)
@@ -20,12 +23,12 @@
 7. Оценки пользователей в виде стикеров на постерах с фильмами
 8. Страница-открытка с грядущими фильмами и датой
 9. Red flag on norwegian, etc films
-10. naverh button
-
 
 [kinorium](https://ru.kinorium.com/collections/kinorium/)
 
 [figma](https://www.figma.com/design/iEelBzbgfnGmk810JXHGGn/%D0%BA%D0%B8%D0%BD%D0%BE%D0%BA%D0%BB%D1%83%D0%B1?node-id=0-1&node-type=canvas&t=ZwrMRzvz8z7EbmCr-0)  
-[github](https://github.com/bet55/-)  
+[github](https://github.com/bet55/kinopolka)  
+[kanban](https://github.com/users/bet55/projects/2)  
+[github old](https://github.com/bet55/-)  
 [kinopoisk](https://www.kinopoisk.ru/mykp/folders/4583/?format=posters&limit=50)  
 [kinopoisk api](https://api.kinopoisk.dev/documentation#/)

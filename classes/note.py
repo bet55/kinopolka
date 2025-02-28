@@ -1,17 +1,20 @@
-from lists.models import Sticker as StickerModel, AppUser, Film, Sticker
-from lists.serializers import StickerSerializer
+from lists.models import Note, User, Movie
+from lists.serializers import NoteSerializer
 from collections import defaultdict
 
 from pydantic_models import RateMovieRequestModel
 
 
-class Note:
+class NoteHandler:
+    """
+    Класс для работы с записями оценок в базе данных
+    """
     @classmethod
     def get_all_notes(cls) -> dict[int, list]:
         notes = defaultdict(list)
 
-        raw_notes = StickerModel.mgr.all()
-        serialize = StickerSerializer(raw_notes, many=True)
+        raw_notes = Note.mgr.all()
+        serialize = NoteSerializer(raw_notes, many=True)
 
         for note in serialize.data:
             notes[note['film']].append(note)
@@ -26,20 +29,20 @@ class Note:
         # formated_request['user'] = AppUser.objects.get(id=formated_request['user'])
         # formated_request['film'] = Film.mgr.get(kp_id=formated_request['film'])
 
-        user = AppUser.objects.get(id=formated_request['user'])
-        film = Film.mgr.get(kp_id=formated_request['film'])
+        user = User.objects.get(id=formated_request['user'])
+        film = Movie.mgr.get(kp_id=formated_request['film'])
         rating = formated_request['rating']
 
         # Todo Хак, нужно переписать на create_or_update
-        sticky_model = [Sticker(user=user, film=film, rating=rating)]
+        sticky_model = [Note(user=user, film=film, rating=rating)]
 
-        res = Sticker.mgr.bulk_create(sticky_model,
-                                                        update_conflicts=True,
-                                                        update_fields=['rating', 'text'],
-                                                        unique_fields=['film', 'user'])
+        res = Note.mgr.bulk_create(sticky_model,
+                                          update_conflicts=True,
+                                          update_fields=['rating', 'text'],
+                                          unique_fields=['film', 'user'])
         return True
 
     @classmethod
     def remove_note(cls, user, film):
-        note = Sticker.mgr.get(user=user, film=film)
+        note = Note.mgr.get(user=user, film=film)
         return note.delete()

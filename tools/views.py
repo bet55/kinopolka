@@ -1,8 +1,8 @@
 from rest_framework.decorators import api_view
 from adrf.decorators import api_view as asapi_view
 from rest_framework.response import Response
-from classes import MovieHandler, Note, Tools
-from lists.models import AppUser
+from classes import MovieHandler, NoteHandler, Tools
+from lists.models import User
 import json
 import asyncio
 from django.shortcuts import render
@@ -11,13 +11,13 @@ from tools.serializers import UserSerializer
 
 @api_view(['GET'])
 def view_notes(request):
-    notes = Note.get_all_notes()
+    notes = NoteHandler.get_all_notes()
     return Response(notes)
 
 
 @api_view(['GET'])
 def view_users(request):
-    users = AppUser.objects.all()
+    users = User.objects.all()
     ser = UserSerializer(users, many=True)
     return Response(ser.data)
 
@@ -41,7 +41,7 @@ async def create_users(self):
 
     results = []
     for user in users:
-        user_model, status = await AppUser.objects.aupdate_or_create(**user)
+        user_model, status = await User.objects.aupdate_or_create(**user)
         results.append({user['username']: status})
 
     return Response(data=results)

@@ -1,5 +1,6 @@
 import pendulum
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as UserModel
+from django.db.models import Model
 from django.db import models
 
 from lists import validators
@@ -8,46 +9,43 @@ QUESTION_MARK_URL = 'https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp'
 
 
 # Create your models here.
-class AppUser(User):
+class User(UserModel):
     avatar = models.URLField(default=QUESTION_MARK_URL)
 
 
-class Actor(models.Model):
+class Actor(Model):
     mgr = models.Manager()
     kp_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     photo = models.URLField(default=QUESTION_MARK_URL)
 
 
-class Director(models.Model):
+class Director(Model):
     mgr = models.Manager()
     kp_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     photo = models.URLField(default=QUESTION_MARK_URL)
 
 
-class Writer(models.Model):
+class Writer(Model):
     mgr = models.Manager()
     kp_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     photo = models.URLField(default=QUESTION_MARK_URL)
 
 
-class FilmGenreRelations(models.Model):
-    film = models.ForeignKey('Film', on_delete=models.CASCADE)
-    genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
-    # Заработало без этой моделе. Я ничего не понял.
-    # https://stackoverflow.com/questions/64462130/how-to-change-the-primary-key-of-manytomany-table-in-django
-    # https://docs.djangoproject.com/en/1.11/ref/models/fields/#django.db.models.ManyToManyField.through
+class FilmGenreRelations(Model):
+    film = models.ForeignKey('lists.models.Movie', on_delete=models.CASCADE)
+    genre = models.ForeignKey('lists.models.Genre', on_delete=models.CASCADE)
 
 
-class Genre(models.Model):
+class Genre(Model):
     mgr = models.Manager()
     name = models.CharField(max_length=50, primary_key=True)
     watch_counter = models.IntegerField(default=0)
 
 
-class Film(models.Model):
+class Movie(Model):
     # class CustomJSONField(models.JSONField):
     #
     #     def get_prep_value(self, value):
@@ -85,10 +83,10 @@ class Film(models.Model):
         ordering = ['-rating_kp']
 
 
-class Sticker(models.Model):
+class Note(Model):
     mgr = models.Manager()
-    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
-    film = models.ForeignKey(Film, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    film = models.ForeignKey(Movie, on_delete=models.CASCADE)
     text = models.TextField(default='И сказать нечего...')
     rating = models.IntegerField(null=False)
 

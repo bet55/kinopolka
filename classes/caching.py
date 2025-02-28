@@ -5,10 +5,13 @@ from diskcache import Cache
 
 
 class Caching:
+    """
+    Класс для кэширования данных
+    """
     def __init__(self, dirname: str = None, ttl: int = None):
         """
-        :param dirname: (str) - название папки хранения файла кеша.
-        :param ttl: (int) время актуальности кеша в секундах.
+        :param dirname: (str) - название папки хранения файла кэша.
+        :param ttl: (int) время актуальности кэша в секундах.
         """
         # Признак успешности инициализации
         self.__initialized: bool = True
@@ -36,25 +39,25 @@ class Caching:
         self.__dirname = dirname if dirname else None
         self.__ttl = ttl if ttl else None
 
-        # Инициализация кешировальщика
+        # Инициализация кэшировальщика
         self.__cache = None
         try:
             self.__cache = Cache(self.__dirname)
         except OperationalError as e:
-            self.__error_message = f"При инициализации кешировальщика возникла ошибка. [{str(e)}]"
+            self.__error_message = f"При инициализации кэшировальщика возникла ошибка. [{str(e)}]"
             logging.error(self.__error_message)
             self.__initialized = False
             return None
         except Exception as e:
-            self.__error_message = f"При инициализации кешировальщика возникла непредвиденная ошибка. [{str(e)}]"
+            self.__error_message = f"При инициализации кэшировальщика возникла непредвиденная ошибка. [{str(e)}]"
             logging.error(self.__error_message)
             self.__initialized = False
             return None
 
     def check_cache(self, key: Union[str, int] = None) -> bool:
         """
-        Проверка наличия параметра в кеше.
-        :param key: (int|str) параметр в кеше.
+        Проверка наличия параметра в кэше.
+        :param key: (int|str) параметр в кэше.
         :return: (bool) результат проверки.
         """
         # Проверка параметров
@@ -69,9 +72,9 @@ class Caching:
 
     def get_cache(self, key: Union[str, int] = None) -> Any:
         """
-        Получение данных из кеша.
-        :param key: (int|str) ключ размещения данных в кеше.
-        :return: (any) python-объект данных из кеша.
+        Получение данных из кэша.
+        :param key: (int|str) ключ размещения данных в кэше.
+        :return: (any) python-объект данных из кэша.
         """
         # Проверка параметров
         if key is None:
@@ -83,15 +86,15 @@ class Caching:
             logging.error(self.__error_message)
             return None
 
-        # Получение данных из кеша
+        # Получение данных из кэша
         try:
             return self.__cache.get(key)
         except TypeError as e:
-            self.__error_message = "Не удалось получить данные из кеша."
+            self.__error_message = "Не удалось получить данные из кэша."
             logging.error(self.__error_message)
             return False
         except Exception as e:
-            self.__error_message = "При получении данных из кеша возникла непредвиденная ошибка."
+            self.__error_message = "При получении данных из кэша возникла непредвиденная ошибка."
             logging.error(self.__error_message)
             return False
 
@@ -103,10 +106,10 @@ class Caching:
 
     def set_cache(self, key: Union[str, int] = None, value: Any = None) -> bool:
         """
-        Размещение данных в кеш.
-        :param key: (int|str) ключ размещения данных в кеше.
+        Размещение данных в кэш.
+        :param key: (int|str) ключ размещения данных в кэше.
         :param value: (any) python-объект.
-        :return: (bool) результат кеширования.
+        :return: (bool) результат кэширования.
         """
         # Проверка параметров
         if key is None:
@@ -118,14 +121,14 @@ class Caching:
             logging.error(self.__error_message)
             return False
 
-        # Кеширование данных
+        # Кэширование данных
         try:
             return self.__cache.set(key, value, expire=self.__ttl)
         except TypeError as e:
-            self.__error_message = "Не удалось закешировать данные."
+            self.__error_message = "Не удалось закэшировать данные."
             logging.error(self.__error_message)
             return False
         except Exception as e:
-            self.__error_message = "При кешировании данных возникла непредвиденная ошибка."
+            self.__error_message = "При кэшировании данных возникла непредвиденная ошибка."
             logging.error(self.__error_message)
             return False

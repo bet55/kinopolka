@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from classes import Tools, MovieHandler
-from lists.models import AppUser
+from lists.models import User
 from lists.serializers import UserSerializer
 
 
@@ -11,7 +11,7 @@ from lists.serializers import UserSerializer
 def carousel(request):
     movies = MovieHandler.get_all_movies(all_info=False)
 
-    users = AppUser.objects.all()
+    users = User.objects.all()
     us_sr = UserSerializer(users, many=True)
 
     random_images = Tools.get_random_images()

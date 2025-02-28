@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'lists',
     'postcard',
-    'features'
+    'features',
+    'tools'
 ]
 
 MIDDLEWARE = [

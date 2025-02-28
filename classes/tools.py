@@ -1,20 +1,15 @@
-import dataclasses
-from rest_framework.decorators import api_view
-from adrf.decorators import api_view as asapi_view
-from rest_framework.response import Response
-from asgiref.sync import sync_to_async
-from classes import MovieHandler, Note
-from lists.models import AppUser
+from classes import MovieHandler, NoteHandler
+from lists.models import User
 import json
 import asyncio
-from django.shortcuts import render
-from tools.serializers import UserSerializer
 import os
 import random
 
 
 class Tools:
-
+    """
+    Вспомогательный класс для генерации ссылок на случайные изображения и старт проекта с нуля
+    """
     @classmethod
     def get_random_images(cls):
         return {'card': cls.random_card_image(), 'nav': cls.random_nav_image()}
@@ -50,7 +45,7 @@ class Tools:
         await self.save_movies_to_db()
 
     def check_project_pre_creation(self):
-        users = AppUser.objects.all()
+        users = User.objects.all()
         if len(users) > 1:
             raise Exception('В системе уже есть пользователи')
         if len(users) < 1:
@@ -67,7 +62,7 @@ class Tools:
 
         results = []
         for user in users:
-            user_model, status = await AppUser.objects.aupdate_or_create(**user)
+            user_model, status = await User.objects.aupdate_or_create(**user)
             results.append({user['username']: status})
 
         return results

@@ -1,10 +1,10 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer, ListSerializer, BaseSerializer, ReturnDict, DateTimeField
 from django.db import models
 
-from lists.models import Film, Genre, AppUser, Sticker
+from lists.models import Movie, Genre, User, Note
 
 
-class FilmListSerializer(serializers.ListSerializer):
+class MovieListSerializer(ListSerializer):
     def to_representation(self, data):
         iterable = data.all() if isinstance(data, models.manager.BaseManager) else data
 
@@ -14,16 +14,16 @@ class FilmListSerializer(serializers.ListSerializer):
 
     @property
     def data(self):
-        ret = serializers.BaseSerializer.data.fget(self)
-        return serializers.ReturnDict(ret, serializer=self)
+        ret = BaseSerializer.data.fget(self)
+        return ReturnDict(ret, serializer=self)
 
 
-class FilmSerializer(serializers.ModelSerializer):
-    premiere = serializers.DateTimeField(format="%d/%m/%Y")
+class MovieSerializer(ModelSerializer):
+    premiere = DateTimeField(format="%d/%m/%Y")
 
     class Meta:
-        list_serializer_class = FilmListSerializer
-        model = Film
+        list_serializer_class = MovieListSerializer
+        model = Movie
         fields = ['kp_id',
                   'name',
                   'poster',
@@ -35,9 +35,9 @@ class FilmSerializer(serializers.ModelSerializer):
                   ]
 
 
-class FilmSmallSerializer(serializers.ModelSerializer):
+class MovieSmallSerializer(ModelSerializer):
     class Meta:
-        model = Film
+        model = Movie
         fields = ['kp_id',
                   'poster',
                   ]
@@ -45,19 +45,19 @@ class FilmSmallSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         notes = instance.sticker_set.all()
-        representation['notes'] = StickerSerializer(notes, many=True).data
+        representation['notes'] = NoteSerializer(notes, many=True).data
         return representation
 
 
-class GenreSerializer(serializers.ModelSerializer):
+class GenreSerializer(ModelSerializer):
     class Meta:
         model = Genre
         fields = '__all__'
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(ModelSerializer):
     class Meta:
-        model = AppUser
+        model = User
         fields = ['id',
                   'username',
                   'first_name',
@@ -66,7 +66,7 @@ class UserSerializer(serializers.ModelSerializer):
                   ]
 
 
-class StickerSerializer(serializers.ModelSerializer):
+class NoteSerializer(ModelSerializer):
     class Meta:
-        model = Sticker
+        model = Note
         fields = '__all__'

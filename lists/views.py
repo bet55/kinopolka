@@ -1,16 +1,12 @@
-import asyncio
-
 from django.shortcuts import render
-from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
-from classes import KP_Movie, MovieHandler, Note, Tools
-from classes.app_user import AppUserHandler
-from lists.models import Film, Director, Genre, Actor, Writer, FilmGenreRelations, Sticker, AppUser
-from lists.serializers import FilmSerializer, FilmSmallSerializer, GenreSerializer, UserSerializer, StickerSerializer
+from classes import MovieHandler, NoteHandler, Tools, UserHandler
+from lists.models import User
+from lists.serializers import UserSerializer
 
 
 class MoviesView(APIView):
@@ -29,7 +25,7 @@ class MoviesView(APIView):
             'movies.html',
             context={
                 'movies': MovieHandler.get_all_movies(all_info=False, is_archive=is_archive),
-                'users': AppUserHandler.get_all_users(),
+                'users': UserHandler.get_all_users(),
                 'is_archive': is_archive,
                 'random': Tools.get_random_images(),
             }
@@ -74,7 +70,7 @@ class MoviesView(APIView):
 
 class MovieRatingView(APIView):
     def delete(self, request):
-        success = Note.remove_note(request.data['user'], request.data['film'])
+        success = NoteHandler.remove_note(request.data['user'], request.data['film'])
 
         return Response(
             data={
@@ -84,7 +80,7 @@ class MovieRatingView(APIView):
         )
 
     def post(self, request):
-        success = Note.create_note(request.data)
+        success = NoteHandler.create_note(request.data)
 
         return Response(
             data={
@@ -104,7 +100,7 @@ class MovieAdditionView(APIView):
             'add_movie.html',
             context={
                 'random': Tools.get_random_images(),
-                'users': AppUserHandler.get_all_users(),
+                'users': UserHandler.get_all_users(),
             }
         )
 
@@ -133,7 +129,7 @@ def view_movies(request):
         movies = mv.get_all_movies(is_archive=is_archive)
         return Response(movies)
 
-    users = AppUser.objects.all()
+    users = User.objects.all()
     us_sr = UserSerializer(users, many=True)
 
     movies = mv.get_all_movies(all_info=False, is_archive=is_archive)
@@ -159,7 +155,7 @@ def view_movie_by_id(request, kp_id):
 @api_view(['GET', 'POST'])
 def add_movie(request):
     if request.method == 'GET':
-        users = AppUser.objects.all()
+        users = User.objects.all()
         us_sr = UserSerializer(users, many=True)
 
         random_images = Tools.get_random_images()
@@ -203,10 +199,10 @@ def rate_movie(request):
         user = request.dat['user']
         film = request.data['film']
 
-        res = Note.remove_note(user, film)
+        res = NoteHandler.remove_note(user, film)
 
         return Response(data={'success': bool(res), 'error': str(res)})
 
-    note_created = Note.create_note(request.data)
+    note_created = NoteHandler.create_note(request.data)
 
     return Response(data={'success': note_created, 'error': ''})
