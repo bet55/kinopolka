@@ -7,7 +7,7 @@ from lists.models import User
 from lists.serializers import UserSerializer
 
 
-#  Добавить анимацию пересчета  цифр
+#  Добавить анимацию пересчета цифр
 # https://codepen.io/r-i-c-h/pen/BaXGZXx
 
 @api_view()

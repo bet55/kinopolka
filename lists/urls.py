@@ -1,7 +1,6 @@
 from django.urls import path
 
-from lists.views import view_movies, add_movie, view_movie_by_id, remove_movie, \
-    change_archive_status, rate_movie, MoviesView, MovieRatingView, MovieAdditionView
+from lists.views import MoviesView, MovieRatingView, MovieAdditionView
 
 urlpatterns = [
 

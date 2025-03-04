@@ -5,6 +5,10 @@ from django.db import models
 
 from lists import validators
 
+
+def default_countries():
+    return ['unknown']
+
 QUESTION_MARK_URL = 'https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp'
 
 
@@ -34,9 +38,9 @@ class Writer(Model):
     photo = models.URLField(default=QUESTION_MARK_URL)
 
 
-class FilmGenreRelations(Model):
-    film = models.ForeignKey('lists.models.Movie', on_delete=models.CASCADE)
-    genre = models.ForeignKey('lists.models.Genre', on_delete=models.CASCADE)
+class MovieGenreRelations(Model):
+    movie = models.ForeignKey('lists.Movie', on_delete=models.CASCADE)
+    genre = models.ForeignKey('lists.Genre', on_delete=models.CASCADE)
 
 
 class Genre(Model):
@@ -58,7 +62,8 @@ class Movie(Model):
     mgr = models.Manager()
     kp_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50, validators=[validators.validate_name])
-    countries = models.JSONField(default=list(('unknown',)))
+
+    countries = models.JSONField(default=default_countries)
     genres = models.ManyToManyField(Genre)
     # genres = models.ManyToManyField(Genre, through=FilmGenreRelations)
     directors = models.ManyToManyField(Director)
@@ -86,11 +91,11 @@ class Movie(Model):
 class Note(Model):
     mgr = models.Manager()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    film = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     text = models.TextField(default='И сказать нечего...')
     rating = models.IntegerField(null=False)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'film'], name='user_film_key'),
+            models.UniqueConstraint(fields=['user', 'movie'], name='user_movie_key'),
         ]

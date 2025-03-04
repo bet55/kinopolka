@@ -1,4 +1,4 @@
-from classes import MovieHandler, NoteHandler
+from classes import MovieHandler
 from lists.models import User
 import json
 import asyncio
@@ -10,34 +10,36 @@ class Tools:
     """
     Вспомогательный класс для генерации ссылок на случайные изображения и старт проекта с нуля
     """
+    IMAGES_PATH = 'static/img'
+
+    @classmethod
+    def _get_current_theme(cls):
+        return 'default'
+
     @classmethod
     def get_random_images(cls):
-        return {'card': cls.random_card_image(), 'nav': cls.random_nav_image()}
+        theme = cls._get_current_theme()
+        return {'card': cls.random_card_image(theme), 'nav': cls.random_nav_image(theme)}
 
     @classmethod
-    def random_card_image(self):
-        FOLDER = 'static/img/new_year/big_poster'
+    def random_card_image(cls, theme: str):
+        FOLDER = 'big_poster'
+        full_path = f'{cls.IMAGES_PATH}/themes/{theme}/{FOLDER}'
 
-        DEFAULT_IMG = f'/{FOLDER}/big_poster14.jpg'
-
-        file_names = os.listdir(FOLDER)
+        file_names = os.listdir(full_path)
         random_img = random.choice(file_names)
 
-        return f'/{FOLDER}/{random_img}' if random_img else DEFAULT_IMG
+        return f'/{full_path}/{random_img}'
 
     @classmethod
-    def random_nav_image(self):
-        FOLDER = 'static/img/new_year/subnavigation'
+    def random_nav_image(cls, theme: str):
+        FOLDER = 'subnavigation'
+        full_path = f'{cls.IMAGES_PATH}/themes/{theme}/{FOLDER}'
 
-        DEFAULT_IMG = f'/{FOLDER}/subnavigation12.gif'
-
-        file_names = os.listdir(FOLDER)
+        file_names = os.listdir(full_path)
         random_img = random.choice(file_names)
 
-        #  Пускай, ёлочка чаще появляется
-        random_img = random.choice([random_img, 'subnavigation12.gif'])
-
-        return f'/{FOLDER}/{random_img}' if random_img else DEFAULT_IMG
+        return f'/{full_path}/{random_img}'
 
     async def init_project(self):
         # self.check_project_pre_creation()
@@ -52,12 +54,14 @@ class Tools:
             raise Exception('Сперва создайте супер пользователя')
 
     async def create_users(self):
-        url = '/static/img/avatars/'
+        url = f'/{self.IMAGES_PATH}/avatars/'
         users = [
             {'username': 'drbloody1', 'first_name': 'Алексей', 'last_name': 'Губин', 'avatar': url + 'drbloody1.jpg'},
-            {'username': 'daenillando', 'first_name': 'Александр', 'last_name': 'Бусыгин', 'avatar': url + 'Deputant.png'},
+            {'username': 'daenillando', 'first_name': 'Александр', 'last_name': 'Бусыгин',
+             'avatar': url + 'Deputant.png'},
             {'username': 'Deputant', 'first_name': 'Никита', 'last_name': 'Шулаев', 'avatar': url + 'Deputant.jpg'},
-            {'username': 'lightthouse', 'first_name': 'Степан', 'last_name': 'Казанцев', 'avatar': url + 'lightthouse1.jpg'},
+            {'username': 'lightthouse', 'first_name': 'Степан', 'last_name': 'Казанцев',
+             'avatar': url + 'lightthouse1.jpg'},
         ]
 
         results = []

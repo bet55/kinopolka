@@ -44,7 +44,7 @@ class MovieSmallSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        notes = instance.sticker_set.all()
+        notes = instance.note_set.all()
         representation['notes'] = NoteSerializer(notes, many=True).data
         return representation
 

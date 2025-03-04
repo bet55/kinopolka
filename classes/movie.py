@@ -20,12 +20,15 @@ class MovieHandler:
 
     @classmethod
     def get_all_movies(cls, all_info: bool = True, is_archive: bool = False) -> dict | list:
-        try:
-            raw_film = Movie.mgr.filter(is_archive=is_archive)
-            serialize = MovieSerializer(raw_film, many=True) if all_info else MovieSmallSerializer(raw_film, many=True)
-            return serialize.data
-        except:
-            raise MoviesError
+        raw_film = Movie.mgr.filter(is_archive=is_archive)
+        serialize = MovieSerializer(raw_film, many=True) if all_info else MovieSmallSerializer(raw_film, many=True)
+        return serialize.data
+        # try:
+        #     raw_film = Movie.mgr.filter(is_archive=is_archive)
+        #     serialize = MovieSerializer(raw_film, many=True) if all_info else MovieSmallSerializer(raw_film, many=True)
+        #     return serialize.data
+        # except Exception as e:
+        #     raise MoviesError
 
     @classmethod
     def change_movie_status(cls, kp_id: int | str, is_archive: bool):
