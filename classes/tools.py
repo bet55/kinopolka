@@ -4,39 +4,52 @@ import json
 import asyncio
 import os
 import random
+from settings.theme_images import ImageFolders, Themes, IMAGES_PATH
+from settings.theme_calendar import CALENDAR
+from settings.application import TIMEZONE
+import pendulum
 
 
 class Tools:
     """
     Вспомогательный класс для генерации ссылок на случайные изображения и старт проекта с нуля
     """
-    IMAGES_PATH = 'static/img'
 
     @classmethod
-    def _get_current_theme(cls):
-        return 'default'
+    def _get_current_theme(cls) -> Themes:
+        """
+        Вычисляем текущую тему оформления приложения
+        """
+        current_date = pendulum.now(tz=TIMEZONE).format('DD.MM')
+        theme = CALENDAR.get(current_date, Themes.default.value)
+        return theme
 
     @classmethod
-    def get_random_images(cls):
+    def get_random_images(cls) -> dict:
+        """
+        Получаем набор путей до изображений для размещения на странице приложения
+        """
         theme = cls._get_current_theme()
-        return {'card': cls.random_card_image(theme), 'nav': cls.random_nav_image(theme)}
+
+        return {
+            'poster': cls._choose_random_image(theme, ImageFolders.poster.value),
+            'navigation': cls._choose_random_image(theme, ImageFolders.navigation.value),
+            'header': cls._choose_random_image(theme, ImageFolders.header.value),
+            'postcard': cls._choose_random_image(theme, ImageFolders.postcard.value),
+        }
 
     @classmethod
-    def random_card_image(cls, theme: str):
-        FOLDER = 'big_poster'
-        full_path = f'{cls.IMAGES_PATH}/themes/{theme}/{FOLDER}'
+    def _choose_random_image(cls, theme: Themes, folder: ImageFolders) -> str:
+        """
+        Получаем путь до случайно выбранного изображения в выбранной теме и папке
+        """
+        empty_file = f'{IMAGES_PATH}/empty.png'
+        full_path = f'{IMAGES_PATH}/themes/{theme}/{folder}'
 
         file_names = os.listdir(full_path)
-        random_img = random.choice(file_names)
+        if not file_names:
+            return empty_file
 
-        return f'/{full_path}/{random_img}'
-
-    @classmethod
-    def random_nav_image(cls, theme: str):
-        FOLDER = 'subnavigation'
-        full_path = f'{cls.IMAGES_PATH}/themes/{theme}/{FOLDER}'
-
-        file_names = os.listdir(full_path)
         random_img = random.choice(file_names)
 
         return f'/{full_path}/{random_img}'
@@ -54,7 +67,7 @@ class Tools:
             raise Exception('Сперва создайте супер пользователя')
 
     async def create_users(self):
-        url = f'/{self.IMAGES_PATH}/avatars/'
+        url = f'/{IMAGES_PATH}/avatars/'
         users = [
             {'username': 'drbloody1', 'first_name': 'Алексей', 'last_name': 'Губин', 'avatar': url + 'drbloody1.jpg'},
             {'username': 'daenillando', 'first_name': 'Александр', 'last_name': 'Бусыгин',
