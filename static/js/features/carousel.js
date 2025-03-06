@@ -1,17 +1,18 @@
 import {addToCart} from "../based_layout/movies_cart.js";
 import {fetchMovies} from "../movie/fetching.js";
+import {formatTime} from "../utils/format_time.js";
 
 const carousel = document.querySelector('#carousel');
 let posters = document.querySelectorAll('.poster');
 const start = document.querySelector('#start button');
 const result = document.querySelector('#result');
+const resultDuration = document.querySelector('#duration b');
 const arrow = document.querySelector('.arrow');
 
 const posterWidth = posters[0].clientWidth;
 const borderWidth = Number(getComputedStyle(posters[0]).borderTopWidth.slice(0, -2)) * 2; // слева + справа
 const containerWidth = posterWidth + borderWidth;
 
-console.log(borderWidth, 'border')
 
 let offset = posters.length * containerWidth;
 let frames = 2; // сколько прокруток до сокрытия постера
@@ -34,7 +35,7 @@ let sleepTime = 500;
 function randomTicksCount(postersCount) {
     const min = postersCount * 0.8;
     const max = postersCount * 2.2;
-    console.log(min, max)
+
     const randomInt = Math.floor(Math.random() * (max - min) + min);
 
     return randomInt;
@@ -52,6 +53,17 @@ function addWinPoster(movieId, src) {
     resultPoster.src = src;
     resultPoster.classList.add('win-poster');
     result.appendChild(resultPoster);
+
+    // Обновляем общую длительность всех выпавших фильмов
+    const prevDuration = resultDuration.textContent
+    if (!prevDuration) {
+        resultDuration.textContent = formatTime(allMovies[movieId]['duration']);
+    } else {
+        let [hours, , mins] = prevDuration.split(' ');
+        mins = parseInt(hours) * 60  + parseInt(mins) + allMovies[movieId]['duration'];
+        resultDuration.textContent = formatTime(mins);
+    }
+
 
     // Добавление в корзину
     resultPoster.addEventListener('click', e => {
@@ -95,7 +107,6 @@ const roll = async () => {
     // Сколько круток будет
     const ticksCount = randomTicksCount(posters.length);
 
-    console.log(posters.length, ticksCount, delta)
 
     // Отключаем кнопку старта
     toggleButtons();

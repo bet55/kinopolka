@@ -136,7 +136,7 @@
     span {
         display: block;
         margin-bottom: 1em;
-        border-bottom: 2px solid black;
+        /*border-bottom: 2px solid black;*/
 
         overflow: hidden;
         text-overflow: ellipsis;

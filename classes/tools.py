@@ -43,7 +43,7 @@ class Tools:
         """
         Получаем путь до случайно выбранного изображения в выбранной теме и папке
         """
-        empty_file = f'{IMAGES_PATH}/empty.png'
+        empty_file = f'/{IMAGES_PATH}/empty.png'
         full_path = f'{IMAGES_PATH}/themes/{theme}/{folder}'
 
         file_names = os.listdir(full_path)
