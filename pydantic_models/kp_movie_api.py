@@ -1,9 +1,6 @@
-import json
 
 from pydantic import BaseModel, Field, field_serializer, AliasPath, AliasChoices
-from typing import List, Optional, Dict, Any
-import pendulum
-from icecream import ic
+from typing import List, Optional, Dict
 
 n_url = 'https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp'
 

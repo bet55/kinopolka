@@ -5,7 +5,6 @@ from classes import MovieHandler, NoteHandler, Tools
 from lists.models import User
 import json
 import asyncio
-from django.shortcuts import render
 from tools.serializers import UserSerializer
 
 

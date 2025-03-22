@@ -1,4 +1,3 @@
-import pendulum
 from django.contrib.auth.models import User as UserModel
 from django.db.models import Model
 from django.db import models

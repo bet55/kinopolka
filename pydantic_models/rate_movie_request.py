@@ -1,7 +1,4 @@
-from pydantic import BaseModel, Field, field_serializer, AliasPath, AliasChoices
-from typing import List, Optional, Dict, Any
-import pendulum
-from icecream import ic
+from pydantic import BaseModel
 
 
 class RateMovieRequestModel(BaseModel):

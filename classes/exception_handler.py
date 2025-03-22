@@ -1,6 +1,5 @@
 from rest_framework.views import exception_handler
 
-from classes.exceptions import MoviesError
 
 
 def custom_exception_handler(exception, context):

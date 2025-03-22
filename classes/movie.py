@@ -1,4 +1,3 @@
-from classes.exceptions import MoviesError
 from classes.kp import KP_Movie
 from lists.models import Movie, Actor, Director, Writer, Genre
 from lists.serializers import MovieSerializer, MovieSmallSerializer

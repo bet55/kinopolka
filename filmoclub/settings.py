@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-moq19!=-t5w#&p!h4aw=b
 DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,185.80.91.29').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '0.0.0.0;127.0.0.1;localhost;185.80.91.29').split(';')
 
 
 # Application definition

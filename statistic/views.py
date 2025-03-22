@@ -1,7 +1,6 @@
 from rest_framework.decorators import api_view
 from django.shortcuts import render
 from classes import Statistic, Tools
-from rest_framework.response import Response
 
 from lists.models import User
 from lists.serializers import UserSerializer

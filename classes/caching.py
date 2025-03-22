@@ -89,11 +89,11 @@ class Caching:
         # Получение данных из кэша
         try:
             return self.__cache.get(key)
-        except TypeError as e:
+        except TypeError:
             self.__error_message = "Не удалось получить данные из кэша."
             logging.error(self.__error_message)
             return False
-        except Exception as e:
+        except Exception:
             self.__error_message = "При получении данных из кэша возникла непредвиденная ошибка."
             logging.error(self.__error_message)
             return False
@@ -124,11 +124,11 @@ class Caching:
         # Кэширование данных
         try:
             return self.__cache.set(key, value, expire=self.__ttl)
-        except TypeError as e:
+        except TypeError:
             self.__error_message = "Не удалось закэшировать данные."
             logging.error(self.__error_message)
             return False
-        except Exception as e:
+        except Exception:
             self.__error_message = "При кэшировании данных возникла непредвиденная ошибка."
             logging.error(self.__error_message)
             return False

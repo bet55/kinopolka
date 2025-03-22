@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from rest_framework.renderers import HTMLFormRenderer
 from rest_framework.request import Request
 from rest_framework.response import Response
 
