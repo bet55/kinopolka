@@ -1,23 +1,37 @@
 // Функция для создания скриншота элементов страницы
 // Используется для создания снимков открыток и их рассылки/архивации
 
+// meeting date
+// movies
+// background picture
 
-async function sendToServer(blob) {
-    const formData = new FormData();
-    formData.append('screenshot', blob, 'screenshot.png'); // 'screenshot' is the field name
+async function sendToServer(picture, posters, meeting_date, screenName) {
 
-    const response = await fetch('https://your-server.com/upload', {
-        method: 'POST',
-        body: formData,
-    });
+    const url = "http://0.0.0.0:8000/test_postcard"
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
 
-    if (!response.ok) {
-        throw new Error('Failed to send screenshot to server');
-    }
+    const formdata = new FormData();
+    formdata.append("meeting_date", meeting_date);
+    formdata.append("background_picture", picture, screenName);
+    posters.forEach(p => formdata.append("movies", p));
 
-    const result = await response.json();
-    console.log('Server response:', result);
+    console.log(posters)
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+    };
+
+
+    fetch(url, requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.error(error));
 }
+
 
 async function clientUpload(container, screenName) {
     const dataUrl = await modernScreenshot.domToPng(container);
@@ -28,16 +42,16 @@ async function clientUpload(container, screenName) {
     return dataUrl
 }
 
-async function serverUpload(container) {
+async function serverUpload(container, posters, meeting_date, screenName) {
     const blob = await modernScreenshot.domToBlob(container);
-    console.log('Blob created:', blob);
+    await sendToServer(blob, posters, meeting_date, screenName)
 }
 
-async function modernShot(container, direction = '', screenName = 'screenshot.png') {
+async function modernShot(container, posters, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
     try {
 
         if (direction === 'server') {
-            return await serverUpload(container, screenName)
+            return await serverUpload(container, posters, meeting_date, screenName)
         } else {
             return await clientUpload(container, screenName)
         }
