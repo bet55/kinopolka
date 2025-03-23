@@ -38,5 +38,3 @@ THEMES_RANGES = {
     '29.12-11.01': Themes.new_year.value,
     '31.10-31.10': Themes.halloween.value,
 }
-
-

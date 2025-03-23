@@ -5,6 +5,7 @@
 
 #postcard {
     height: 100%;
+    width: 100%
 }
 
 
@@ -18,8 +19,8 @@
 
 .poster-container {
     position: absolute;
-    height: 16em;
-    width: 12em;
+    height: 14em;
+    width: 10em;
 
     display: flex;
     justify-content: center;
@@ -45,9 +46,9 @@
 .poster {
     position: absolute;
     top: 0.8em;
-    left: 0.9em;
-    height: 90%;
-    width: 85%;
+    left: 0.8em;
+    height: 89%;
+    width: 84%;
 
     &:hover {
         filter: hue-rotate(180deg);
@@ -80,13 +81,13 @@
 }
 
 .poster-container:nth-child(3) {
-    top: 53%;
+    top: 51%;
     left: 6%;
     transform: rotate(-7deg);
 }
 
 .poster-container:nth-child(4) {
-    top: 53%;
+    top: 51%;
     left: 31%;
     transform: rotate(4deg);
 }
@@ -125,17 +126,17 @@
 /* Текстовое описание приглашения */
 #invitation {
     position: absolute;
-    height: 50%;
-    width: 50%;
-    top: 38%;
-    left: 58%;
+    height: 49%;
+    width: 47%;
+    top: 39%;
+    left: 52%;
     font-size: 1.8em;
     font-weight: bold;
 
 
     span {
         display: block;
-        margin-bottom: 1em;
+        margin-bottom: 0.9em;
         /*border-bottom: 2px solid black;*/
 
         overflow: hidden;
@@ -145,27 +146,27 @@
 
     }
 
-    @media (min-height: 1080px) {
-        left: 65%;
-    }
+    /*@media (min-height: 1080px) {*/
+    /*    left: 65%;*/
+    /*}*/
 
-    @media (min-height: 1200px) {
-        width: 51%;
-        left: 54%;
-        font-size: 2.4em;
-    }
+    /*@media (min-height: 1200px) {*/
+    /*    width: 51%;*/
+    /*    left: 54%;*/
+    /*    font-size: 2.4em;*/
+    /*}*/
 
 
-    @media (min-height: 1440px) {
-        width: 60%;
-        left: 62%;
-        font-size: 2.6em;
+    /*@media (min-height: 1440px) {*/
+    /*    width: 60%;*/
+    /*    left: 62%;*/
+    /*    font-size: 2.6em;*/
 
-    }
+    /*}*/
 
-    @media (min-height: 2160px) {
-        font-size: 4em;
+    /*@media (min-height: 2160px) {*/
+    /*    font-size: 4em;*/
 
-    }
+    /*}*/
 
 }
