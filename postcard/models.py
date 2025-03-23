@@ -8,4 +8,5 @@ class Postcard(models.Model):
     movies = models.ManyToManyField(Movie)
     created_at = models.DateTimeField(default=pendulum.now('Asia/Yekaterinburg').to_date_string())
     #TODO: think about 1 active card at a time
-    #is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+    background_picture = models.ImageField(upload_to='media/postcards/', null=True)

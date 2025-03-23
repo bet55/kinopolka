@@ -5,10 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from classes import Tools
+from classes.postcard import PostcardHandler
 from lists.models import User
 from lists.serializers import UserSerializer
-from postcard.models import Postcard
-from postcard.serializers import PostcardSerializer
 
 
 @api_view(['GET'])
@@ -21,29 +20,27 @@ def view_postcard(request):
 
 class PostCardViewSet(APIView):
     def get(self, request):
-        postcard = Postcard.objects.get(pk=request.data['id'])
-        serializer = PostcardSerializer(postcard)
-        return Response(serializer.data)
+        postcard = PostcardHandler.get_postcard(request.data['id'])
+        if postcard:
+            return Response(data=postcard, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
-        serializer = PostcardSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        postcard, success = PostcardHandler.create_postcard(request.data)
+        if success:
+            return Response(data=postcard, status=status.HTTP_201_CREATED)
+        return Response(data=postcard, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request):
-        postcard = Postcard.objects.get(pk=request.data['id'])
-        serializer = PostcardSerializer(postcard, data=request.data)
-        if serializer.is_valid():
-            serializer.update(postcard, serializer.validated_data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        updated_postcard, success = PostcardHandler.update_postcard(request.data)
+        if success:
+            return Response(data=updated_postcard, status=status.HTTP_200_OK)
+        if updated_postcard:
+            return Response(data=updated_postcard, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request):
-        try:
-            postcard = Postcard.objects.get(pk=request.data['id'])
-            postcard.delete()
+        result = PostcardHandler.delete_postcard(request.data['id'])
+        if result:
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except Postcard.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_404_NOT_FOUND)

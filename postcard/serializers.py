@@ -9,11 +9,16 @@ class PostcardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Postcard
-        fields = '__all__'
+        fields = ['meeting_date',
+                  'movies',
+                  'is_active',
+                  'background_picture',
+                  ]
 
     def create(self, validated_data):
         postcard = Postcard(
             meeting_date=validated_data['meeting_date'],
+            background_picture=validated_data['background_picture'],
         )
         postcard.save()
         postcard.movies.set(validated_data['movies'])
