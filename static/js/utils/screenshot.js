@@ -10,7 +10,7 @@ async function sendToServer(picture, posters, meeting_date, screenName) {
     const date = new Date();
     const timestampScreenName = screenName.replace('.', date.getTime() + '.')
 
-    const url = document.baseURI.split('/', 3).join('/') + '/test_postcard';
+    const url = document.baseURI.split('/', 3).join('/');
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
 

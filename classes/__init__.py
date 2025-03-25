@@ -5,3 +5,4 @@ from .movie import MovieHandler
 from .note import NoteHandler
 from .statistic import Statistic
 from .tools import Tools
+from .postcard import PostcardHandler

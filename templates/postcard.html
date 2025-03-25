@@ -17,15 +17,20 @@
 {% block center-content %}
 
     <div id="postcard-container">
-        <img id="postcard" src="{{ random.postcard }}" alt="">
+
+        <img id="postcard" src="{{ postcard }}" alt="default">
 
         <div id="posters">
         </div>
 
-        <div id="invitation">
-            <span id="invitation-title" contentEditable="true" spellcheck="false">Скоро ...</span>
-            <span>&nbsp</span>
-        </div>
+        {% if not is_active %}
+            <div id="invitation">
+                <span id="invitation-title" contentEditable="true" spellcheck="false">Скоро ...</span>
+                <span>&nbsp</span>
+            </div>
+
+        {% endif %}
+
 
     </div>
 
