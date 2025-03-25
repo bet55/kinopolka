@@ -69,8 +69,7 @@ const savePostcard = async () => {
             const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
             await screenshot(postcard, posters_ids, title.innerText);
 
-            // Перезагружаем страницу
-            window.location.reload();
+
         }
     })
 

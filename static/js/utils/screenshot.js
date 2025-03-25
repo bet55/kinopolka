@@ -32,7 +32,12 @@ async function sendToServer(picture, posters, meeting_date, screenName) {
 
     fetch(url, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => {
+            console.log(result)
+
+            // Перезагружаем страницу
+            window.location.reload();
+        })
         .catch((error) => console.error(error));
 }
 

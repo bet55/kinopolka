@@ -6,6 +6,54 @@ from rest_framework.request import Request
 from rest_framework import status
 
 from classes import Tools, UserHandler, PostcardHandler
+import pendulum
+
+@api_view(['GET'])
+def send_email( request: Request):
+    import os
+    from email.mime.image import MIMEImage
+
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    from django.utils.html import strip_tags
+
+    postcard, is_active = PostcardHandler.get_postcard()
+    date = postcard.meeting_date
+
+
+    html_content = render_to_string('email.html', {
+        'postcard': postcard.background_picture.url, 'date': date
+    })
+
+    # return render(request, 'email.html', context={
+    #     'postcard': postcard.background_picture.url, 'date': date
+    # })
+    text_content = strip_tags(html_content)  # Текстовая версия
+
+    # Создание письма
+    email = EmailMultiAlternatives(
+        subject="Ваша персональная открытка",
+        body=text_content,
+        from_email=None,  # Использует DEFAULT_FROM_EMAIL
+        to=['darkpolarbear42@gmail.com', '9261881@gmail.com'],
+    )
+    email.attach_alternative(html_content, "text/html")
+
+    # Прикрепляем изображение (если нужно вложение)
+    email.attach_file(postcard.background_picture.path)
+
+    # Добавляем изображение как inline-вложение
+    if postcard.background_picture:
+        with open(postcard.background_picture.path, 'rb') as img:
+            mime_img = MIMEImage(img.read())
+            mime_img.add_header('Content-ID', '<postcard>')
+            mime_img.add_header('Content-Disposition', 'inline')
+            email.attach(mime_img)
+
+    email.send()
+
+    return Response(data={'Email отправлен'}, status=status.HTTP_200_OK)
+
 
 
 class PostCardViewSet(APIView):
@@ -28,6 +76,7 @@ class PostCardViewSet(APIView):
 
     def post(self, request: Request):
         postcard, success = PostcardHandler.create_postcard(request.data)
+        print(postcard)
         if success:
             return Response(data=postcard, status=status.HTTP_201_CREATED)
         return Response(data=postcard, status=status.HTTP_400_BAD_REQUEST)
