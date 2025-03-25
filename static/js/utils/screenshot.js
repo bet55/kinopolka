@@ -10,7 +10,8 @@ async function sendToServer(picture, posters, meeting_date, screenName) {
     const date = new Date();
     const timestampScreenName = screenName + date.getTime()
 
-    const url = "http://185.80.91.29:8000//test_postcard"
+    const url = "http://0.0.0.0:8000/test_postcard"
+    // const url = "http://185.80.91.29:8000/test_postcard"
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
 
@@ -26,6 +27,8 @@ async function sendToServer(picture, posters, meeting_date, screenName) {
         body: formdata,
         redirect: "follow"
     };
+
+    console.log('Отправляем открытку ...')
 
 
     fetch(url, requestOptions)
@@ -49,7 +52,7 @@ async function serverUpload(container, posters, meeting_date, screenName) {
     await sendToServer(blob, posters, meeting_date, screenName)
 }
 
-async function modernShot(container, posters, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
+async function screenshot(container, posters, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
     try {
 
         if (direction === 'server') {
@@ -64,4 +67,4 @@ async function modernShot(container, posters, meeting_date = '2001-09-11', scree
     }
 }
 
-export {modernShot}
+export {screenshot}

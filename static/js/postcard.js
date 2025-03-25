@@ -1,6 +1,6 @@
 import {cartHandler} from "./postcard/movies_cart.js";
 import {createToast} from "./utils/create_toast.js";
-import {modernShot} from "./utils/screenshot.js";
+import {screenshot} from "./utils/screenshot.js";
 
 
 const savePostcard = async () => {
@@ -17,7 +17,7 @@ const savePostcard = async () => {
             const posters = document.querySelectorAll('.poster');
             title.contentEditable = false;
             const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
-            await modernShot(postcard, posters_ids, title.innerText);
+            await screenshot(postcard, posters_ids, title.innerText);
         }
     })
 
