@@ -57,11 +57,17 @@
     @media (min-width: 2500px) {
         top: 1.1em;
         left: 1.3em;
+
+        height: 90%;
+        width: 85%;
     }
 
     @media (min-width: 3000px) {
         top: 1.7em;
         left: 1.7em;
+
+        height: 90%;
+        width: 86%;
     }
 }
 
@@ -157,16 +163,14 @@
     /*}*/
 
 
-    /*@media (min-height: 1440px) {*/
-    /*    width: 60%;*/
-    /*    left: 62%;*/
-    /*    font-size: 2.6em;*/
+    @media (min-height: 1340px) {
+        font-size: 2.8em;
 
-    /*}*/
+    }
 
-    /*@media (min-height: 2160px) {*/
-    /*    font-size: 4em;*/
+    @media (min-height: 2160px) {
+        font-size: 4em;
 
-    /*}*/
+    }
 
 }
