@@ -8,10 +8,9 @@
 async function sendToServer(picture, posters, meeting_date, screenName) {
     // добавляем временную метку, чтобы в папке были файлы с разными названиями
     const date = new Date();
-    const timestampScreenName = screenName + date.getTime()
+    const timestampScreenName = screenName.replace('.', date.getTime() + '.')
 
-    const url = "http://0.0.0.0:8000/test_postcard"
-    // const url = "http://185.80.91.29:8000/test_postcard"
+    const url = document.baseURI.split('/', 3).join('/') + '/test_postcard';
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
 
