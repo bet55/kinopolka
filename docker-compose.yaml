@@ -8,8 +8,8 @@ services:
       uv venv &&
       source .venv/bin/activate &&
       uv sync &&
-      python manage.py makemigrations &&
-      python manage.py migrate &&
+      uv run manage.py makemigrations &&
+      uv run manage.py migrate &&
       sh start.sh"
     volumes:
       - .:/app

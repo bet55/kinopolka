@@ -54,7 +54,7 @@ const rateRequest = async (movieId, userId, rating, comment) => {
     const rateUrl = '/movies/rate';
     const sendData = {
         user: userId,
-        film: movieId,
+        movie: movieId,
         rating: rating,
     }
 

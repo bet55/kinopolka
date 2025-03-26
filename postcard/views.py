@@ -54,33 +54,6 @@ def send_email( request: Request):
 
     return Response(data={'Email отправлен'}, status=status.HTTP_200_OK)
 
-
-
-@api_view(['GET'])
-def send_postcard(request):
-    active_postcard = PostcardHandler.get_active_postcard()
-    screenshot = active_postcard.background_picture
-    subject = 'Киноклуб уже скоро!'
-    body = 'Приглашаем вас на очередное заседание киноклуба!'
-    email = EmailMessage(
-        subject,
-        body,
-        '9261881@gmail.com',
-        [
-                  '9261881@gmail.com',
-                  'stepanda96@yandex.ru'
-        ],
-    )
-    with screenshot.open("rb") as image_file:
-        email.attach(
-            filename=screenshot.name,
-            content=image_file.read(),
-            mimetype="image/jpg"
-        )
-    email.send()
-    return Response(status=status.HTTP_200_OK)
-
-
 class PostCardViewSet(APIView):
     def get(self, request: Request):
         users = UserHandler.get_all_users()
@@ -88,8 +61,6 @@ class PostCardViewSet(APIView):
         postcard, is_active = PostcardHandler.get_postcard()
 
         postcard = postcard.background_picture.url if is_active else random_images.get('postcard')
-
-        print(postcard, is_active)
 
         context = {
             'postcard': postcard,
