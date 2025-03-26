@@ -131,6 +131,15 @@ STATIC_URL = 'static/'
 MEDIA_ROOT = ''
 MEDIA_URL = ''
 
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # SMTP server for Gmail
+EMAIL_PORT = 587  # Port for TLS
+EMAIL_USE_TLS = True  # Use TLS for secure connection
+EMAIL_HOST_USER = '9261881@gmail.com'  # Your email address
+EMAIL_HOST_PASSWORD = 'lgdx ikqm vvpg etlf'  # Your email password or app-specific password
+
 STATICFILES_DIRS = [
    os.path.join(BASE_DIR, "static"),
 ]

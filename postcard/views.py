@@ -1,3 +1,5 @@
+from django.core.mail import EmailMessage
+
 from adrf.views import APIView
 from rest_framework.decorators import api_view
 from django.shortcuts import render
@@ -8,6 +10,7 @@ from classes import Tools
 from classes.postcard import PostcardHandler
 from lists.models import User
 from lists.serializers import UserSerializer
+from django.core.mail import send_mail
 
 
 @api_view(['GET'])
@@ -16,6 +19,31 @@ def view_postcard(request):
     us_sr = UserSerializer(users, many=True)
     random_images = Tools.get_random_images()
     return render(request, 'postcard.html', context={'random': random_images, 'users': us_sr.data})
+
+
+@api_view(['GET'])
+def send_postcard(request):
+    active_postcard = PostcardHandler.get_active_postcard()
+    screenshot = active_postcard.background_picture
+    subject = 'Киноклуб уже скоро!'
+    body = 'Приглашаем вас на очередное заседание киноклуба!'
+    email = EmailMessage(
+        subject,
+        body,
+        '9261881@gmail.com',
+        [
+                  '9261881@gmail.com',
+                  'stepanda96@yandex.ru'
+        ],
+    )
+    with screenshot.open("rb") as image_file:
+        email.attach(
+            filename=screenshot.name,
+            content=image_file.read(),
+            mimetype="image/jpg"
+        )
+    email.send()
+    return Response(status=status.HTTP_200_OK)
 
 
 class PostCardViewSet(APIView):

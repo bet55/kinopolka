@@ -1,3 +1,4 @@
+from classes.exceptions import TooManyActivePostcardsError
 from postcard.models import Postcard
 from postcard.serializers import PostcardSerializer
 
@@ -10,6 +11,12 @@ class PostcardHandler:
     def create_postcard(cls, postcard_data: dict) -> (dict, bool):
         serializer = PostcardSerializer(data=postcard_data)
         if serializer.is_valid():
+
+            #при создании новой карточки все существующие становятся неактивными
+            active_postcards = Postcard.objects.filter(is_active=True)
+            for active_postcard in active_postcards:
+                cls._deactivate_postcard(active_postcard)
+
             serializer.save()
             return serializer.data, True
         return serializer.errors, False
@@ -49,12 +56,18 @@ class PostcardHandler:
             return None
         return postcard.delete()
 
-    @classmethod
-    def deactivate_postcard(cls, postcard_id: int) -> bool:
+    @staticmethod
+    def _deactivate_postcard(postcard) -> bool:
+        postcard.is_active = False
         try:
-            postcard = Postcard.objects.get(id=postcard_id)
+            postcard.save()
         except Postcard.DoesNotExist:
             return False
-        postcard.is_active = False
-        postcard.save()
         return True
+
+    @staticmethod
+    def get_active_postcard() -> Postcard:
+        active_postcards = Postcard.objects.filter(is_active=True)
+        if len(active_postcards) != 1:
+            raise TooManyActivePostcardsError
+        return active_postcards[0]
