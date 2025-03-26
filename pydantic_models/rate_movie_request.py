@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class RateMovieRequestModel(BaseModel):
-    film: int
+    movie: int
     user: int
     rating: int
     text: str = ''

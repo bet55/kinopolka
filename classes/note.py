@@ -29,20 +29,17 @@ class NoteHandler:
         modeling = RateMovieRequestModel(**note_body)
         formated_request = modeling.model_dump(exclude_none=True, exclude_defaults=True, exclude_unset=True)
 
-        # formated_request['user'] = AppUser.objects.get(id=formated_request['user'])
-        # formated_request['film'] = Film.mgr.get(kp_id=formated_request['film'])
-
         user = User.objects.get(id=formated_request['user'])
-        film = Movie.mgr.get(kp_id=formated_request['film'])
+        film = Movie.mgr.get(kp_id=formated_request['movie'])
         rating = formated_request['rating']
 
         # Todo Хак, нужно переписать на create_or_update
-        sticky_model = [Note(user=user, film=film, rating=rating)]
+        sticky_model = [Note(user=user, movie=film, rating=rating)]
 
         res = Note.mgr.bulk_create(sticky_model,
                                           update_conflicts=True,
                                           update_fields=['rating', 'text'],
-                                          unique_fields=['film', 'user'])
+                                          unique_fields=['movie', 'user'])
         return True
 
     @classmethod
