@@ -32,6 +32,6 @@ http://185.80.91.29:8000/
 [kinopoisk](https://www.kinopoisk.ru/mykp/folders/4583/?format=posters&limit=50)  
 [kinopoisk api](https://api.kinopoisk.dev/documentation#/)
 
-Использованы изображения со следующих сайтов:
-https://www.flaticon.com
-https://www.pngwing.com
+Использованы изображения со следующих сайтов:  
+https://www.flaticon.com  
+https://www.pngwing.com  

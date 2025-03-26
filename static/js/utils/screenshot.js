@@ -1,9 +1,8 @@
+import {createToast} from "./create_toast.js";
+
 // Функция для создания скриншота элементов страницы
 // Используется для создания снимков открыток и их рассылки/архивации
 
-// meeting date
-// movies
-// background picture
 
 async function sendToServer(picture, posters, meeting_date, screenName) {
     // добавляем временную метку, чтобы в папке были файлы с разными названиями
@@ -27,18 +26,30 @@ async function sendToServer(picture, posters, meeting_date, screenName) {
         redirect: "follow"
     };
 
-    console.log('Отправляем открытку ...')
-
 
     fetch(url, requestOptions)
-        .then((response) => response.text())
+        .then((response) => {
+
+            if (!response.ok) {
+                throw Error(`${response.status}: ${response.statusText}`);
+            }
+            return response.text()
+        })
         .then((result) => {
-            console.log(result)
+
+            createToast('Открытка успешно сохранена', 'success')
 
             // Перезагружаем страницу
-            window.location.reload();
+            setTimeout(() => window.location.reload(), 1000)
+
         })
-        .catch((error) => console.error(error));
+        .catch((error) => {
+
+            console.error(error);
+            createToast('Открытка не сохранена', 'error')
+        });
+
+
 }
 
 

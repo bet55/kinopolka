@@ -7,11 +7,17 @@ function sendPostcard() {
     const sendButton = document.querySelector('#postcard-send-button');
 
     if (!sendButton) {
-        return false
+        return null;
     }
 
     sendButton.addEventListener('click', () => {
-        console.log('send email')
+        sendButton.classList.add('active_option')
+
+        createToast('Отправка email пока не работает', 'info');
+
+        setTimeout(() => sendButton.classList.remove('active_option'), 1000)
+
+
     })
 }
 
@@ -19,10 +25,12 @@ function createPostcard() {
     const createButton = document.querySelector('#postcard-create-button');
 
     if (!createButton) {
-        return false
+        return null;
     }
 
     createButton.addEventListener('click', () => {
+        createButton.classList.add('active_option')
+
         const url = document.baseURI.split('/', 3).join('/');
 
         const requestOptions = {
@@ -30,18 +38,30 @@ function createPostcard() {
             redirect: "follow"
         };
 
-        console.log('Создаём открытку ...')
-
 
         fetch(url, requestOptions)
-            .then((response) => response.text())
+            .then((response) => {
+                if (!response.ok) {
+                    throw Error(`${response.status}: ${response.text()}`);
+                }
+                return response.text()
+            })
             .then((result) => {
-                console.log(result)
+
+                createToast('Открытка заархивирована', 'success');
+                createButton.classList.remove('active_option')
 
                 // Перезагружаем страницу
-                window.location.reload();
+                setTimeout(() => window.location.reload(), 1000)
+
             })
-            .catch((error) => console.error(error));
+            .catch((error) => {
+
+                console.error(error);
+                createToast('Открытка не заархивирована', 'error');
+                createButton.classList.remove('active_option')
+            });
+
 
     })
 
@@ -55,22 +75,30 @@ const savePostcard = async () => {
     const title = document.querySelector('#invitation-title');
 
     if (!saveButton) {
-        return false
+        return null;
     }
 
 
     saveButton.addEventListener('click', async e => {
 
-        if (title.innerText.replace(/\D/g, '').length < 1) {
-            createToast('Введите дату церемонии', 'error')
-        } else {
-            const posters = document.querySelectorAll('.poster');
-            title.contentEditable = false;
-            const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
-            await screenshot(postcard, posters_ids, title.innerText);
+        const postcardFilled = (title.innerText.replace(/\D/g, '').length) && document.querySelector('.poster');
 
-
+        if (!postcardFilled) {
+            createToast('Заполните открытку', 'error')
+            return null;
         }
+
+        saveButton.classList.add('active_option')
+
+        title.contentEditable = false;
+        const posters = document.querySelectorAll('.poster');
+        const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
+        await screenshot(postcard, posters_ids);
+        // await screenshot(postcard, posters_ids, title.innerText); Добавим, когда изменим модель
+
+        saveButton.classList.remove('active_option')
+
+
     })
 
 
