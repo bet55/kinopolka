@@ -14,9 +14,33 @@ function sendPostcard() {
     sendButton.addEventListener('click', () => {
         sendButton.classList.add('active_option')
 
-        createToast('Отправка email пока не работает', 'info');
+        const url = document.baseURI.split('/', 3).join('/') + '/email/';
 
-        setTimeout(() => sendButton.classList.remove('active_option'), 1000)
+        const requestOptions = {
+            method: "POST",
+            redirect: "follow"
+        };
+
+        fetch(url, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    throw Error(`${response.status}: ${response.text()}`);
+                }
+                return response.text()
+            })
+            .then((result) => {
+
+                createToast('Открытка отправлена', 'success');
+                sendButton.classList.remove('active_option')
+
+
+            })
+            .catch((error) => {
+
+                console.error(error);
+                createToast('Открытка не отправлена', 'error');
+                sendButton.classList.remove('active_option')
+            });
 
 
     })
@@ -32,7 +56,7 @@ function createPostcard() {
     createButton.addEventListener('click', () => {
         createButton.classList.add('active_option')
 
-        const url = document.baseURI.split('/', 3).join('/');
+        const url = document.baseURI.split('/', 3).join('/') + '/';
 
         const requestOptions = {
             method: "PUT",
@@ -79,9 +103,8 @@ const savePostcard = async () => {
         return null;
     }
 
-    // Времянка, пока не доделаем модели
+    // Предположение, что будет в следующую субботу
     title.innerText = getNextSaturday('text');
-    title.contentEditable = false;
 
     saveButton.addEventListener('click', async e => {
 
@@ -97,7 +120,7 @@ const savePostcard = async () => {
         title.contentEditable = false;
         const posters = document.querySelectorAll('.poster');
         const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
-        await screenshot(postcard, posters_ids, getNextSaturday('iso'));
+        await screenshot(postcard, posters_ids, title.innerText, getNextSaturday('iso'));
 
         saveButton.classList.remove('active_option')
 

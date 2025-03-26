@@ -4,18 +4,19 @@ import {createToast} from "./create_toast.js";
 // Используется для создания снимков открыток и их рассылки/архивации
 
 
-async function sendToServer(picture, posters, meeting_date, screenName) {
+async function sendToServer(picture, posters, title, meeting_date, screenName) {
     // добавляем временную метку, чтобы в папке были файлы с разными названиями
     const date = new Date();
     const timestampScreenName = screenName.replace('.', date.getTime() + '.')
 
-    const url = document.baseURI.split('/', 3).join('/');
+    const url = document.baseURI.split('/', 3).join('/') + '/';
     const myHeaders = new Headers();
     myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
 
     const formdata = new FormData();
+    formdata.append("title", title);
     formdata.append("meeting_date", meeting_date);
-    formdata.append("background_picture", picture, timestampScreenName);
+    formdata.append("screenshot", picture, timestampScreenName);
     posters.forEach(p => formdata.append("movies", p));
 
 
@@ -62,16 +63,16 @@ async function clientUpload(container, screenName) {
     return dataUrl
 }
 
-async function serverUpload(container, posters, meeting_date, screenName) {
+async function serverUpload(container, posters, title, meeting_date, screenName) {
     const blob = await modernScreenshot.domToBlob(container);
-    await sendToServer(blob, posters, meeting_date, screenName)
+    await sendToServer(blob, posters, title, meeting_date, screenName)
 }
 
-async function screenshot(container, posters, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
+async function screenshot(container, posters, title, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
     try {
 
         if (direction === 'server') {
-            return await serverUpload(container, posters, meeting_date, screenName)
+            return await serverUpload(container, posters, title, meeting_date, screenName)
         } else {
             return await clientUpload(container, screenName)
         }

@@ -1,33 +1,30 @@
 from adrf.views import APIView
 from rest_framework.decorators import api_view
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 
 from classes import Tools, UserHandler, PostcardHandler
-import pendulum
+from email.mime.image import MIMEImage
 
-@api_view(['GET'])
-def send_email( request: Request):
-    import os
-    from email.mime.image import MIMEImage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
-    from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
-    from django.utils.html import strip_tags
+
+@api_view(['POST'])
+def send_email(request: Request):
+    users = UserHandler.get_all_users()
+    emails = [user.get('email') for user in users]
 
     postcard, is_active = PostcardHandler.get_postcard()
     date = postcard.meeting_date
 
-
     html_content = render_to_string('email.html', {
-        'postcard': postcard.background_picture.url, 'date': date
+        'postcard': postcard.screenshot.url, 'date': date
     })
 
-    # return render(request, 'email.html', context={
-    #     'postcard': postcard.background_picture.url, 'date': date
-    # })
     text_content = strip_tags(html_content)  # Текстовая версия
 
     # Создание письма
@@ -35,16 +32,16 @@ def send_email( request: Request):
         subject="Ваша персональная открытка",
         body=text_content,
         from_email=None,  # Использует DEFAULT_FROM_EMAIL
-        to=['darkpolarbear42@gmail.com', '9261881@gmail.com'],
+        to=emails,
     )
     email.attach_alternative(html_content, "text/html")
 
     # Прикрепляем изображение (если нужно вложение)
-    email.attach_file(postcard.background_picture.path)
+    # email.attach_file(postcard.background_picture.path)
 
     # Добавляем изображение как inline-вложение
-    if postcard.background_picture:
-        with open(postcard.background_picture.path, 'rb') as img:
+    if postcard.screenshot:
+        with open(postcard.screenshot.path, 'rb') as img:
             mime_img = MIMEImage(img.read())
             mime_img.add_header('Content-ID', '<postcard>')
             mime_img.add_header('Content-Disposition', 'inline')
@@ -54,13 +51,14 @@ def send_email( request: Request):
 
     return Response(data={'Email отправлен'}, status=status.HTTP_200_OK)
 
+
 class PostCardViewSet(APIView):
     def get(self, request: Request):
         users = UserHandler.get_all_users()
         random_images = Tools.get_random_images()
         postcard, is_active = PostcardHandler.get_postcard()
 
-        postcard = postcard.background_picture.url if is_active else random_images.get('postcard')
+        postcard = postcard.screenshot.url if is_active else random_images.get('postcard')
 
         context = {
             'postcard': postcard,

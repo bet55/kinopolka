@@ -12,13 +12,14 @@ class PostcardSerializer(serializers.ModelSerializer):
         fields = ['meeting_date',
                   'movies',
                   'is_active',
-                  'background_picture',
+                  'screenshot',
+                  'title'
                   ]
 
     def create(self, validated_data):
         postcard = Postcard(
             meeting_date=validated_data['meeting_date'],
-            background_picture=validated_data['background_picture'],
+            screenshot=validated_data['screenshot'],
         )
         postcard.save()
         postcard.movies.set(validated_data['movies'])
