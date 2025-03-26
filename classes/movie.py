@@ -1,8 +1,14 @@
 from classes.kp import KP_Movie
 from lists.models import Movie, Actor, Director, Writer, Genre
-from lists.serializers import MovieSerializer, MovieSmallSerializer
+from lists.serializers import MovieSerializer, MovieSmallSerializer, MovieRatingSerializer
 from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
 from collections import namedtuple
+from enum import Enum
+
+
+class MoviesStructure(Enum):
+    posters = 'posters'
+    rating = 'rating'
 
 
 class MovieHandler:
@@ -18,11 +24,23 @@ class MovieHandler:
         return serialize.data
 
     @classmethod
-    def get_all_movies(cls, all_info: bool = True, is_archive: bool = False) -> dict | list:
+    def get_all_movies(cls, info_type: MoviesStructure = None, is_archive: bool = False) -> dict | list:
+        serialize = None
         raw_film = Movie.mgr.filter(is_archive=is_archive)
-        serialize = MovieSerializer(raw_film, many=True) if all_info else MovieSmallSerializer(raw_film, many=True)
-        return serialize.data
 
+        print(info_type)
+
+        if info_type == MoviesStructure.posters.value:
+            print('postiiiim')
+            serialize = MovieSmallSerializer(raw_film, many=True)
+
+        if info_type == MoviesStructure.rating.value:
+            print('ratiiiim')
+            serialize = MovieRatingSerializer(raw_film, many=True)
+
+        serialize = MovieSerializer(raw_film, many=True) if not serialize else serialize
+
+        return serialize.data
 
     @classmethod
     def change_movie_status(cls, kp_id: int | str, is_archive: bool):

@@ -1,10 +1,9 @@
 from django.urls import path
 
-from postcard.views import view_postcard, PostCardViewSet, send_postcard
+from postcard.views import PostCardViewSet, send_email
 
 urlpatterns = [
-    path('', view_postcard),
-    path('test_postcard', PostCardViewSet.as_view(), name='test_postcard'),
-    path('send_postcard', send_postcard),
+    path('', PostCardViewSet.as_view(), name='postcard_views'),
+    path('email', send_email, name='postcard_views'),
 
 ]

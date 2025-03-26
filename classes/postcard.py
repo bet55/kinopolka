@@ -1,28 +1,46 @@
-from classes.exceptions import TooManyActivePostcardsError
+from typing import Optional
+
 from postcard.models import Postcard
 from postcard.serializers import PostcardSerializer
+from django.shortcuts import get_object_or_404
 
 
 class PostcardHandler:
     '''
     Класс для работы с открытками в базе данных
     '''
+
     @classmethod
     def create_postcard(cls, postcard_data: dict) -> (dict, bool):
+        cls.deactivate_postcard()
+
         serializer = PostcardSerializer(data=postcard_data)
         if serializer.is_valid():
-
-            #при создании новой карточки все существующие становятся неактивными
-            active_postcards = Postcard.objects.filter(is_active=True)
-            for active_postcard in active_postcards:
-                cls._deactivate_postcard(active_postcard)
-
             serializer.save()
             return serializer.data, True
         return serializer.errors, False
 
     @classmethod
-    def get_postcard(cls, postcard_id: int) -> dict | None:
+    def get_postcard(cls) -> (Optional[dict], bool):
+        """
+        Возвращаем последнюю активную открытку и статус открытки
+        """
+        is_active: bool = True
+        try:
+            postcard = Postcard.objects.filter(is_active=True).latest('created_at')
+            postcard = get_object_or_404(Postcard, pk=postcard.id)
+
+            if not postcard:
+                is_active = False
+                return None, is_active
+
+            return postcard, is_active
+        except Postcard.DoesNotExist:
+            is_active = False
+            return None, is_active
+
+    @classmethod
+    def get_postcard_by_id(cls, postcard_id: int) -> dict | None:
         try:
             postcard = Postcard.objects.get(id=postcard_id)
             serializer = PostcardSerializer(postcard)
@@ -56,18 +74,17 @@ class PostcardHandler:
             return None
         return postcard.delete()
 
-    @staticmethod
-    def _deactivate_postcard(postcard) -> bool:
-        postcard.is_active = False
+    @classmethod
+    def deactivate_postcard(cls, postcard_id: int = None, update_all=True) -> bool:
         try:
-            postcard.save()
-        except Postcard.DoesNotExist:
-            return False
-        return True
+            if update_all:
+                Postcard.objects.all().update(is_active=False)
+                return True
 
-    @staticmethod
-    def get_active_postcard() -> Postcard:
-        active_postcards = Postcard.objects.filter(is_active=True)
-        if len(active_postcards) != 1:
-            raise TooManyActivePostcardsError
-        return active_postcards[0]
+            postcard = Postcard.objects.get(id=postcard_id)
+            postcard.is_active = False
+            postcard.save()
+            return True
+
+        except Exception:
+            return False

@@ -31,6 +31,7 @@ const createFilmsList = (filmsStorage) => {
 
 
         removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const filmContainer = e.target.parentElement;
             const filmId = filmContainer.dataset.kpId;
             filmContainer.remove();

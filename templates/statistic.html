@@ -9,6 +9,34 @@
 
 {% block center-content %}
 
+    <div id="movies-users" class="row movies-container">
+        <h1>Лучшие фильмы по мнению пользователей</h1>
+        {% for m in movies %}
+
+            <div class="movie" data-kp-id="{{ m.kp_id }}">
+                <img src="{{ m.poster }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
+                <h4>{{ m.name }}</h4>
+            </div>
+
+        {% endfor %}
+    </div>
+
+    <br>
+
+    <div id="movies-kp" class="row movies-container">
+        <h1>Лучшие фильмы по мнению кинопоиска</h1>
+        {% for m in kp_movies %}
+
+            <div class="movie" data-kp-id="{{ m.kp_id }}">
+                <img src="{{ m.poster }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
+                <h4>{{ m.name }}</h4>
+            </div>
+
+        {% endfor %}
+    </div>
+
+    <br>
+
     <div id="stats">
         <ul>
             <li>Всего посмотренно фильмов: <span>{{ statistic.count }} </span></li>

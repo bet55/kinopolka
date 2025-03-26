@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .postcard-container {
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .postcard-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .postcard-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="postcard-container">
+    <h2>Новая открытка для вас!</h2>
+
+    <img src="cid:postcard" alt="Postcard" class="postcard-image">
+    <img src="{{ postcard }}" alt="Postcard" class="postcard-image">
+
+
+    <div class="postcard-details">
+        <p><strong>Дата встречи:</strong> {{ date }}</p>
+
+{#        <p><strong>Фильмы:</strong></p>#}
+{#        <ul>#}
+{#            {% for movie in movies %}#}
+{#                <li>{{ movie.title }}</li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+
+    </div>
+
+    <p>С уважением,<br>Ваша команда</p>
+</div>
+</body>
+</html>

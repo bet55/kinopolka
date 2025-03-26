@@ -1,23 +1,57 @@
+import {createToast} from "./create_toast.js";
+
 // Функция для создания скриншота элементов страницы
 // Используется для создания снимков открыток и их рассылки/архивации
 
 
-async function sendToServer(blob) {
-    const formData = new FormData();
-    formData.append('screenshot', blob, 'screenshot.png'); // 'screenshot' is the field name
+async function sendToServer(picture, posters, meeting_date, screenName) {
+    // добавляем временную метку, чтобы в папке были файлы с разными названиями
+    const date = new Date();
+    const timestampScreenName = screenName.replace('.', date.getTime() + '.')
 
-    const response = await fetch('https://your-server.com/upload', {
-        method: 'POST',
-        body: formData,
-    });
+    const url = document.baseURI.split('/', 3).join('/');
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
 
-    if (!response.ok) {
-        throw new Error('Failed to send screenshot to server');
-    }
+    const formdata = new FormData();
+    formdata.append("meeting_date", meeting_date);
+    formdata.append("background_picture", picture, timestampScreenName);
+    posters.forEach(p => formdata.append("movies", p));
 
-    const result = await response.json();
-    console.log('Server response:', result);
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: formdata,
+        redirect: "follow"
+    };
+
+
+    fetch(url, requestOptions)
+        .then((response) => {
+
+            if (!response.ok) {
+                throw Error(`${response.status}: ${response.statusText}`);
+            }
+            return response.text()
+        })
+        .then((result) => {
+
+            createToast('Открытка успешно сохранена', 'success')
+
+            // Перезагружаем страницу
+            setTimeout(() => window.location.reload(), 1000)
+
+        })
+        .catch((error) => {
+
+            console.error(error);
+            createToast('Открытка не сохранена', 'error')
+        });
+
+
 }
+
 
 async function clientUpload(container, screenName) {
     const dataUrl = await modernScreenshot.domToPng(container);
@@ -28,16 +62,16 @@ async function clientUpload(container, screenName) {
     return dataUrl
 }
 
-async function serverUpload(container) {
+async function serverUpload(container, posters, meeting_date, screenName) {
     const blob = await modernScreenshot.domToBlob(container);
-    console.log('Blob created:', blob);
+    await sendToServer(blob, posters, meeting_date, screenName)
 }
 
-async function modernShot(container, direction = '', screenName = 'screenshot.png') {
+async function screenshot(container, posters, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
     try {
 
         if (direction === 'server') {
-            return await serverUpload(container, screenName)
+            return await serverUpload(container, posters, meeting_date, screenName)
         } else {
             return await clientUpload(container, screenName)
         }
@@ -48,4 +82,4 @@ async function modernShot(container, direction = '', screenName = 'screenshot.pn
     }
 }
 
-export {modernShot}
+export {screenshot}

@@ -9,3 +9,5 @@ app_cache
 db.sqlite3
 start.sh
 requests.http
+
+.ipynb_checkpoints

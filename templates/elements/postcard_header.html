@@ -1,0 +1,32 @@
+{% load static %}
+
+{% if not is_active %}
+
+    <div class="postcard-option" id="postcard-save-container">
+        <img id="postcard-save-button" src="{% static 'img/postcard_options/save.png' %}" alt="сохранить"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-title="Сохранить открытку">
+    </div>
+{% endif %}
+
+
+{% if is_active %}
+    <div class="postcard-option" id="postcard-create-container">
+        <img id="postcard-create-button" src="{% static 'img/postcard_options/create.png' %}" alt="создать"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-title="Создать новую открытку">
+    </div>
+
+
+    <div class="postcard-option" id="postcard-send-container">
+        <img id="postcard-send-button" src="{% static 'img/postcard_options/send.png' %}" alt="отправить"
+             data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-title="Разослать открытку">
+    </div>
+{% endif %}
+
+
+

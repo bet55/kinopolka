@@ -4,7 +4,7 @@ from features.views import carousel
 
 urlpatterns = [
 
-    path('carousel', carousel),
+    path('/carousel', carousel),
 
 
 ]

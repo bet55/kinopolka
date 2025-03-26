@@ -17,7 +17,7 @@ export function createToast(text, status) {
     toastText.innerText = text;
 
     // Отрисовываем тост
-    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast, {delay: 1500});
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast, {delay: 1700});
     toastBootstrap.show();
 
     // Убираем цвет

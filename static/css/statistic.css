@@ -1,3 +1,24 @@
+.movies-container{
+    width: 100%;
+
+    h1 {
+        color: var(--orange-color);
+        font-weight: bold;
+    }
+}
+
+.movie {
+    width: 32%;
+
+    img {
+        width: 75%;
+    }
+    h4 {
+        color: var(--red-color);
+    }
+}
+
+
 #stats {
     color: var(--black-color);
 

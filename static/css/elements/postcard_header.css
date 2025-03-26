@@ -1,0 +1,56 @@
+/* Анимация исполнения запроса */
+
+@property --a {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes a {
+    to {
+        --a: 1turn;
+    }
+}
+
+.active_option {
+    --b: 4px;
+    --f: url(#glow-0);
+    --l: rgba(2, 81, 26, 0.5),
+    rgba(103, 181, 65, 0.5),
+    rgba(142, 188, 32, 0.5),
+    rgba(16, 58, 40, 0.5),
+    rgba(32, 83, 9, 0.5),
+    rgba(10, 71, 36, 0.5);
+
+
+    box-sizing: border-box;
+    border: solid var(--b) #0000;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: calc(2 * var(--b));
+    background: repeating-conic-gradient(from var(--a, 0deg), var(--l, #0000 0% 70%, rgba(0, 255, 102, 0.5))) border-box;
+    filter: var(--f, url(#glow-0));
+    animation: a 3s linear infinite;
+}
+
+/* Параметры иконок */
+.postcard-option {
+
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    img {
+
+        height: 40%;
+
+    }
+}
+
+
+

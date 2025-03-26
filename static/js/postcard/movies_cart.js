@@ -45,6 +45,8 @@ const addMovieToPostcard = (movieItem, movieId) => {
 
     // Создаем обработчик удаления постеров
     posterContainer.addEventListener('click', e => {
+        e.stopPropagation()
+
         title.remove();
         posterContainer.remove();
 

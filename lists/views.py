@@ -29,7 +29,7 @@ class MoviesView(APIView):
             request,
             'movies.html',
             context={
-                'movies': MovieHandler.get_all_movies(all_info=False, is_archive=is_archive),
+                'movies': MovieHandler.get_all_movies(info_type='posters', is_archive=is_archive),
                 'users': UserHandler.get_all_users(),
                 'is_archive': is_archive,
                 'random': Tools.get_random_images(),

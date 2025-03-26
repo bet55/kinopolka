@@ -35,6 +35,17 @@ class MovieSerializer(ModelSerializer):
                   ]
 
 
+class MovieRatingSerializer(ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = ['kp_id',
+                  'rating_imdb',
+                  'rating_kp',
+                  'poster',
+                  'name'
+                  ]
+
+
 class MovieSmallSerializer(ModelSerializer):
     class Meta:
         model = Movie
