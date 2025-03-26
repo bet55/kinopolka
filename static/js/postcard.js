@@ -1,6 +1,7 @@
 import {cartHandler} from "./postcard/movies_cart.js";
 import {createToast} from "./utils/create_toast.js";
 import {screenshot} from "./utils/screenshot.js";
+import {getNextSaturday} from "./utils/next_saturday.js";
 
 
 function sendPostcard() {
@@ -78,10 +79,13 @@ const savePostcard = async () => {
         return null;
     }
 
+    // Времянка, пока не доделаем модели
+    title.innerText = getNextSaturday('text');
+    title.contentEditable = false;
 
     saveButton.addEventListener('click', async e => {
 
-        const postcardFilled = (title.innerText.replace(/\D/g, '').length) && document.querySelector('.poster');
+        const postcardFilled = (title.innerText.replace(/\D/g, '')) && document.querySelector('.poster');
 
         if (!postcardFilled) {
             createToast('Заполните открытку', 'error')
@@ -93,8 +97,7 @@ const savePostcard = async () => {
         title.contentEditable = false;
         const posters = document.querySelectorAll('.poster');
         const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
-        await screenshot(postcard, posters_ids);
-        // await screenshot(postcard, posters_ids, title.innerText); Добавим, когда изменим модель
+        await screenshot(postcard, posters_ids, getNextSaturday('iso'));
 
         saveButton.classList.remove('active_option')
 
