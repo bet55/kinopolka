@@ -8,7 +8,7 @@ from lists.serializers import UserSerializer
 
 @api_view(['GET'])
 def carousel(request):
-    movies = MovieHandler.get_all_movies(all_info=False)
+    movies = MovieHandler.get_all_movies(info_type='posters')
 
     users = User.objects.all()
     us_sr = UserSerializer(users, many=True)

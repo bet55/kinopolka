@@ -10,14 +10,17 @@ class NoteHandler:
     Класс для работы с записями оценок в базе данных
     """
     @classmethod
-    def get_all_notes(cls) -> dict[int, list]:
+    def get_all_notes(cls, result_format = 'dict') -> dict[int, list]:
         notes = defaultdict(list)
 
         raw_notes = Note.mgr.all()
-        serialize = NoteSerializer(raw_notes, many=True)
+        serialize = NoteSerializer(raw_notes, many=True).data
 
-        for note in serialize.data:
-            notes[note['film']].append(note)
+        if result_format == 'list':
+            return serialize
+
+        for note in serialize:
+            notes[note['movie']].append(note)
 
         return dict(notes)
 
