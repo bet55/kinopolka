@@ -9,8 +9,11 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 import os
 from pathlib import Path
+import logging_loki
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,72 +22,75 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-moq19!=-t5w#&p!h4aw=b4hzs9k8^290t513qhm-86r39=4&#y')
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-moq19!=-t5w#&p!h4aw=b4hzs9k8^290t513qhm-86r39=4&#y"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', '0') == '1'
+DEBUG = os.environ.get("DEBUG", "0") == "1"
 
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '0.0.0.0;127.0.0.1;localhost;185.80.91.29').split(';')
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS", "0.0.0.0;127.0.0.1;localhost;185.80.91.29"
+).split(";")
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'corsheaders',
-    'rest_framework',
-    'lists',
-    'postcard',
-    'features',
-    'tools'
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "corsheaders",
+    "rest_framework",
+    "lists",
+    "postcard",
+    "features",
+    "tools",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     # 'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'filmoclub.urls'
+ROOT_URLCONF = "filmoclub.urls"
 
 CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'filmoclub.wsgi.application'
+WSGI_APPLICATION = "filmoclub.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -93,38 +99,37 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "Asia/Yekaterinburg"
 
 USE_I18N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Хранение изображений(открытки) из бд
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
-MEDIA_URL = ''
-MEDIA_ROOT = ''
-
+MEDIA_URL = ""
+MEDIA_ROOT = ""
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
@@ -132,21 +137,85 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'classes.exception_handler.custom_exception_handler',
+    "EXCEPTION_HANDLER": "classes.exception_handler.custom_exception_handler",
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'  # Или другой SMTP-сервер
+# email для отправки приглашений
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.yandex.ru"  # Или другой SMTP-сервер
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '0')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '0')
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "0")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "0")
 
 EMAIL_SERVER = EMAIL_HOST_USER
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+# telegram для отправки рассылки в группу телеграмма
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_GROUP_ID = os.getenv("TELEGRAM_GROUP_ID")
+
+# kinopoisk api token
+KP_API_TOKEN = os.getenv("KP_API_TOKEN")
+
+
+# настройки логгера
+class LogFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord):
+        """Добавляем в логи данные для фильтрации. Формат: tags: {'thread': 11}"""
+        if not hasattr(record, 'tags'):
+            record.tags = {}
+
+        record.tags['function'] = record.funcName
+        record.tags['line'] = record.lineno
+        record.tags['file'] = record.filename
+        return True
+
+
+loki_url = os.getenv('LOKI_URL') + '/loki/api/v1/push'
+application = os.getenv('APP_NAME')
+service = os.getenv('SERVICE_NAME')
+
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'console_msg': {
+            'format': '{levelname} {msg} {filename} {funcName} {lineno} {exc_info}',
+            'style': '{'
+        }
+    },
+    'filters': {
+        'loki_tags': {
+            '()': LogFilter
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'console_msg'
+        },
+        'loki': {
+            'class': 'logging_loki.LokiHandler',
+            'level': 'DEBUG',
+            'formatter': 'console_msg',
+            'url': loki_url,
+            'tags': {'application': application, 'service': service},
+            'version': '2',
+            'filters': ['loki_tags']
+        }
+    },
+
+    'loggers': {
+        'kinopolka_logger': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'loki'],
+        }
+    }
+}

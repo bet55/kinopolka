@@ -6,9 +6,10 @@ from lists import validators
 
 
 def default_countries():
-    return ['unknown']
+    return ["unknown"]
 
-QUESTION_MARK_URL = 'https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp'
+
+QUESTION_MARK_URL = "https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
 
 
 # Create your models here.
@@ -38,8 +39,8 @@ class Writer(Model):
 
 
 class MovieGenreRelations(Model):
-    movie = models.ForeignKey('lists.Movie', on_delete=models.CASCADE)
-    genre = models.ForeignKey('lists.Genre', on_delete=models.CASCADE)
+    movie = models.ForeignKey("lists.Movie", on_delete=models.CASCADE)
+    genre = models.ForeignKey("lists.Genre", on_delete=models.CASCADE)
 
 
 class Genre(Model):
@@ -70,10 +71,10 @@ class Movie(Model):
     writers = models.ManyToManyField(Writer)
     budget = models.IntegerField(default=0)
     fees = models.IntegerField(default=0)
-    premiere = models.DateTimeField(default='1900-01-24T09:27:20.807Z')
-    description = models.TextField(default='...')
-    short_description = models.TextField(default='...')
-    slogan = models.TextField(default='...')
+    premiere = models.DateTimeField(default="1900-01-24T09:27:20.807Z")
+    description = models.TextField(default="...")
+    short_description = models.TextField(default="...")
+    slogan = models.TextField(default="...")
     duration = models.IntegerField(default=0)
     poster = models.URLField(default=QUESTION_MARK_URL)
     rating_kp = models.DecimalField(default=0.0, decimal_places=3, max_digits=4)
@@ -84,17 +85,17 @@ class Movie(Model):
     is_archive = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-rating_kp']
+        ordering = ["-rating_kp"]
 
 
 class Note(Model):
     mgr = models.Manager()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    text = models.TextField(default='И сказать нечего...')
+    text = models.TextField(default="И сказать нечего...")
     rating = models.IntegerField(null=False)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'movie'], name='user_movie_key'),
+            models.UniqueConstraint(fields=["user", "movie"], name="user_movie_key"),
         ]

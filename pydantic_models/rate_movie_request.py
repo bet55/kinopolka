@@ -5,5 +5,4 @@ class RateMovieRequestModel(BaseModel):
     movie: int
     user: int
     rating: int
-    text: str = ''
-
+    text: str = ""

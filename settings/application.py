@@ -1,2 +1,0 @@
-
-TIMEZONE = 'Asia/Yekaterinburg'

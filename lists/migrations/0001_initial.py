@@ -13,123 +13,212 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Actor',
+            name="Actor",
             fields=[
-                ('kp_id', models.IntegerField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50)),
-                ('photo', models.URLField(default='https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp')),
+                ("kp_id", models.IntegerField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=50)),
+                (
+                    "photo",
+                    models.URLField(
+                        default="https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
+                    ),
+                ),
             ],
             managers=[
-                ('mgr', django.db.models.manager.Manager()),
+                ("mgr", django.db.models.manager.Manager()),
             ],
         ),
         migrations.CreateModel(
-            name='AppUser',
+            name="AppUser",
             fields=[
-                ('user_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('avatar', models.URLField(default='https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp')),
+                (
+                    "user_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "avatar",
+                    models.URLField(
+                        default="https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'user',
-                'verbose_name_plural': 'users',
-                'abstract': False,
+                "verbose_name": "user",
+                "verbose_name_plural": "users",
+                "abstract": False,
             },
-            bases=('auth.user',),
+            bases=("auth.user",),
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
         migrations.CreateModel(
-            name='Director',
+            name="Director",
             fields=[
-                ('kp_id', models.IntegerField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50)),
-                ('photo', models.URLField(default='https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp')),
+                ("kp_id", models.IntegerField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=50)),
+                (
+                    "photo",
+                    models.URLField(
+                        default="https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
+                    ),
+                ),
             ],
             managers=[
-                ('mgr', django.db.models.manager.Manager()),
+                ("mgr", django.db.models.manager.Manager()),
             ],
         ),
         migrations.CreateModel(
-            name='Genre',
+            name="Genre",
             fields=[
-                ('name', models.CharField(max_length=50, primary_key=True, serialize=False)),
-                ('watch_counter', models.IntegerField(default=0)),
+                (
+                    "name",
+                    models.CharField(max_length=50, primary_key=True, serialize=False),
+                ),
+                ("watch_counter", models.IntegerField(default=0)),
             ],
             managers=[
-                ('mgr', django.db.models.manager.Manager()),
+                ("mgr", django.db.models.manager.Manager()),
             ],
         ),
         migrations.CreateModel(
-            name='Writer',
+            name="Writer",
             fields=[
-                ('kp_id', models.IntegerField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50)),
-                ('photo', models.URLField(default='https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp')),
+                ("kp_id", models.IntegerField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=50)),
+                (
+                    "photo",
+                    models.URLField(
+                        default="https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
+                    ),
+                ),
             ],
             managers=[
-                ('mgr', django.db.models.manager.Manager()),
+                ("mgr", django.db.models.manager.Manager()),
             ],
         ),
         migrations.CreateModel(
-            name='Film',
+            name="Film",
             fields=[
-                ('kp_id', models.IntegerField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=50, validators=[lists.validators.validate_name])),
-                ('countries', models.JSONField(default=['unknown'])),
-                ('budget', models.IntegerField(default=0)),
-                ('fees', models.IntegerField(default=0)),
-                ('premiere', models.DateTimeField(default='1900-01-24T09:27:20.807Z')),
-                ('description', models.TextField(default='...')),
-                ('short_description', models.TextField(default='...')),
-                ('slogan', models.TextField(default='...')),
-                ('duration', models.IntegerField(default=0)),
-                ('poster', models.URLField(default='https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp')),
-                ('rating_kp', models.DecimalField(decimal_places=3, default=0.0, max_digits=4)),
-                ('rating_imdb', models.DecimalField(decimal_places=3, default=0.0, max_digits=4)),
-                ('votes_kp', models.IntegerField(default=0)),
-                ('votes_imdb', models.IntegerField(default=0)),
-                ('watch_date', models.DateTimeField(null=True)),
-                ('is_archive', models.BooleanField(default=False)),
-                ('actors', models.ManyToManyField(to='lists.actor')),
-                ('directors', models.ManyToManyField(to='lists.director')),
-                ('genres', models.ManyToManyField(to='lists.genre')),
-                ('writers', models.ManyToManyField(to='lists.writer')),
+                ("kp_id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "name",
+                    models.CharField(
+                        max_length=50, validators=[lists.validators.validate_name]
+                    ),
+                ),
+                ("countries", models.JSONField(default=["unknown"])),
+                ("budget", models.IntegerField(default=0)),
+                ("fees", models.IntegerField(default=0)),
+                ("premiere", models.DateTimeField(default="1900-01-24T09:27:20.807Z")),
+                ("description", models.TextField(default="...")),
+                ("short_description", models.TextField(default="...")),
+                ("slogan", models.TextField(default="...")),
+                ("duration", models.IntegerField(default=0)),
+                (
+                    "poster",
+                    models.URLField(
+                        default="https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
+                    ),
+                ),
+                (
+                    "rating_kp",
+                    models.DecimalField(decimal_places=3, default=0.0, max_digits=4),
+                ),
+                (
+                    "rating_imdb",
+                    models.DecimalField(decimal_places=3, default=0.0, max_digits=4),
+                ),
+                ("votes_kp", models.IntegerField(default=0)),
+                ("votes_imdb", models.IntegerField(default=0)),
+                ("watch_date", models.DateTimeField(null=True)),
+                ("is_archive", models.BooleanField(default=False)),
+                ("actors", models.ManyToManyField(to="lists.actor")),
+                ("directors", models.ManyToManyField(to="lists.director")),
+                ("genres", models.ManyToManyField(to="lists.genre")),
+                ("writers", models.ManyToManyField(to="lists.writer")),
             ],
             options={
-                'ordering': ['-rating_kp'],
+                "ordering": ["-rating_kp"],
             },
             managers=[
-                ('mgr', django.db.models.manager.Manager()),
+                ("mgr", django.db.models.manager.Manager()),
             ],
         ),
         migrations.CreateModel(
-            name='FilmGenreRelations',
+            name="FilmGenreRelations",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('film', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lists.film')),
-                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lists.genre')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "film",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="lists.film"
+                    ),
+                ),
+                (
+                    "genre",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="lists.genre"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Sticker',
+            name="Sticker",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(default='И сказать нечего...')),
-                ('rating', models.IntegerField()),
-                ('film', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lists.film')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lists.appuser')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(default="И сказать нечего...")),
+                ("rating", models.IntegerField()),
+                (
+                    "film",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="lists.film"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="lists.appuser"
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('user', 'film'), name='user_film_key')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("user", "film"), name="user_film_key"
+                    )
+                ],
             },
             managers=[
-                ('mgr', django.db.models.manager.Manager()),
+                ("mgr", django.db.models.manager.Manager()),
             ],
         ),
     ]

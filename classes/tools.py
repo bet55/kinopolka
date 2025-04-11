@@ -4,9 +4,9 @@ import json
 import asyncio
 import os
 import random
-from settings.theme_images import ImageFolders, Themes, IMAGES_PATH
-from settings.theme_calendar import CALENDAR
-from settings.application import TIMEZONE
+from filmoclub.calendar.theme_images import ImageFolders, Themes, IMAGES_PATH
+from filmoclub.calendar.theme_calendar import CALENDAR
+from django.conf import settings
 import pendulum
 
 
@@ -20,7 +20,7 @@ class Tools:
         """
         Вычисляем текущую тему оформления приложения
         """
-        current_date = pendulum.now(tz=TIMEZONE).format('DD.MM')
+        current_date = pendulum.now(tz=settings.TIME_ZONE).format("DD.MM")
         theme = CALENDAR.get(current_date, Themes.default.value)
         return theme
 
@@ -32,10 +32,12 @@ class Tools:
         theme = cls._get_current_theme()
 
         return {
-            'poster': cls._choose_random_image(theme, ImageFolders.poster.value),
-            'navigation': cls._choose_random_image(theme, ImageFolders.navigation.value),
-            'header': cls._choose_random_image(theme, ImageFolders.header.value),
-            'postcard': cls._choose_random_image(theme, ImageFolders.postcard.value),
+            "poster": cls._choose_random_image(theme, ImageFolders.poster.value),
+            "navigation": cls._choose_random_image(
+                theme, ImageFolders.navigation.value
+            ),
+            "header": cls._choose_random_image(theme, ImageFolders.header.value),
+            "postcard": cls._choose_random_image(theme, ImageFolders.postcard.value),
         }
 
     @classmethod
@@ -43,9 +45,9 @@ class Tools:
         """
         Получаем путь до случайно выбранного изображения в выбранной теме и папке
         """
-        empty_file = f'/{IMAGES_PATH}/empty.png'
+        empty_file = f"/{IMAGES_PATH}/empty.png"
 
-        full_path = f'{IMAGES_PATH}/themes/{theme}/{folder}'
+        full_path = f"{IMAGES_PATH}/themes/{theme}/{folder}"
 
         file_names = os.listdir(full_path)
         if not file_names:
@@ -53,7 +55,7 @@ class Tools:
 
         random_img = random.choice(file_names)
 
-        return f'/{full_path}/{random_img}'
+        return f"/{full_path}/{random_img}"
 
     async def init_project(self):
         # self.check_project_pre_creation()
@@ -63,58 +65,82 @@ class Tools:
     def check_project_pre_creation(self):
         users = User.objects.all()
         if len(users) > 1:
-            raise Exception('В системе уже есть пользователи')
+            raise Exception("В системе уже есть пользователи")
         if len(users) < 1:
-            raise Exception('Сперва создайте супер пользователя')
+            raise Exception("Сперва создайте супер пользователя")
 
     async def create_users(self):
-        url = f'/{IMAGES_PATH}/avatars/'
+        url = f"/{IMAGES_PATH}/avatars/"
         users = [
-            {'username': 'drbloody1', 'first_name': 'Алексей', 'last_name': 'Губин', 'avatar': url + 'drbloody1.jpg'},
-            {'username': 'daenillando', 'first_name': 'Александр', 'last_name': 'Бусыгин',
-             'avatar': url + 'Deputant.png'},
-            {'username': 'Deputant', 'first_name': 'Никита', 'last_name': 'Шулаев', 'avatar': url + 'Deputant.jpg'},
-            {'username': 'lightthouse', 'first_name': 'Степан', 'last_name': 'Казанцев',
-             'avatar': url + 'lightthouse1.jpg'},
+            {
+                "username": "drbloody1",
+                "first_name": "Алексей",
+                "last_name": "Губин",
+                "avatar": url + "drbloody1.jpg",
+            },
+            {
+                "username": "daenillando",
+                "first_name": "Александр",
+                "last_name": "Бусыгин",
+                "avatar": url + "Deputant.png",
+            },
+            {
+                "username": "Deputant",
+                "first_name": "Никита",
+                "last_name": "Шулаев",
+                "avatar": url + "Deputant.jpg",
+            },
+            {
+                "username": "lightthouse",
+                "first_name": "Степан",
+                "last_name": "Казанцев",
+                "avatar": url + "lightthouse1.jpg",
+            },
         ]
 
         results = []
         for user in users:
             user_model, status = await User.objects.aupdate_or_create(**user)
-            results.append({user['username']: status})
+            results.append({user["username"]: status})
 
         return results
 
     async def save_movies_to_db(self) -> dict:
-        movies_json = 'data/movies_to_watch_dump.json'
-        archive_movies_json = 'data/archive_movies_dump.json'
+        movies_json = "data/movies_to_watch_dump.json"
+        archive_movies_json = "data/archive_movies_dump.json"
 
-        failed_movies_file = 'data/failed_movies.json'
-        error_file = 'data/save_error.json'
+        failed_movies_file = "data/failed_movies.json"
+        error_file = "data/save_error.json"
 
-        with open(archive_movies_json, 'r') as f:
+        with open(archive_movies_json, "r") as f:
             archive_movies = json.load(f)
-            archive_movies = [{**arch, **{'is_archive': True}} for arch in archive_movies]
+            archive_movies = [
+                {**arch, **{"is_archive": True}} for arch in archive_movies
+            ]
 
-        with open(movies_json, 'r') as f:
+        with open(movies_json, "r") as f:
             movies = json.load(f)
 
         all_movies = movies + archive_movies
 
         async def export(mv_info):
             try:
-                await MovieHandler.a_download(mv_info.get('id', -1), mv_info)
-                return {'success': True, 'id': mv_info.get('id', -1)}
+                await MovieHandler.a_download(mv_info.get("id", -1), mv_info)
+                return {"success": True, "id": mv_info.get("id", -1)}
             except Exception as exp:
-                return {'success': False, 'id': mv_info.get('id', -1), 'message': str(exp)}
+                return {
+                    "success": False,
+                    "id": mv_info.get("id", -1),
+                    "message": str(exp),
+                }
 
         tasks = [export(movie) for movie in all_movies]
         tasks_result = await asyncio.gather(*tasks)
 
-        success_results_count = len([r for r in tasks_result if r['success'] is True])
-        bad_results = [r for r in tasks_result if r['success'] is False]
+        success_results_count = len([r for r in tasks_result if r["success"] is True])
+        bad_results = [r for r in tasks_result if r["success"] is False]
 
-        with open(failed_movies_file, 'w') as f:
+        with open(failed_movies_file, "w") as f:
             f.write(json.dumps(bad_results, indent=4, ensure_ascii=False))
 
-        return {'success_count': success_results_count, 'all_count': len(all_movies)}
+        return {"success_count": success_results_count, "all_count": len(all_movies)}

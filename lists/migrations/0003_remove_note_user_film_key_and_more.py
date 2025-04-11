@@ -7,31 +7,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lists', '0002_rename_models'),
+        ("lists", "0002_rename_models"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='note',
-            name='user_film_key',
+            model_name="note",
+            name="user_film_key",
         ),
         migrations.RenameField(
-            model_name='moviegenrerelations',
-            old_name='film',
-            new_name='movie',
+            model_name="moviegenrerelations",
+            old_name="film",
+            new_name="movie",
         ),
         migrations.RenameField(
-            model_name='note',
-            old_name='film',
-            new_name='movie',
+            model_name="note",
+            old_name="film",
+            new_name="movie",
         ),
         migrations.AlterField(
-            model_name='movie',
-            name='countries',
+            model_name="movie",
+            name="countries",
             field=models.JSONField(default=lists.models.default_countries),
         ),
         migrations.AddConstraint(
-            model_name='note',
-            constraint=models.UniqueConstraint(fields=('user', 'movie'), name='user_movie_key'),
+            model_name="note",
+            constraint=models.UniqueConstraint(
+                fields=("user", "movie"), name="user_movie_key"
+            ),
         ),
     ]

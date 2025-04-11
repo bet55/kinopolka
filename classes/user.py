@@ -6,6 +6,7 @@ class UserHandler:
     """
     Класс для работы с пользователями в базе данных
     """
+
     @classmethod
     def get_user(self, user_id: int | str) -> dict:
         app_user = User.objects.get(pk=user_id)

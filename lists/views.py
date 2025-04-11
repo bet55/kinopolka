@@ -19,37 +19,39 @@ class MoviesView(APIView):
         if kp_id:
             return Response(MovieHandler.get_movie(kp_id=kp_id))
 
-        response_format = request.query_params.get('format')
-        is_archive = 'archive' in request.path
+        response_format = request.query_params.get("format")
+        is_archive = "archive" in request.path
 
-        if response_format == 'json':
+        if response_format == "json":
             return Response(MovieHandler.get_all_movies(is_archive=is_archive))
 
         return render(
             request,
-            'movies.html',
+            "movies.html",
             context={
-                'movies': MovieHandler.get_all_movies(info_type='posters', is_archive=is_archive),
-                'users': UserHandler.get_all_users(),
-                'is_archive': is_archive,
-                'random': Tools.get_random_images(),
-            }
+                "movies": MovieHandler.get_all_movies(
+                    info_type="posters", is_archive=is_archive
+                ),
+                "users": UserHandler.get_all_users(),
+                "is_archive": is_archive,
+                "random": Tools.get_random_images(),
+            },
         )
 
     def patch(self, request: Request):
         """
         Изменение архивного статуса
         """
-        kp_id = request.data['kp_id']
-        is_archive = request.data['is_archive']
+        kp_id = request.data["kp_id"]
+        is_archive = request.data["is_archive"]
 
         success = MovieHandler.change_movie_status(kp_id, is_archive)
 
         return Response(
             data={
-                'success': str(success),
-                'error': '',
-                'id': kp_id,
+                "success": str(success),
+                "error": "",
+                "id": kp_id,
             }
         )
 
@@ -57,14 +59,14 @@ class MoviesView(APIView):
         """
         Удаление фильма
         """
-        kp_id = request.data.get('kp_id')
+        kp_id = request.data.get("kp_id")
 
         if not kp_id:
             return Response(
                 data={
-                    'success': False,
-                    'error': 'Lost kp_id',
-                    'id': False,
+                    "success": False,
+                    "error": "Lost kp_id",
+                    "id": False,
                 }
             )
 
@@ -72,9 +74,9 @@ class MoviesView(APIView):
 
         return Response(
             data={
-                'success': str(movie_is_deleted),
-                'error': '',
-                'id': kp_id,
+                "success": str(movie_is_deleted),
+                "error": "",
+                "id": kp_id,
             }
         )
 
@@ -88,12 +90,12 @@ class MovieRatingView(APIView):
         """
         Удаление заметки с рейтингом фильма
         """
-        success = NoteHandler.remove_note(request.data['user'], request.data['film'])
+        success = NoteHandler.remove_note(request.data["user"], request.data["film"])
 
         return Response(
             data={
-                'success': bool(success),
-                'error': str(success),
+                "success": bool(success),
+                "error": str(success),
             }
         )
 
@@ -105,8 +107,8 @@ class MovieRatingView(APIView):
 
         return Response(
             data={
-                'success': success,
-                'error': '',
+                "success": success,
+                "error": "",
             }
         )
 
@@ -128,25 +130,27 @@ class MovieAdditionView(APIView):
         """
         return render(
             request,
-            'add_movie.html',
+            "add_movie.html",
             context={
-                'random': Tools.get_random_images(),
-                'users': UserHandler.get_all_users(),
-            }
+                "random": Tools.get_random_images(),
+                "users": UserHandler.get_all_users(),
+            },
         )
 
     def post(self, request: Request):
         """
         Запрос на добавление
         """
-        kp_id = ''.join(char for char in list(request.data.get('kp_id', '')) if char.isdigit())
+        kp_id = "".join(
+            char for char in list(request.data.get("kp_id", "")) if char.isdigit()
+        )
 
         movie_id, success = MovieHandler.download(kp_id)
 
         return Response(
             data={
-                'success': success,
-                'error': '',
-                'id': movie_id,
+                "success": success,
+                "error": "",
+                "id": movie_id,
             }
         )

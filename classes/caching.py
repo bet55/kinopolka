@@ -8,6 +8,7 @@ class Caching:
     """
     Класс для кэширования данных
     """
+
     def __init__(self, dirname: str = None, ttl: int = None):
         """
         :param dirname: (str) - название папки хранения файла кэша.
@@ -44,7 +45,9 @@ class Caching:
         try:
             self.__cache = Cache(self.__dirname)
         except OperationalError as e:
-            self.__error_message = f"При инициализации кэшировальщика возникла ошибка. [{str(e)}]"
+            self.__error_message = (
+                f"При инициализации кэшировальщика возникла ошибка. [{str(e)}]"
+            )
             logging.error(self.__error_message)
             self.__initialized = False
             return None
@@ -64,7 +67,9 @@ class Caching:
         if key is None:
             return False
         if type(key) not in [int, str]:
-            self.__error_message = "Переданный key не является целым числом или строкой."
+            self.__error_message = (
+                "Переданный key не является целым числом или строкой."
+            )
             logging.error(self.__error_message)
             return False
 
@@ -82,7 +87,9 @@ class Caching:
             logging.error(self.__error_message)
             return None
         if key and type(key) not in [int, str]:
-            self.__error_message = "Переданный key не является целым числом или строкой."
+            self.__error_message = (
+                "Переданный key не является целым числом или строкой."
+            )
             logging.error(self.__error_message)
             return None
 
@@ -94,7 +101,9 @@ class Caching:
             logging.error(self.__error_message)
             return False
         except Exception:
-            self.__error_message = "При получении данных из кэша возникла непредвиденная ошибка."
+            self.__error_message = (
+                "При получении данных из кэша возникла непредвиденная ошибка."
+            )
             logging.error(self.__error_message)
             return False
 
@@ -117,7 +126,9 @@ class Caching:
             logging.error(self.__error_message)
             return False
         if key and type(key) not in [int, str]:
-            self.__error_message = "Переданный key не является целым числом или строкой."
+            self.__error_message = (
+                "Переданный key не является целым числом или строкой."
+            )
             logging.error(self.__error_message)
             return False
 
@@ -129,6 +140,8 @@ class Caching:
             logging.error(self.__error_message)
             return False
         except Exception:
-            self.__error_message = "При кэшировании данных возникла непредвиденная ошибка."
+            self.__error_message = (
+                "При кэшировании данных возникла непредвиденная ошибка."
+            )
             logging.error(self.__error_message)
             return False

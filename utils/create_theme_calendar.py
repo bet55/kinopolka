@@ -1,5 +1,5 @@
 import pendulum
-from settings.theme_images import THEMES_RANGES
+from filmoclub.calendar.theme_images import THEMES_RANGES
 
 
 def create_theme_calendar() -> dict[str, str]:
@@ -14,9 +14,9 @@ def create_theme_calendar() -> dict[str, str]:
     current_year = current_date.year
 
     for date_range, theme in THEMES_RANGES.items():
-        l_range, r_range = date_range.split('-')
-        l_day, l_month = [int(i) for i in l_range.split('.')]
-        r_day, r_month = [int(i) for i in r_range.split('.')]
+        l_range, r_range = date_range.split("-")
+        l_day, l_month = [int(i) for i in l_range.split(".")]
+        r_day, r_month = [int(i) for i in r_range.split(".")]
 
         r_year = current_year if l_month <= r_month else current_year + 1
 
@@ -26,7 +26,7 @@ def create_theme_calendar() -> dict[str, str]:
         days_dif = r_date.diff(l_date).in_days()
         for days_offset in range(days_dif + 1):
             day_str = l_date.add(days=days_offset)
-            calendar[day_str.format('DD.MM')] = theme
+            calendar[day_str.format("DD.MM")] = theme
 
     return calendar
 

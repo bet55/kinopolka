@@ -8,17 +8,25 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('lists', '0001_initial'),
+        ("lists", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Postcard',
+            name="Postcard",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('meeting_date', models.DateTimeField()),
-                ('created_at', models.DateTimeField(default='2024-12-18')),
-                ('movies', models.ManyToManyField(to='lists.film')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("meeting_date", models.DateTimeField()),
+                ("created_at", models.DateTimeField(default="2024-12-18")),
+                ("movies", models.ManyToManyField(to="lists.film")),
             ],
         ),
     ]

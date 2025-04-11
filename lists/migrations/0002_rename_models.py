@@ -7,27 +7,23 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lists', '0001_initial'),
-        ('postcard', '0002_alter_postcard_created_at'),
+        ("lists", "0001_initial"),
+        ("postcard", "0002_alter_postcard_created_at"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
+        migrations.RenameModel(old_name="Film", new_name="Movie"),
         migrations.RenameModel(
-            old_name='Film',
-            new_name='Movie'
+            old_name="FilmGenreRelations",
+            new_name="MovieGenreRelations",
         ),
         migrations.RenameModel(
-            old_name='FilmGenreRelations',
-            new_name='MovieGenreRelations',
+            old_name="AppUser",
+            new_name="User",
         ),
         migrations.RenameModel(
-            old_name='AppUser',
-            new_name='User',
+            old_name="Sticker",
+            new_name="Note",
         ),
-        migrations.RenameModel(
-            old_name='Sticker',
-            new_name='Note',
-        ),
-
     ]

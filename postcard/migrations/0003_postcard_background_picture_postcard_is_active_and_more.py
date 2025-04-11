@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('postcard', '0002_alter_postcard_created_at'),
+        ("postcard", "0002_alter_postcard_created_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='postcard',
-            name='background_picture',
-            field=models.ImageField(null=True, upload_to='media/postcards/'),
+            model_name="postcard",
+            name="background_picture",
+            field=models.ImageField(null=True, upload_to="media/postcards/"),
         ),
         migrations.AddField(
-            model_name='postcard',
-            name='is_active',
+            model_name="postcard",
+            name="is_active",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='postcard',
-            name='created_at',
-            field=models.DateTimeField(default='2025-03-26'),
+            model_name="postcard",
+            name="created_at",
+            field=models.DateTimeField(default="2025-03-26"),
         ),
     ]

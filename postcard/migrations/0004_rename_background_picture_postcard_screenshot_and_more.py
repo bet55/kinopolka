@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('postcard', '0003_postcard_background_picture_postcard_is_active_and_more'),
+        ("postcard", "0003_postcard_background_picture_postcard_is_active_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='postcard',
-            old_name='background_picture',
-            new_name='screenshot',
+            model_name="postcard",
+            old_name="background_picture",
+            new_name="screenshot",
         ),
         migrations.AddField(
-            model_name='postcard',
-            name='title',
+            model_name="postcard",
+            name="title",
             field=models.CharField(max_length=255, null=True),
         ),
     ]

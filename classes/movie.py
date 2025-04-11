@@ -1,21 +1,26 @@
 from classes.kp import KP_Movie
 from lists.models import Movie, Actor, Director, Writer, Genre
-from lists.serializers import MovieSerializer, MovieSmallSerializer, MovieRatingSerializer
+from lists.serializers import (
+    MovieSerializer,
+    MovieSmallSerializer,
+    MovieRatingSerializer,
+)
 from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
 from collections import namedtuple
 from enum import Enum
 
 
 class MoviesStructure(Enum):
-    posters = 'posters'
-    rating = 'rating'
+    posters = "posters"
+    rating = "rating"
 
 
 class MovieHandler:
     """
     Класс для работы с фильмами в базе данных
     """
-    KPEntities = namedtuple('KPEntities', ['movie', 'persons', 'genres'])
+
+    KPEntities = namedtuple("KPEntities", ["movie", "persons", "genres"])
 
     @classmethod
     def get_movie(cls, kp_id: int | str) -> dict:
@@ -24,18 +29,20 @@ class MovieHandler:
         return serialize.data
 
     @classmethod
-    def get_all_movies(cls, info_type: MoviesStructure = None, is_archive: bool = False) -> dict | list:
+    def get_all_movies(
+        cls, info_type: MoviesStructure = None, is_archive: bool = False
+    ) -> dict | list:
         serialize = None
         raw_film = Movie.mgr.filter(is_archive=is_archive)
 
         print(info_type)
 
         if info_type == MoviesStructure.posters.value:
-            print('postiiiim')
+            print("postiiiim")
             serialize = MovieSmallSerializer(raw_film, many=True)
 
         if info_type == MoviesStructure.rating.value:
-            print('ratiiiim')
+            print("ratiiiim")
             serialize = MovieRatingSerializer(raw_film, many=True)
 
         serialize = MovieSerializer(raw_film, many=True) if not serialize else serialize
@@ -63,7 +70,7 @@ class MovieHandler:
 
         save_movies = cls._save_movie_to_db(converted_response)
 
-        return api_response.get('id', -1), save_movies[1]
+        return api_response.get("id", -1), save_movies[1]
 
     @classmethod
     def _save_movie_to_db(cls, movie_info: KPEntities):
@@ -72,10 +79,21 @@ class MovieHandler:
         movie_model, m_status = Movie.mgr.update_or_create(**movie)
 
         a, d, w, g = cls._create_models_counstuctor_list(persons, genres)
-        Actor.mgr.bulk_create(a, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        Director.mgr.bulk_create(d, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        Writer.mgr.bulk_create(w, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        Genre.mgr.bulk_create(g, update_conflicts=True, update_fields=['watch_counter'], unique_fields=['name'])
+        Actor.mgr.bulk_create(
+            a, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+        )
+        Director.mgr.bulk_create(
+            d, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+        )
+        Writer.mgr.bulk_create(
+            w, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+        )
+        Genre.mgr.bulk_create(
+            g,
+            update_conflicts=True,
+            update_fields=["watch_counter"],
+            unique_fields=["name"],
+        )
 
         movie_model.actors.set(a)
         movie_model.directors.set(d)
@@ -85,7 +103,9 @@ class MovieHandler:
         return movie_model, m_status
 
     @classmethod
-    async def a_download(cls, kp_id: int | str, kp_scheme: dict = None) -> tuple[int, bool]:
+    async def a_download(
+        cls, kp_id: int | str, kp_scheme: dict = None
+    ) -> tuple[int, bool]:
 
         if not kp_scheme:
             kp_client = KP_Movie()
@@ -97,7 +117,7 @@ class MovieHandler:
 
         save_movies = await cls._a_save_movie_to_db(converted_response)
 
-        return api_response.get('id', -1), save_movies[1]
+        return api_response.get("id", -1), save_movies[1]
 
     @classmethod
     async def _a_save_movie_to_db(cls, movie_info: KPEntities):
@@ -106,11 +126,21 @@ class MovieHandler:
 
         a, d, w, g = cls._create_models_counstuctor_list(persons, genres)
 
-        await Actor.mgr.abulk_create(a, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        await Director.mgr.abulk_create(d, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        await Writer.mgr.abulk_create(w, update_conflicts=True, update_fields=['photo'], unique_fields=['kp_id'])
-        await Genre.mgr.abulk_create(g, update_conflicts=True, update_fields=['watch_counter'],
-                                     unique_fields=['name'])
+        await Actor.mgr.abulk_create(
+            a, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+        )
+        await Director.mgr.abulk_create(
+            d, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+        )
+        await Writer.mgr.abulk_create(
+            w, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+        )
+        await Genre.mgr.abulk_create(
+            g,
+            update_conflicts=True,
+            update_fields=["watch_counter"],
+            unique_fields=["name"],
+        )
 
         await movie_model.actors.aset(a)
         await movie_model.directors.aset(d)
@@ -120,10 +150,12 @@ class MovieHandler:
         return movie_model, m_status
 
     @classmethod
-    def _create_models_counstuctor_list(cls, persons: dict[str, list], genres: list) -> tuple[list, list, list, list]:
-        actors = [Actor(**pers) for pers in persons['actor']]
-        directors = [Director(**pers) for pers in persons['director']]
-        writers = [Writer(**pers) for pers in persons['writer']]
+    def _create_models_counstuctor_list(
+        cls, persons: dict[str, list], genres: list
+    ) -> tuple[list, list, list, list]:
+        actors = [Actor(**pers) for pers in persons["actor"]]
+        directors = [Director(**pers) for pers in persons["director"]]
+        writers = [Writer(**pers) for pers in persons["writer"]]
         genres = [Genre(**gen) for gen in genres]
 
         return actors, directors, writers, genres
@@ -139,27 +171,32 @@ class MovieHandler:
 
     @classmethod
     def _genres_preprocess(cls, movie_info: dict) -> list[str]:
-        modeling = KpFilmGenresModel(genres=movie_info.get('genres'))
-        formated_genres = modeling.dict().get('genres')
+        modeling = KpFilmGenresModel(genres=movie_info.get("genres"))
+        formated_genres = modeling.dict().get("genres")
         return formated_genres
 
     @classmethod
     def _movie_preprocess(cls, movie_info: dict) -> dict[str, int | str]:
         modeling = KPFilmModel(**movie_info)
-        formated_movie = modeling.model_dump(exclude_none=True, exclude_defaults=True, exclude_unset=True)
+        formated_movie = modeling.model_dump(
+            exclude_none=True, exclude_defaults=True, exclude_unset=True
+        )
         return formated_movie
 
     @classmethod
     def _persons_preprocess(cls, movie_info: dict) -> dict[str, list]:
-        persons = {'actor': [], 'writer': [], 'director': []}
+        persons = {"actor": [], "writer": [], "director": []}
 
-        for p in movie_info.get('persons', []):
-            if not all([p.get('id'), p.get('name')]):
+        for p in movie_info.get("persons", []):
+            if not all([p.get("id"), p.get("name")]):
                 continue
 
             try:
-                persons[p['enProfession']].append(
-                    KpFilmPersonModel(**p).model_dump(exclude_none=True, exclude_defaults=True, exclude_unset=True))
+                persons[p["enProfession"]].append(
+                    KpFilmPersonModel(**p).model_dump(
+                        exclude_none=True, exclude_defaults=True, exclude_unset=True
+                    )
+                )
             except KeyError:
                 continue
 
