@@ -3,6 +3,9 @@ from sqlite3 import OperationalError
 from typing import Any, Union
 from diskcache import Cache
 
+# Configure logger
+logger = logging.getLogger('kinopolka')
+
 
 class Caching:
     """
@@ -23,17 +26,17 @@ class Caching:
         # Проверка параметров
         if dirname and type(dirname) is not str:
             self.__error_message = "Переданный dirname не является строкой."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             self.__initialized = False
             return None
         if ttl and type(ttl) is not int:
             self.__error_message = "Переданный ttl не является целым числом."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             self.__initialized = False
             return None
         if ttl and ttl < 0:
             self.__error_message = "Переданн отрицательный ttl."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             self.__initialized = False
             return None
 
@@ -48,12 +51,12 @@ class Caching:
             self.__error_message = (
                 f"При инициализации кэшировальщика возникла ошибка. [{str(e)}]"
             )
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             self.__initialized = False
             return None
         except Exception as e:
             self.__error_message = f"При инициализации кэшировальщика возникла непредвиденная ошибка. [{str(e)}]"
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             self.__initialized = False
             return None
 
@@ -70,7 +73,7 @@ class Caching:
             self.__error_message = (
                 "Переданный key не является целым числом или строкой."
             )
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False
 
         return key in self.__cache
@@ -84,13 +87,13 @@ class Caching:
         # Проверка параметров
         if key is None:
             self.__error_message = "Параметр key не задан."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return None
         if key and type(key) not in [int, str]:
             self.__error_message = (
                 "Переданный key не является целым числом или строкой."
             )
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return None
 
         # Получение данных из кэша
@@ -98,13 +101,13 @@ class Caching:
             return self.__cache.get(key)
         except TypeError:
             self.__error_message = "Не удалось получить данные из кэша."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False
         except Exception:
             self.__error_message = (
                 "При получении данных из кэша возникла непредвиденная ошибка."
             )
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False
 
     def get_error_message(self) -> str:
@@ -123,13 +126,13 @@ class Caching:
         # Проверка параметров
         if key is None:
             self.__error_message = "Параметр key не задан."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False
         if key and type(key) not in [int, str]:
             self.__error_message = (
                 "Переданный key не является целым числом или строкой."
             )
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False
 
         # Кэширование данных
@@ -137,11 +140,11 @@ class Caching:
             return self.__cache.set(key, value, expire=self.__ttl)
         except TypeError:
             self.__error_message = "Не удалось закэшировать данные."
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False
         except Exception:
             self.__error_message = (
                 "При кэшировании данных возникла непредвиденная ошибка."
             )
-            logging.error(self.__error_message)
+            logger.error(self.__error_message)
             return False

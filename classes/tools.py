@@ -1,3 +1,4 @@
+import logging
 from classes import MovieHandler
 from lists.models import User
 import json
@@ -9,6 +10,7 @@ from filmoclub.calendar.theme_calendar import CALENDAR
 from django.conf import settings
 import pendulum
 
+logger = logging.getLogger('kinopolka')
 
 class Tools:
     """
@@ -19,15 +21,24 @@ class Tools:
     def _get_current_theme(cls) -> Themes:
         """
         Вычисляем текущую тему оформления приложения
+
+        :return: Название текущей темы, в зависимости от текущей даты.
         """
-        current_date = pendulum.now(tz=settings.TIME_ZONE).format("DD.MM")
-        theme = CALENDAR.get(current_date, Themes.default.value)
-        return theme
+        try:
+            current_date = pendulum.now(tz=settings.TIME_ZONE).format("DD.MM")
+            theme = CALENDAR.get(current_date, Themes.default.value)
+            logger.debug("Determined current theme: %s for date %s", theme, current_date)
+            return theme
+        except Exception as e:
+            logger.error("Failed to determine current theme: %s", str(e))
+            return Themes.default.value
 
     @classmethod
     def get_random_images(cls) -> dict:
         """
         Получаем набор путей до изображений для размещения на странице приложения
+
+        :return: Словарь с путями к изображениям для каждого блока на html странице.
         """
         theme = cls._get_current_theme()
 
@@ -43,7 +54,9 @@ class Tools:
     @classmethod
     def _choose_random_image(cls, theme: Themes, folder: ImageFolders) -> str:
         """
-        Получаем путь до случайно выбранного изображения в выбранной теме и папке
+        Получаем путь до случайно выбранного изображения в выбранной теме и папке.
+
+        :return: Строка с расположением изображения.
         """
         empty_file = f"/{IMAGES_PATH}/empty.png"
 
@@ -51,6 +64,7 @@ class Tools:
 
         file_names = os.listdir(full_path)
         if not file_names:
+            logger.warning("No images found in %s", full_path)
             return empty_file
 
         random_img = random.choice(file_names)

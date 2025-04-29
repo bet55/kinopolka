@@ -1,8 +1,7 @@
 from django.urls import path
 
-from postcard.views import PostCardViewSet, tmp
+from postcard.views import PostCardViewSet
 
 urlpatterns = [
-    path("", PostCardViewSet.as_view(), name="postcard_views"),
-    path("check/", tmp, name="postcard_views"),
+    path("", PostCardViewSet.as_view(), name="postcard_views")
 ]

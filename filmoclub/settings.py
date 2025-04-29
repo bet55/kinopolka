@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
-import logging_loki
 import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -164,17 +163,23 @@ TELEGRAM_GROUP_ID = os.getenv("TELEGRAM_GROUP_ID")
 # kinopoisk api token
 KP_API_TOKEN = os.getenv("KP_API_TOKEN")
 
-
 # настройки логгера
+from logging.config import dictConfig
+import logging_loki  # pass
+
+
 class LogFilter(logging.Filter):
     def filter(self, record: logging.LogRecord):
         """Добавляем в логи данные для фильтрации. Формат: tags: {'thread': 11}"""
+        # print(record.__dict__)
+
         if not hasattr(record, 'tags'):
             record.tags = {}
 
-        record.tags['function'] = record.funcName
-        record.tags['line'] = record.lineno
-        record.tags['file'] = record.filename
+        record.tags['function'] = getattr(record, 'funcName', 'unknown')
+        record.tags['line'] = getattr(record, 'lineno', 'unknown')
+        record.tags['file'] = getattr(record, 'filename', 'unknown')
+        record.tags['message'] = getattr(record, 'message', 'unknown')
         return True
 
 
@@ -184,9 +189,10 @@ service = os.getenv('SERVICE_NAME')
 
 LOGGING = {
     'version': 1,
+    'disable_existing_loggers': False,
     'formatters': {
         'console_msg': {
-            'format': '{levelname} {msg} {filename} {funcName} {lineno} {exc_info}',
+            'format': '{levelname} {message} {filename} {funcName} {lineno}',
             'style': '{'
         }
     },
@@ -203,7 +209,7 @@ LOGGING = {
         },
         'loki': {
             'class': 'logging_loki.LokiHandler',
-            'level': 'DEBUG',
+            'level': 'INFO',
             'formatter': 'console_msg',
             'url': loki_url,
             'tags': {'application': application, 'service': service},
@@ -213,9 +219,24 @@ LOGGING = {
     },
 
     'loggers': {
-        'kinopolka_logger': {
-            'level': 'DEBUG',
+        'kinopolka': {
+            'level': 'INFO',
             'handlers': ['console', 'loki'],
+        },
+
+        'django': {
+            'level': 'INFO',
+            'handlers': ['console', 'loki'],
+            'propagate': False,
+        },
+        'django.request': {
+            'level': 'ERROR',
+            'handlers': ['console', 'loki'],
+            'propagate': False,
+        },
+        '': {  # Root logger
+            'level': 'INFO',
+            'handlers': ['console'],
         }
     }
 }

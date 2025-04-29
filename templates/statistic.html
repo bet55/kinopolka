@@ -23,9 +23,9 @@
 
     <br>
 
-    <div id="movies-kp" class="row movies-container">
-        <h1>Лучшие фильмы по мнению кинопоиска</h1>
-        {% for m in kp_movies %}
+    <div id="movies-imdb" class="row movies-container">
+        <h1>Лучшие фильмы по мнению imdb</h1>
+        {% for m in imdb_movies %}
 
             <div class="movie" data-kp-id="{{ m.kp_id }}">
                 <img src="{{ m.poster }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">

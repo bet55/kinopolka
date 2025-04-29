@@ -1,73 +1,102 @@
-from adrf.decorators import api_view
+from adrf.views import APIView as AsyncAPIView
 from adrf.views import APIView
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-
 from classes import Tools, UserHandler, PostcardHandler, Invitation
-
 import logging
-logger = logging.getLogger('kinopolka_logger')
 
-@api_view(['GET'])
-def tmp(request: Request):
-    logger.info('I am here')
-    return Response({'res': 'nice'})
+# Configure logger
+logger = logging.getLogger('kinopolka')
 
-
-class InvitationViewSet(APIView):
-    def post(self, request: Request):
+class InvitationViewSet(AsyncAPIView):
+    async def post(self, request: Request):
         """
-        Делаем рассылку о следующем чаепитие
+        Send invitation for the next tea party.
         """
-        invitation = Invitation()
-        result = invitation.send_invitation()
-        return Response(result)
-
+        try:
+            invitation = Invitation()
+            result = await invitation.send_invitation()
+            logger.info("Invitation sent successfully")
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error("Failed to send invitation: %s", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PostCardViewSet(APIView):
     def get(self, request: Request):
         """
-        Получаем страницу с открыткой текущего мероприятия
+        Retrieve the page with the current event's postcard.
         """
-        users = UserHandler.get_all_users()
-        random_images = Tools.get_random_images()
-        postcard, is_active = PostcardHandler.get_postcard()
+        try:
+            users = UserHandler.get_all_users()
+            random_images = Tools.get_random_images()
+            postcard, is_active = PostcardHandler.get_postcard()  # Updated to handle tuple return
 
-        postcard = (
-            postcard.screenshot.url if is_active else random_images.get("postcard")
-        )
+            # Берем активную открытку или пустой бланк
+            postcard_url = (
+                postcard.screenshot.url if is_active and postcard else random_images.get("postcard")
+            )
 
-        context = {
-            "postcard": postcard,
-            "random": random_images,
-            "users": users,
-            "is_active": is_active,
-        }
-        return render(request, "postcard.html", context=context)
+            context = {
+                "postcard": postcard_url,
+                "random": random_images,
+                "users": users,
+                "is_active": is_active,
+            }
+            logger.info("Retrieved postcard page with is_active: %s", is_active)
+            return render(request, "postcard.html", context=context)
+        except Exception as e:
+            logger.error("Failed to retrieve postcard page: %s", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request: Request):
         """
-        Создаём новую открытку
+        Create a new postcard.
         """
-        postcard, success = PostcardHandler.create_postcard(request.data)
-        if success:
-            return Response(data=postcard, status=status.HTTP_201_CREATED)
-        return Response(data=postcard, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            postcard_data, success = PostcardHandler.create_postcard(request.data)
+            if success:
+                logger.info("Created new postcard successfully")
+                return Response(data=postcard_data, status=status.HTTP_201_CREATED)
+            logger.warning("Failed to create postcard: %s", postcard_data)
+            return Response(data=postcard_data, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error("Error creating postcard: %s", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def put(self, request: Request):
         """
-        Делаем все открытки неактивными
+        Deactivate all postcards.
         """
-        PostcardHandler.deactivate_postcard()
-        return Response(data={"Postcards deactivated"}, status=status.HTTP_201_CREATED)
+        try:
+            success = PostcardHandler.deactivate_postcard()  # No need for postcard_id since update_all=True by default
+            if success:
+                logger.info("All postcards deactivated successfully")
+                return Response(data={"message": "Postcards deactivated"}, status=status.HTTP_200_OK)
+            logger.warning("Failed to deactivate postcards")
+            return Response({"error": "Failed to deactivate postcards"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error("Error deactivating postcards: %s", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request: Request):
         """
-        Удаляем выбранную открытку
+        Delete a specific postcard.
         """
-        result = PostcardHandler.delete_postcard(request.data["id"])
-        if result:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            postcard_id = request.data.get("id")
+            if not postcard_id:
+                logger.error("Missing postcard ID in delete request")
+                return Response({"error": "Postcard ID required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            success = PostcardHandler.delete_postcard(postcard_id)  # Updated to handle bool return
+            if success:
+                logger.info("Deleted postcard with id: %s", postcard_id)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            logger.warning("Failed to delete postcard with id: %s", postcard_id)
+            return Response({"error": "Postcard not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error("Error deleting postcard: %s", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

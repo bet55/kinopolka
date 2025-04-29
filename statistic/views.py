@@ -22,7 +22,7 @@ def movies_stats(request):
     random_images = Tools.get_random_images()
     users = UserHandler.get_all_users()
     top_users_movies = Statistic.most_rated_users_movies()
-    top_kp_movies = Statistic.most_rated_kp_movies()
+    top_imdb_movies = Statistic.most_rated_imdb_movies()
 
     return render(
         request,
@@ -33,6 +33,6 @@ def movies_stats(request):
             "random": random_images,
             "users": users,
             "movies": top_users_movies,
-            "kp_movies": top_kp_movies,
+            "imdb_movies": top_imdb_movies,
         },
     )

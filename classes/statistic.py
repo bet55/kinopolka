@@ -29,17 +29,17 @@ class Statistic:
         pass
 
     @classmethod
-    def most_rated_kp_movies(cls):
+    def most_rated_imdb_movies(cls):
 
         all_movies = MovieHandler.get_all_movies(MoviesStructure.rating.value, True)
 
         df = pd.DataFrame(all_movies)
-        df["rating_kp"] = df["rating_kp"].astype(float)
+        df["rating_imdb"] = df["rating_imdb"].astype(float)
         top_3 = (
             df.groupby(["kp_id"])
-            .agg({"rating_kp": "mean"})
+            .agg({"rating_imdb": "mean"})
             .reset_index()
-            .sort_values(by="rating_kp", ascending=False)
+            .sort_values(by="rating_imdb", ascending=False)
             .head(3)
         )
 
