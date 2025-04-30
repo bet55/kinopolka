@@ -48,6 +48,8 @@ const createFilmsList = (filmsStorage) => {
 // Получаем все элементы из стораджа, у которых ключ - это число
 const getStorageFilmIds = () => {
     let lsKeys = Object.keys(localStorage);
+
+
     let lsValues = [];
 
 
@@ -55,8 +57,16 @@ const getStorageFilmIds = () => {
         if (isNaN(key)) {
             continue;
         }
-        lsValues.push(JSON.parse(localStorage.getItem(key)))
+
+        try {
+            lsValues.push(JSON.parse(localStorage.getItem(key)))
+        } catch (e) {
+            localStorage.removeItem(key)
+        }
+
     }
+
+
     return lsValues;
 }
 
@@ -80,7 +90,9 @@ function cartMoviesHandler() {
 
     // Заполняем список закладок фильмами из локал стораджа
     const filmIds = getStorageFilmIds();
+
     createFilmsList(filmIds);
+
 
     cartMoviesList.addEventListener('click', (e) => {
         e.stopPropagation();

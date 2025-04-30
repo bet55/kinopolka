@@ -7,6 +7,7 @@ from lists.models import Movie, Actor, Director, Writer, Genre
 from lists.serializers import MovieSerializer, MovieSmallSerializer, MovieRatingSerializer
 from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
 from classes.kp import KP_Movie
+from asgiref.sync import sync_to_async
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
@@ -29,7 +30,7 @@ class MovieHandler:
     """
 
     @classmethod
-    def get_movie(cls, kp_id: Union[int, str]) -> Optional[Dict]:
+    async def get_movie(cls, kp_id: Union[int, str]) -> Optional[Dict]:
         """
         Retrieve a movie by its Kinopoisk ID.
 
@@ -44,7 +45,7 @@ class MovieHandler:
             return None
 
         try:
-            film_model = Movie.mgr.get(kp_id=kp_id)
+            film_model = await Movie.mgr.aget(kp_id=kp_id)
             serialized = MovieSerializer(film_model)
             logger.info("Retrieved movie with kp_id: %s", kp_id)
             return serialized.data
@@ -57,6 +58,7 @@ class MovieHandler:
             return None
 
     @classmethod
+    @sync_to_async
     def get_all_movies(
             cls, info_type: Optional[MoviesStructure] = None, is_archive: bool = False
     ) -> List[Dict]:
@@ -91,7 +93,7 @@ class MovieHandler:
             return []
 
     @classmethod
-    def change_movie_status(cls, kp_id: Union[int, str], is_archive: bool) -> bool:
+    async def change_movie_status(cls, kp_id: Union[int, str], is_archive: bool) -> bool:
         """
         Update the archive status of a movie.
 
@@ -111,7 +113,7 @@ class MovieHandler:
             return False
 
         try:
-            film_model = Movie.mgr.get(kp_id=kp_id)
+            film_model = await Movie.mgr.aget(kp_id=kp_id)
             film_model.is_archive = is_archive
             film_model.save()
             logger.info("Updated archive status for movie %s to %s", kp_id, is_archive)
@@ -125,7 +127,7 @@ class MovieHandler:
             return False
 
     @classmethod
-    def remove_movie(cls, kp_id: Union[int, str]) -> bool:
+    async def remove_movie(cls, kp_id: Union[int, str]) -> bool:
         """
         Delete a movie by its Kinopoisk ID.
 
@@ -140,8 +142,8 @@ class MovieHandler:
             return False
 
         try:
-            film_model = Movie.mgr.get(kp_id=kp_id)
-            film_model.delete()
+            film_model = await Movie.mgr.aget(kp_id=kp_id)
+            await film_model.adelete()
             logger.info("Deleted movie with kp_id: %s", kp_id)
             return True
 

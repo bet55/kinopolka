@@ -6,6 +6,8 @@ from django.db import IntegrityError
 from lists.models import Note, User, Movie
 from lists.serializers import NoteSerializer
 from pydantic_models import RateMovieRequestModel
+from asgiref.sync import sync_to_async
+
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
@@ -17,6 +19,7 @@ class NoteHandler:
     """
 
     @classmethod
+    @sync_to_async
     def get_all_notes(cls, result_format: str = "dict") -> Union[Dict[int, List[Dict]], List[Dict]]:
         """
         Получение всех заметок с оценками фильмов.
@@ -47,12 +50,12 @@ class NoteHandler:
 
             return dict(notes)
 
-        except (Exception) as e:
+        except Exception as e:
             logger.error("Failed to retrieve notes: %s", str(e))
             return {} if result_format == "dict" else []
 
     @classmethod
-    def create_note(cls, note_body: Dict) -> bool:
+    async def create_note(cls, note_body: Dict) -> bool:
         """
         Создаём или обновляем заметку с оценкой о фильме.
 
@@ -77,8 +80,8 @@ class NoteHandler:
                 return False
 
             # Fetch user and movie
-            user = User.objects.get(id=formatted_request["user"])
-            film = Movie.mgr.get(kp_id=formatted_request["movie"])
+            user = User.objects.aget(id=formatted_request["user"])
+            film = Movie.mgr.aget(kp_id=formatted_request["movie"])
             rating = formatted_request["rating"]
 
             # Create note object
@@ -87,7 +90,7 @@ class NoteHandler:
                 note.text = formatted_request["text"]
 
             # Use bulk_create for upsert (create or update)
-            Note.mgr.bulk_create(
+            Note.mgr.abulk_create(
                 [note],
                 update_conflicts=True,
                 update_fields=["rating", "text"],
@@ -107,7 +110,7 @@ class NoteHandler:
             return False
 
     @classmethod
-    def remove_note(cls, user_id: int, movie_kp_id: int) -> bool:
+    async def remove_note(cls, user_id: int, movie_kp_id: int) -> bool:
         """
         Remove a movie note for a specific user and movie.
 
@@ -125,8 +128,8 @@ class NoteHandler:
             return False
 
         try:
-            note = Note.mgr.get(user__id=user_id, movie__kp_id=movie_kp_id)
-            note.delete()
+            note = Note.mgr.aget(user__id=user_id, movie__kp_id=movie_kp_id)
+            note.adelete()
             logger.info("Deleted note for user %s, movie %s", user_id, movie_kp_id)
             return True
 

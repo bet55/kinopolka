@@ -26,7 +26,6 @@ const showMoviePoster = (movieInfo) => {
 
 export function fillMovieCard(allMovies) {
 
-    console.log(allMovies)
 
     // Возможность раскрывать/прятать текст описания
     cardDescription.addEventListener('click', e => {

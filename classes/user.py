@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from lists.models import User
 from lists.serializers import UserSerializer
+from asgiref.sync import sync_to_async
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
@@ -13,7 +14,7 @@ class UserHandler:
     """
 
     @classmethod
-    def get_user(cls, user_id: int | str) -> Optional[Dict]:
+    async def get_user(cls, user_id: int | str) -> Optional[Dict]:
         """
         Retrieve a user by their ID.
 
@@ -26,7 +27,7 @@ class UserHandler:
             return None
 
         try:
-            app_user = User.objects.get(pk=user_id)
+            app_user = await User.objects.aget(pk=user_id)
             serialized_user = UserSerializer(app_user)
             logger.info("Retrieved user with id: %s", user_id)
             return serialized_user.data
@@ -39,6 +40,7 @@ class UserHandler:
             return None
 
     @classmethod
+    @sync_to_async
     def get_all_users(cls) -> List[Dict]:
         """
         Получение всех пользователей.
@@ -51,6 +53,7 @@ class UserHandler:
             logger.info("Retrieved %d users", all_app_users.count())
             return serialized_all_app_users.data
 
-        except (DatabaseError, Exception) as e:
+        except Exception as e:
+            from icecream import ic
             logger.error("Failed to retrieve all users: %s", str(e))
             return []

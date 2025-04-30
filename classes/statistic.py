@@ -1,8 +1,10 @@
 from classes import NoteHandler, MovieHandler, MoviesStructure
-from lists.models import Movie
 import pandas as pd
+import numpy as np
 import plotly
 import plotly.express as px
+
+from icecream import ic
 
 
 class Statistic:
@@ -10,11 +12,18 @@ class Statistic:
     Класс для обработки статистики по просмотренным и ожидаемым фильмам из списков
     """
 
-    @classmethod
-    def get_movies_statistic(cls):
+    TOP_MOVIES = 4
 
-        film_model = Movie.mgr.filter(is_archive=True).values()
-        df = pd.DataFrame(film_model)
+    @classmethod
+    async def get_movies_statistic(cls):
+
+        film_model = await MovieHandler.get_all_movies(is_archive=True)
+        df = pd.DataFrame(film_model.values())
+
+        # почему-то слетают типы нужно проверить сериалайзер
+        df.loc[:, ['duration', 'rating_kp', 'rating_imdb']] = (
+            df.loc[:, ['duration', 'rating_kp', 'rating_imdb']].astype(np.float16))
+
         stats = {
             "total_duration": df["duration"].sum(),
             "rating_kp": round(df["rating_kp"].mean(), 2),
@@ -29,52 +38,55 @@ class Statistic:
         pass
 
     @classmethod
-    def most_rated_imdb_movies(cls):
+    async def most_rated_imdb_movies(cls):
 
-        all_movies = MovieHandler.get_all_movies(MoviesStructure.rating.value, True)
+        all_movies = await MovieHandler.get_all_movies(MoviesStructure.rating.value, True)
 
         df = pd.DataFrame(all_movies)
         df["rating_imdb"] = df["rating_imdb"].astype(float)
-        top_3 = (
+        top_movies = (
             df.groupby(["kp_id"])
             .agg({"rating_imdb": "mean"})
             .reset_index()
             .sort_values(by="rating_imdb", ascending=False)
-            .head(3)
+            .head(cls.TOP_MOVIES)
         )
 
-        top_3["poster"] = top_3.apply(
+        top_movies["poster"] = top_movies.apply(
             lambda row: df[df.kp_id == row.kp_id]["poster"].values[0], axis=1
         )
-        top_3["name"] = top_3.apply(
+        top_movies["name"] = top_movies.apply(
             lambda row: df[df.kp_id == row.kp_id]["name"].values[0], axis=1
         )
-        top_rated_movies = top_3.to_dict("records")
+        top_rated_movies = top_movies.to_dict("records")
 
         return top_rated_movies
 
     @classmethod
-    def most_rated_users_movies(cls):
+    async def most_rated_users_movies(cls):
         movies = []
-        notes = NoteHandler.get_all_notes("list")
+        notes = await NoteHandler.get_all_notes("list")
 
         df = pd.DataFrame(notes)
-        top_3 = (
+
+        top_movies = (
             df.groupby(["movie"])
             .agg({"rating": "mean"})
             .reset_index()
             .sort_values(by="rating", ascending=False)
-            .head(3)
+            .head(cls.TOP_MOVIES)
         )
 
-        for movie_id in list(top_3.movie):
-            movies.append(MovieHandler.get_movie(movie_id))
+        for movie_id in list(top_movies.movie):
+            movies.append(await MovieHandler.get_movie(movie_id))
 
         return movies
 
     @classmethod
-    def draw(cls):
-        film_model = Movie.mgr.filter(is_archive=True).values()
+    async def draw(cls):
+        film_model =  await MovieHandler.get_all_movies(is_archive=True)
+        film_model = film_model.values()
+
         df = pd.DataFrame(film_model)
         figure_config = {
             "x": "rating_kp",

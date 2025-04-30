@@ -1,5 +1,8 @@
 from django.urls import path
 
-from statistic.views import movies_stats
+from statistic.views import MoviesStatistic
 
-urlpatterns = [path("", movies_stats)]
+urlpatterns = [
+    path("", MoviesStatistic.as_view(), name="statistic_view"),
+
+]

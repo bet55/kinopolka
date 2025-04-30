@@ -93,6 +93,7 @@ DATABASES = {
     }
 }
 
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -220,7 +221,7 @@ LOGGING = {
 
     'loggers': {
         'kinopolka': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'handlers': ['console', 'loki'],
         },
 
@@ -234,9 +235,9 @@ LOGGING = {
             'handlers': ['console', 'loki'],
             'propagate': False,
         },
-        '': {  # Root logger
-            'level': 'INFO',
-            'handlers': ['console'],
-        }
+        # '': {  # Root logger
+        #     'level': 'INFO',
+        #     'handlers': ['console'],
+        # }
     }
 }

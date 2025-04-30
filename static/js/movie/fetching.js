@@ -11,6 +11,13 @@ export const fetchMovies = async () => {
         const message = `Movies request error: ${response.status}`;
         console.error(message);
     }
-    return await response.json();
+
+    const responseJson = await response.json();
+
+    if(responseJson['success'] != true) {
+        console.error(responseJson['error'])
+    }
+
+    return responseJson['data'];
 }
 

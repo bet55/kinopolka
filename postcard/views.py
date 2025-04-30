@@ -1,4 +1,3 @@
-from adrf.views import APIView as AsyncAPIView
 from adrf.views import APIView
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -10,7 +9,7 @@ import logging
 # Configure logger
 logger = logging.getLogger('kinopolka')
 
-class InvitationViewSet(AsyncAPIView):
+class InvitationViewSet(APIView):
     async def post(self, request: Request):
         """
         Send invitation for the next tea party.
@@ -25,14 +24,14 @@ class InvitationViewSet(AsyncAPIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PostCardViewSet(APIView):
-    def get(self, request: Request):
+    async def get(self, request: Request):
         """
         Retrieve the page with the current event's postcard.
         """
         try:
-            users = UserHandler.get_all_users()
+            users = await UserHandler.get_all_users()
             random_images = Tools.get_random_images()
-            postcard, is_active = PostcardHandler.get_postcard()  # Updated to handle tuple return
+            postcard, is_active = await PostcardHandler.get_postcard()
 
             # Берем активную открытку или пустой бланк
             postcard_url = (
@@ -51,7 +50,7 @@ class PostCardViewSet(APIView):
             logger.error("Failed to retrieve postcard page: %s", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request: Request):
+    async def post(self, request: Request):
         """
         Create a new postcard.
         """
@@ -66,7 +65,7 @@ class PostCardViewSet(APIView):
             logger.error("Error creating postcard: %s", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def put(self, request: Request):
+    async def put(self, request: Request):
         """
         Deactivate all postcards.
         """
@@ -81,7 +80,7 @@ class PostCardViewSet(APIView):
             logger.error("Error deactivating postcards: %s", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def delete(self, request: Request):
+    async def delete(self, request: Request):
         """
         Delete a specific postcard.
         """

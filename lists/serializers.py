@@ -41,6 +41,7 @@ class MovieSerializer(ModelSerializer):
             "description",
             "duration",
             "rating_kp",
+            "rating_imdb",
             "is_archive",
         ]
 

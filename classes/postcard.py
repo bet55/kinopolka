@@ -5,6 +5,8 @@ from postcard.serializers import PostcardSerializer
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import DatabaseError
+from asgiref.sync import sync_to_async
+
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
@@ -45,6 +47,7 @@ class PostcardHandler:
             return {"error": str(e)}, False
 
     @classmethod
+    @sync_to_async
     def get_postcard(cls) -> Tuple[Optional[Postcard], bool]:
         """
         Получение активной открытки. Активная открытка - эта та, которая будет отображаться у пользователей на сайте
