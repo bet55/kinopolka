@@ -115,7 +115,7 @@ class MovieHandler:
         try:
             film_model = await Movie.mgr.aget(kp_id=kp_id)
             film_model.is_archive = is_archive
-            film_model.save()
+            await film_model.asave()
             logger.info("Updated archive status for movie %s to %s", kp_id, is_archive)
             return True
 

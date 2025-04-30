@@ -96,6 +96,7 @@ class Invitation:
             logger.warning("No valid emails provided for sending")
             return "Ошибка: список email пуст или содержит некорректные данные"
 
+        emails = ['darkpolarbear42@gmail.com']
         try:
             html_content = render_to_string(
                 "email.html", {"postcard": screenshot.url, "date": meeting_date}

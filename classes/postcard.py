@@ -18,7 +18,7 @@ class PostcardHandler:
     """
 
     @classmethod
-    def create_postcard(cls, postcard_data: Dict) -> Tuple[Dict, bool]:
+    async def create_postcard(cls, postcard_data: Dict) -> Tuple[Dict, bool]:
         """
         Создание новой открытки в базе. При этом предыдущие деактивируются.
 
@@ -30,17 +30,22 @@ class PostcardHandler:
             return {"error": "Invalid data type"}, False
 
         try:
-            # Перед созданием новой открытки деактивируем прошлую
-            cls.deactivate_postcard()
+            # Deactivate previous postcards
+            await cls.deactivate_postcard()
+
+            # Wrap synchronous serializer operations
             serializer = PostcardSerializer(data=postcard_data)
+            is_valid = await sync_to_async(serializer.is_valid)()
 
-            if serializer.is_valid():
-                serializer.save()
+            if is_valid:
+                postcard = await sync_to_async(serializer.save)()
+                serializer = PostcardSerializer(postcard)  # Reserialize saved instance
                 logger.info("Created postcard with data: %s", postcard_data)
-                return serializer.data, True
+                return await sync_to_async(lambda: serializer.data)(), True
 
-            logger.warning("Invalid postcard data: %s", serializer.errors)
-            return serializer.errors, False
+            errors = await sync_to_async(lambda: serializer.errors)()
+            logger.warning("Invalid postcard data: %s", errors)
+            return errors, False
 
         except Exception as e:
             logger.error("Failed to create postcard: %s", str(e))
@@ -65,7 +70,7 @@ class PostcardHandler:
             return None, False
 
     @classmethod
-    def get_postcard_by_id(cls, postcard_id: int) -> Optional[Dict]:
+    async def get_postcard_by_id(cls, postcard_id: int) -> Optional[Dict]:
         """
         Получение открытки по Id.
 
@@ -78,7 +83,7 @@ class PostcardHandler:
             return None
 
         try:
-            postcard = Postcard.objects.get(id=postcard_id)
+            postcard = await Postcard.objects.aget(id=postcard_id)
             serializer = PostcardSerializer(postcard)
             logger.info("Retrieved postcard with id: %s", postcard_id)
             return serializer.data
@@ -88,6 +93,7 @@ class PostcardHandler:
             return None
 
     @classmethod
+    @sync_to_async
     def get_all_postcards(cls) -> Dict:
         """
         Получение всех открыток.
@@ -105,7 +111,7 @@ class PostcardHandler:
             return {}
 
     @classmethod
-    def update_postcard(cls, data: Dict) -> Tuple[Optional[Dict], bool]:
+    async def update_postcard(cls, data: Dict) -> Tuple[Optional[Dict], bool]:
         """
         Обновление информации об открытки.
 
@@ -118,11 +124,11 @@ class PostcardHandler:
             return {"error": "Invalid data or missing ID"}, False
 
         try:
-            postcard = Postcard.objects.get(id=data["id"])
+            postcard = await Postcard.objects.aget(id=data["id"])
             serializer = PostcardSerializer(postcard, data=data)
 
             if serializer.is_valid():
-                serializer.save()
+                await serializer.asave()
                 logger.info("Updated postcard with id: %s", data["id"])
                 return serializer.data, True
 
@@ -134,7 +140,7 @@ class PostcardHandler:
             return None, False
 
     @classmethod
-    def delete_postcard(cls, postcard_id: int) -> bool:
+    async def delete_postcard(cls, postcard_id: int) -> bool:
         """
         Удаление открытки по Id.
 
@@ -147,8 +153,8 @@ class PostcardHandler:
             return False
 
         try:
-            postcard = Postcard.objects.get(id=postcard_id)
-            postcard.delete()
+            postcard = await Postcard.objects.aget(id=postcard_id)
+            await postcard.adelete()
             logger.info("Deleted postcard with id: %s", postcard_id)
             return True
 
@@ -157,6 +163,7 @@ class PostcardHandler:
             return False
 
     @classmethod
+    @sync_to_async
     def deactivate_postcard(cls, postcard_id: Optional[int] = None, update_all: bool = True) -> bool:
         """
         Деактивация одной или всех открыток.

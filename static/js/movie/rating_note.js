@@ -1,3 +1,5 @@
+import {createToast} from "../utils/create_toast.js";
+
 const createNoteElement = (movieId, userId, rating, comment) => {
     const userNote = document.querySelector(`.note-container[data-kp-id="${movieId}"] .note[data-user-id="${userId}"]`)
     if (userNote) {
@@ -71,8 +73,13 @@ const rateRequest = async (movieId, userId, rating, comment) => {
             },
             body: JSON.stringify(sendData),
         });
-        console.log(await response.json());
+
+        const responseJson = await response.json();
+        if (responseJson['success'] === false) {
+            createToast(data['error'], 'error');
+        }
     } catch (e) {
+        createToast('Ошибка добавления оценки', 'error');
         console.error(sendData);
         console.error(e);
     }

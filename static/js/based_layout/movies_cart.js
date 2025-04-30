@@ -78,10 +78,16 @@ const addToCart = (filmId, film) => {
 }
 // Удаляем фильм из стораджа и списка закладок
 const removeFromCart = (filmId) => {
+    console.log(filmId);
     localStorage.removeItem(filmId);
 
+
+
     const filmContainer = document.querySelector(`li[data-kp-id="${filmId}"]`);
-    filmContainer.remove();
+    if(filmContainer) {
+        filmContainer.remove();
+    }
+
 }
 
 // Обрабатываем кнопку показа списка фильмов из закладок

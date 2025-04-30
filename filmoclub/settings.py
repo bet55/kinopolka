@@ -145,7 +145,7 @@ REST_FRAMEWORK = {
 
 # email для отправки приглашений
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.yandex.ru"  # Или другой SMTP-сервер
+EMAIL_HOST = "smtp.yandex.ru"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "0")
@@ -172,7 +172,7 @@ import logging_loki  # pass
 class LogFilter(logging.Filter):
     def filter(self, record: logging.LogRecord):
         """Добавляем в логи данные для фильтрации. Формат: tags: {'thread': 11}"""
-        # print(record.__dict__)
+        # print(record.__dict__) если нужно посмотреть, что передается в log
 
         if not hasattr(record, 'tags'):
             record.tags = {}

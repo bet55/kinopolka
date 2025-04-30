@@ -4,12 +4,11 @@ const changeNotesVisibility = () => {
     const rateNotes = document.querySelectorAll('.note-container')
     let visibility = localStorage.getItem('ratingVisibility') || 'hidden';
 
-    // Сохраняем состояние со слоем оценок
-    if (visibility === 'visible') {
+    // Отображаем оценки, если в локал стораже нужный флаг и мы на странице архива
+    if (visibility === 'visible' && window.location.href.includes('archive')) {
         rateNotes.forEach(note => {
             note.style.visibility = visibility;
         })
-
     }
 
 
@@ -25,7 +24,7 @@ const changeNotesVisibility = () => {
     }
 }
 
-
+// Функция смены видимости
 const visibilityToggler = changeNotesVisibility()
 
 export function showRatingNotesHandler() {

@@ -114,7 +114,7 @@ class MoviesView(APIView):
             if not success:
                 logger.warning("Failed to update movie status: kp_id=%s", kp_id)
                 return Response(
-                    {"success": False, "error": "Movie not found or update failed", "data": None},
+                    {"success": False, "error": "Фильм не найден или проблема обновления", "data": None},
                     status=status.HTTP_404_NOT_FOUND
                 )
 

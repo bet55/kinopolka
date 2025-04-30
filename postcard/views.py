@@ -55,7 +55,7 @@ class PostCardViewSet(APIView):
         Create a new postcard.
         """
         try:
-            postcard_data, success = PostcardHandler.create_postcard(request.data)
+            postcard_data, success = await PostcardHandler.create_postcard(request.data)
             if success:
                 logger.info("Created new postcard successfully")
                 return Response(data=postcard_data, status=status.HTTP_201_CREATED)
@@ -70,7 +70,7 @@ class PostCardViewSet(APIView):
         Deactivate all postcards.
         """
         try:
-            success = PostcardHandler.deactivate_postcard()  # No need for postcard_id since update_all=True by default
+            success = await PostcardHandler.deactivate_postcard()  # No need for postcard_id since update_all=True by default
             if success:
                 logger.info("All postcards deactivated successfully")
                 return Response(data={"message": "Postcards deactivated"}, status=status.HTTP_200_OK)
@@ -90,7 +90,7 @@ class PostCardViewSet(APIView):
                 logger.error("Missing postcard ID in delete request")
                 return Response({"error": "Postcard ID required"}, status=status.HTTP_400_BAD_REQUEST)
 
-            success = PostcardHandler.delete_postcard(postcard_id)  # Updated to handle bool return
+            success = await PostcardHandler.delete_postcard(postcard_id)  # Updated to handle bool return
             if success:
                 logger.info("Deleted postcard with id: %s", postcard_id)
                 return Response(status=status.HTTP_204_NO_CONTENT)

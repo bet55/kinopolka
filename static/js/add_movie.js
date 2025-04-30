@@ -24,8 +24,12 @@ async function sendData() {
             },
             body: JSON.stringify(sendData),
         });
-        console.log(await response.json());
-        createToast('Фильм добавлен', 'success');
+        const responseJson = await response.json();
+        if(responseJson['success'] === false) {
+            createToast('Ошибка добавления', 'error');
+        } else {
+            createToast('Фильм добавлен', 'success');
+        }
     } catch (e) {
         createToast('Ошибка добавления', 'error');
         console.error(e);

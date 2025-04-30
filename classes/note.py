@@ -80,8 +80,8 @@ class NoteHandler:
                 return False
 
             # Fetch user and movie
-            user = User.objects.aget(id=formatted_request["user"])
-            film = Movie.mgr.aget(kp_id=formatted_request["movie"])
+            user = await User.objects.aget(id=formatted_request["user"])
+            film = await Movie.mgr.aget(kp_id=formatted_request["movie"])
             rating = formatted_request["rating"]
 
             # Create note object
@@ -90,7 +90,7 @@ class NoteHandler:
                 note.text = formatted_request["text"]
 
             # Use bulk_create for upsert (create or update)
-            Note.mgr.abulk_create(
+            await Note.mgr.abulk_create(
                 [note],
                 update_conflicts=True,
                 update_fields=["rating", "text"],

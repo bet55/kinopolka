@@ -1,3 +1,5 @@
+import {createToast} from "../../utils/create_toast.js";
+
 export const changeMovieArchiveStatus = (allMovies, movieId, target, posterContainer) => {
     const isArchive = document.URL.includes('archive');
 
@@ -11,10 +13,14 @@ export const changeMovieArchiveStatus = (allMovies, movieId, target, posterConta
         },
         body: JSON.stringify(sendData)
     }).then(rs => rs.json()).then((data) => {
-        console.log(data)
+        if (data['success'] === false) {
+            createToast(data['error'], 'error');
+        } else {
+            posterContainer.remove();
+        }
     }).catch(rs => {
-        console.error(rs)
+        createToast('ошибка архивации', 'error');
+        console.error(rs);
     });
 
-    posterContainer.remove();
 }
