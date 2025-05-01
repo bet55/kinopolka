@@ -29,6 +29,10 @@
 #add-btn {
     background-color: var(--orange-color);
     margin: 1em;
+
+    .spinner-border {
+        display: none;
+    }
 }
 
 @media (min-width: 2500px) {

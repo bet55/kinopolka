@@ -3,8 +3,11 @@ import {createToast} from "./utils/create_toast.js";
 import {screenshot} from "./utils/screenshot.js";
 import {getNextSaturday} from "./utils/next_saturday.js";
 
+let isPending = false;
 
+// Отправляем приглашение с открыткой
 function sendPostcard() {
+
     const sendButton = document.querySelector('#postcard-send-button');
 
     if (!sendButton) {
@@ -12,27 +15,36 @@ function sendPostcard() {
     }
 
     sendButton.addEventListener('click', () => {
+        // Всё еще исполняется предыдущее действие
+        if (isPending) {
+            return null;
+        }
+
+
         sendButton.classList.add('active_option')
 
-        const url = document.baseURI.split('/', 3).join('/') + '/email/';
+        const url = '/invitation/';
 
         const requestOptions = {
             method: "POST",
             redirect: "follow"
         };
 
+        isPending = true;
         fetch(url, requestOptions)
             .then((response) => {
+
                 if (!response.ok) {
                     throw Error(`${response.status}: ${response.text()}`);
                 }
                 return response.text()
+
             })
             .then((result) => {
 
                 createToast('Открытка отправлена', 'success');
                 sendButton.classList.remove('active_option')
-
+                isPending = false;
 
             })
             .catch((error) => {
@@ -40,12 +52,15 @@ function sendPostcard() {
                 console.error(error);
                 createToast('Открытка не отправлена', 'error');
                 sendButton.classList.remove('active_option')
+                isPending = false;
             });
 
 
     })
 }
 
+
+// Архивируем предыдущую открытку и выводим пустой бланк
 function createPostcard() {
     const createButton = document.querySelector('#postcard-create-button');
 
@@ -54,6 +69,13 @@ function createPostcard() {
     }
 
     createButton.addEventListener('click', () => {
+
+        // Всё еще исполняется предыдущее действие
+        if (isPending) {
+            return null;
+        }
+
+
         createButton.classList.add('active_option')
 
         const url = document.baseURI.split('/', 3).join('/') + '/';
@@ -63,7 +85,7 @@ function createPostcard() {
             redirect: "follow"
         };
 
-
+        isPending = true;
         fetch(url, requestOptions)
             .then((response) => {
                 if (!response.ok) {
@@ -75,7 +97,6 @@ function createPostcard() {
 
                 createToast('Открытка заархивирована', 'success');
                 createButton.classList.remove('active_option')
-
                 // Перезагружаем страницу
                 setTimeout(() => window.location.reload(), 1000)
 
@@ -85,6 +106,7 @@ function createPostcard() {
                 console.error(error);
                 createToast('Открытка не заархивирована', 'error');
                 createButton.classList.remove('active_option')
+                isPending = false;
             });
 
 
@@ -94,6 +116,7 @@ function createPostcard() {
 }
 
 
+// Сохраняем открытку в базе
 const savePostcard = async () => {
     const saveButton = document.querySelector('#postcard-save-button');
     const postcard = document.querySelector('#postcard-container');
@@ -108,6 +131,12 @@ const savePostcard = async () => {
 
     saveButton.addEventListener('click', async e => {
 
+        // Всё еще исполняется предыдущее действие
+        if (isPending) {
+            return null;
+        }
+
+
         const postcardFilled = (title.innerText.replace(/\D/g, '')) && document.querySelector('.poster');
 
         if (!postcardFilled) {
@@ -116,12 +145,14 @@ const savePostcard = async () => {
         }
 
         saveButton.classList.add('active_option')
+        isPending = true;
 
         title.contentEditable = false;
         const posters = document.querySelectorAll('.poster');
         const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
         await screenshot(postcard, posters_ids, title.innerText, getNextSaturday('iso'));
 
+        isPending = false;
         saveButton.classList.remove('active_option')
 
 

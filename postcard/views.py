@@ -15,7 +15,7 @@ class InvitationViewSet(APIView):
         Send invitation for the next tea party.
         """
         try:
-            invitation = Invitation()
+            invitation = await Invitation.create()
             result = await invitation.send_invitation()
             logger.info("Invitation sent successfully")
             return Response(result, status=status.HTTP_200_OK)

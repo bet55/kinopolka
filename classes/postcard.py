@@ -62,6 +62,8 @@ class PostcardHandler:
         try:
             postcard = Postcard.objects.filter(is_active=True).latest("created_at")
             postcard = get_object_or_404(Postcard, pk=postcard.id)
+            from icecream import ic
+            ic(postcard.screenshot, postcard.id)
             logger.info("Retrieved active postcard with id: %s", postcard.id)
             return postcard, True
 

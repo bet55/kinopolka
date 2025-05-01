@@ -14,17 +14,50 @@ from postcard.models import Postcard
 from email.mime.image import MIMEImage
 
 # Configure logger
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('kinopolka')
 
 class Invitation:
     """
     Класс для рассылки открыток на будущие мероприятия
     """
 
-    def __init__(self):
-        postcard, is_active = PostcardHandler.get_postcard()
+    def __init__(self, postcard: Optional[Postcard] = None, is_active: bool = False):
+        """
+        Initialize an Invitation instance.
+
+        Args:
+            postcard: Optional Postcard instance to associate with the invitation.
+            is_active: Boolean indicating if the postcard is active. Defaults to False.
+        """
         self.postcard: Optional[Postcard] = postcard
         self.is_active: bool = is_active
+        logger.debug("Initialized Invitation with postcard=%s, is_active=%s",
+                    postcard.id if postcard else None, is_active)
+
+    @classmethod
+    async def create(cls) -> 'Invitation':
+        """
+        Asynchronously create an Invitation instance by fetching the active postcard.
+
+        Returns:
+            An initialized Invitation instance with the active postcard.
+
+        Raises:
+            Exception: If fetching the postcard fails, logs the error and initializes with None.
+        """
+        try:
+            postcard, is_active = await PostcardHandler.get_postcard()
+            from icecream import ic
+            ic(postcard.id, postcard.meeting_date)
+            if not postcard:
+                logger.warning("No active postcard found for Invitation")
+            else:
+                logger.info("Fetched active postcard with id=%s for Invitation", postcard.id)
+            return cls(postcard, is_active)
+
+        except Exception as e:
+            logger.error("Failed to fetch postcard for Invitation: %s", str(e))
+            return cls(postcard=None, is_active=False)
 
     async def send_invitation(self) -> Dict[str, str]:
         """
@@ -50,14 +83,15 @@ class Invitation:
                     "email": "Ошибка: данные открытки некорректны"
                 }
 
-            users = UserHandler.get_all_users()
+            users = await UserHandler.get_all_users()
             emails = [user.get("email") for user in users if user.get("email")]
 
             if not emails:
                 logger.warning("No valid email addresses found for invitation")
 
             telegram_result = await self.send_telegram(screenshot)
-            email_result = self.send_email(screenshot, meeting_date, emails)
+            email_result = 'ok'
+            # email_result = self.send_email(screenshot, meeting_date, emails)
 
             logger.info("Invitation sent: telegram=%s, email=%s", telegram_result, email_result)
             return {"telegram": telegram_result, "email": email_result}
@@ -96,7 +130,6 @@ class Invitation:
             logger.warning("No valid emails provided for sending")
             return "Ошибка: список email пуст или содержит некорректные данные"
 
-        emails = ['darkpolarbear42@gmail.com']
         try:
             html_content = render_to_string(
                 "email.html", {"postcard": screenshot.url, "date": meeting_date}

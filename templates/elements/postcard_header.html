@@ -1,5 +1,42 @@
 {% load static %}
 
+{# Анимашка загрузки #}
+<svg width="0" height="0" aria-hidden="true">
+        <filter id="glow-0" x="-25%" y="-25%" width="150%" height="150%">
+            <feComponentTransfer>
+                <feFuncA type="table" tableValues="0 2 0"></feFuncA>
+            </feComponentTransfer>
+            <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+            <feComponentTransfer result="rond">
+                <feFuncA type="table" tableValues="-2 3"></feFuncA>
+            </feComponentTransfer>
+            <feMorphology operator="dilate" radius="3"></feMorphology>
+            <feGaussianBlur stdDeviation="6"></feGaussianBlur>
+            <feBlend in="rond" result="glow"></feBlend>
+            <feComponentTransfer in="SourceGraphic">
+                <feFuncA type="table" tableValues="0 0 1"></feFuncA>
+            </feComponentTransfer>
+            <feBlend in2="glow"></feBlend>
+        </filter>
+        <filter id="glow-1" x="-25%" y="-25%" width="150%" height="150%">
+            <feComponentTransfer in="SourceGraphic" result="grad">
+                <feFuncA type="table" tableValues="0 2 0"></feFuncA>
+            </feComponentTransfer>
+            <feMorphology operator="dilate" radius="3"></feMorphology>
+            <feGaussianBlur stdDeviation="6" result="glow"></feGaussianBlur>
+            <feTurbulence type="fractalNoise" baseFrequency="7.13"></feTurbulence>
+            <feDisplacementMap in="glow" scale="12" yChannelSelector="R"></feDisplacementMap>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope=".8"></feFuncA>
+            </feComponentTransfer>
+            <feBlend in="grad" result="out"></feBlend>
+            <feComponentTransfer in="SourceGraphic">
+                <feFuncA type="table" tableValues="0 0 1"></feFuncA>
+            </feComponentTransfer>
+            <feBlend in2="out"></feBlend>
+        </filter>
+    </svg>
+
 {% if not is_active %}
 
     <div class="postcard-option" id="postcard-save-container">

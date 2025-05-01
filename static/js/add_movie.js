@@ -2,6 +2,7 @@ import {createToast} from "./utils/create_toast.js";
 
 
 const addButton = document.querySelector("#add-btn");
+const spinner = addButton.querySelector('.spinner-border');
 const input = document.querySelector("#movie-link");
 const form = document.querySelector('form');
 
@@ -14,7 +15,8 @@ async function sendData() {
         createToast('В строке отсутствует id', 'error');
         return '';
     }
-
+    addButton.disabled = true;
+    spinner.style.display = 'inline-block';
 
     try {
         const response = await fetch(addUrl, {
@@ -25,7 +27,8 @@ async function sendData() {
             body: JSON.stringify(sendData),
         });
         const responseJson = await response.json();
-        if(responseJson['success'] === false) {
+
+        if (responseJson['success'] === false) {
             createToast('Ошибка добавления', 'error');
         } else {
             createToast('Фильм добавлен', 'success');
@@ -35,7 +38,9 @@ async function sendData() {
         console.error(e);
     }
 
+    addButton.disabled = false;
     input.value = '';
+    spinner.style.display = 'none';
 }
 
 form.addEventListener('submit', e => {
