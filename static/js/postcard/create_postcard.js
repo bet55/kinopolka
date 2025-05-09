@@ -29,7 +29,7 @@ export async function createPostcard() {
 
         isPending = true;
 
-        const response = await Request.send('put', url);
+        const response = await Request.send({method: 'put', url: url});
 
         // Ошибка при выполнении запроса
         if (response === null) {

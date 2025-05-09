@@ -5,7 +5,7 @@ import {createToast} from "./create_toast.js";
 class Request {
 
 
-    async static send(method, url, body = null, headers = {}) {
+    static async send({method, url, body = null, headers = {}, showToast = true}) {
 
         const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
         const successEmo = '🌟';
@@ -62,7 +62,10 @@ class Request {
                 return null;
             }
 
-            createToast(`Успешно ${successEmo} !`, 'success');
+            if (showToast) {
+                createToast(`Успешно!`, 'success');
+            }
+
             return responseData?.data ?? responseData;
 
         } catch (e) {

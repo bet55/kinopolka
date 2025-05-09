@@ -6,7 +6,7 @@ export const removeMovie = async (allMovies, movieId, target, posterContainer) =
     const url = '/movies/remove/';
     const sendData = {kp_id: movieId};
 
-    const response = await Request.send('delete', url, sendData);
+    const response = await Request.send({method: 'delete', url: url, body: sendData});
     if (response === null) {
         return null;
     }

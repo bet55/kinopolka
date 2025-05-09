@@ -1,15 +1,13 @@
 import {createToast} from "./utils/create_toast.js";
 import {Request} from "./utils/request.js";
 
+
 const addButton = document.querySelector("#add-btn");
 const spinner = addButton.querySelector('.spinner-border');
 const input = document.querySelector("#movie-link");
 const form = document.querySelector('form');
 
 async function sendData() {
-
-    const url = '';
-    const sendData = {kp_id: input.value};
 
     if (input.value.replace(/\D/g, '').length < 1) {
         createToast('В строке отсутствует id', 'info');
@@ -21,7 +19,7 @@ async function sendData() {
     spinner.style.display = 'inline-block';
 
     // Запрос на добавление фильма
-    await Request.send('post', url, sendData);
+    await Request.send({method: 'post', url: '', body: {kp_id: input.value}});
 
     // Возвращаем страницу в изначальное состояние
     addButton.disabled = false;
@@ -32,6 +30,7 @@ async function sendData() {
 form.addEventListener('submit', e => {
     e.preventDefault();
 })
+
 
 
 // Take over form submission

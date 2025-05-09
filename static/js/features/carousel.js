@@ -1,6 +1,6 @@
 import {addToCart} from "../based_layout/movies_cart.js";
-import {fetchMovies} from "../movie/fetching.js";
 import {formatTime} from "../utils/format_time.js";
+import {Request} from "../utils/request.js";
 
 const carousel = document.querySelector('#carousel');
 let posters = document.querySelectorAll('.poster');
@@ -30,6 +30,8 @@ tickSound.playbackRate = 4;
 // Задержка между крутками
 let sleepTime = 500;
 
+// Получаем все фильмы
+const allMovies = await Request.send({method:'get', url:`/movies/?format=json`, showToast: false});
 
 // Вычисляем случайное количество круток
 function randomTicksCount(postersCount) {
@@ -60,7 +62,7 @@ function addWinPoster(movieId, src) {
         resultDuration.textContent = formatTime(allMovies[movieId]['duration']);
     } else {
         let [hours, , mins] = prevDuration.split(' ');
-        mins = parseInt(hours) * 60  + parseInt(mins) + allMovies[movieId]['duration'];
+        mins = parseInt(hours) * 60 + parseInt(mins) + allMovies[movieId]['duration'];
         resultDuration.textContent = formatTime(mins);
     }
 
@@ -180,15 +182,8 @@ const roll = async () => {
 
 }
 
-let allMovies;
-fetchMovies().then(movies => {
-    allMovies = movies;
-}).then(r => {
-    console.log('is up');
-}).catch(e => {
-    console.error(e);
+// Запускаем рулетку по кнопке
+start.addEventListener('click', async e => {
+    await roll();
 })
 
-start.addEventListener('click', async e => {
-    roll();
-})

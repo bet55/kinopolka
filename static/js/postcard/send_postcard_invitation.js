@@ -1,3 +1,5 @@
+import {Request} from "../utils/request.js";
+
 // Отправляем приглашение с открыткой (email, telegram)
 
 export async function sendPostcard() {
@@ -23,7 +25,7 @@ export async function sendPostcard() {
 
         // Запрос на отправку открытки
         const url = '/invitation/';
-        await Request.send('post', url);
+        await Request.send({method: 'post', url:url});
 
         // Отображаем выполнение запроса
         isPending = false;

@@ -18,7 +18,7 @@ async function sendToServer(picture, posters, title, meeting_date, screenName) {
     posters.forEach(p => formdata.append("movies", p));
 
 
-    const response = await Request.send('post', url, formdata);
+    const response = await Request.send({method: 'post', url: url, body: formdata});
 
     // Если ошибка выполнения запроса, то ничего не делаем
     if (response === null) {
