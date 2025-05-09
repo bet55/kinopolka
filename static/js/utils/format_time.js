@@ -1,3 +1,5 @@
+// Переводим минуты в человекочитаемый формат
+
 function hoursFormated(hours) {
     const hoursDictionary = {
         0: "часов", 1: "час", 2: "часа", 3: "часа", 4: "часа",

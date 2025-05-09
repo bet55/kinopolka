@@ -1,5 +1,5 @@
 import {createToast} from "./utils/create_toast.js";
-
+import {Request} from "./utils/request.js";
 
 const addButton = document.querySelector("#add-btn");
 const spinner = addButton.querySelector('.spinner-border');
@@ -8,36 +8,22 @@ const form = document.querySelector('form');
 
 async function sendData() {
 
+    const url = '';
     const sendData = {kp_id: input.value};
-    const addUrl = '';
 
     if (input.value.replace(/\D/g, '').length < 1) {
-        createToast('В строке отсутствует id', 'error');
-        return '';
+        createToast('В строке отсутствует id', 'info');
+        return null;
     }
+
+    // Отображаем выполнение запроса
     addButton.disabled = true;
     spinner.style.display = 'inline-block';
 
-    try {
-        const response = await fetch(addUrl, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(sendData),
-        });
-        const responseJson = await response.json();
+    // Запрос на добавление фильма
+    await Request.send('post', url, sendData);
 
-        if (responseJson['success'] === false) {
-            createToast('Ошибка добавления', 'error');
-        } else {
-            createToast('Фильм добавлен', 'success');
-        }
-    } catch (e) {
-        createToast('Ошибка добавления', 'error');
-        console.error(e);
-    }
-
+    // Возвращаем страницу в изначальное состояние
     addButton.disabled = false;
     input.value = '';
     spinner.style.display = 'none';
@@ -50,9 +36,6 @@ form.addEventListener('submit', e => {
 
 // Take over form submission
 addButton.addEventListener("click", async (event) => {
-    // event.preventDefault();
-
-
     await sendData();
 });
 

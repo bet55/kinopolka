@@ -1,3 +1,4 @@
+// Добавление фильма в корзину закладок
 export const bookedToggle = (movieId, unbook = false) => {
     const unBookedImg = 'bookmark4';
     const bookedImg = 'bookmark3';

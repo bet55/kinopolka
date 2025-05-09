@@ -1,17 +1,15 @@
 import {createToast} from "./create_toast.js";
-
-// Функция для создания скриншота элементов страницы
-// Используется для создания снимков открыток и их рассылки/архивации
+import {Request} from "./request.js";
 
 
 async function sendToServer(picture, posters, title, meeting_date, screenName) {
+
     // добавляем временную метку, чтобы в папке были файлы с разными названиями
     const date = new Date();
-    const timestampScreenName = screenName.replace('.', date.getTime() + '.')
+    const timestampScreenName = screenName.replace('.', date.getTime() + '.');
 
-    const url = document.baseURI.split('/', 3).join('/') + '/';
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", "Token 943297fcddf785fc56da07c131e20e9d1d449629");
+    const url = '';
+    // const url = document.baseURI.split('/', 3).join('/') + '/';
 
     const formdata = new FormData();
     formdata.append("title", title);
@@ -20,40 +18,19 @@ async function sendToServer(picture, posters, title, meeting_date, screenName) {
     posters.forEach(p => formdata.append("movies", p));
 
 
-    const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: formdata,
-        redirect: "follow"
-    };
+    const response = await Request.send('post', url, formdata);
 
+    // Если ошибка выполнения запроса, то ничего не делаем
+    if (response === null) {
+        return null;
+    }
 
-    fetch(url, requestOptions)
-        .then((response) => {
-
-            if (!response.ok) {
-                throw Error(`${response.status}: ${response.statusText}`);
-            }
-            return response.text()
-        })
-        .then((result) => {
-
-            createToast('Открытка успешно сохранена', 'success')
-
-            // Перезагружаем страницу
-            setTimeout(() => window.location.reload(), 1000)
-
-        })
-        .catch((error) => {
-
-            console.error(error);
-            createToast('Открытка не сохранена', 'error')
-        });
-
+    // Перезагружаем страницу
+    setTimeout(() => window.location.reload(), 1000);
 
 }
 
-
+// Сохраняем скриншот на клиенте
 async function clientUpload(container, screenName) {
     const dataUrl = await modernScreenshot.domToPng(container);
     const link = document.createElement('a');
@@ -63,11 +40,14 @@ async function clientUpload(container, screenName) {
     return dataUrl
 }
 
+// Сохраняем скриншот в бд
 async function serverUpload(container, posters, title, meeting_date, screenName) {
     const blob = await modernScreenshot.domToBlob(container);
     await sendToServer(blob, posters, title, meeting_date, screenName)
 }
 
+// Функция для создания скриншота элементов страницы
+// Используется для создания снимков открыток и их рассылки/архивации
 async function screenshot(container, posters, title, meeting_date = '2001-09-11', screenName = 'screenshot.png', direction = 'server') {
     try {
 

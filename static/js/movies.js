@@ -1,18 +1,19 @@
-import {fetchMovies} from "./movie/fetching.js";
 import {fillMovieCard} from "./movie/card_filling.js";
 import {selectOptionHandler} from "./movie/select_options.js";
 import {showRatingNotesHandler} from "./movie/rating_toggler.js";
+import {paintBookedMovies} from "./movie/paintBookedMovies.js";
+import {Request} from "./utils/request";
 
 
-fetchMovies().then(movies => {
-    const allMovies = movies;
+// Получаем все фильмы
+const baseUrl = document.baseURI.split('/', 3).join('/') + '/movies/';
+const url = (document.baseURI.includes('archive')) ? `${baseUrl}archive/` : `${baseUrl}`;
+const getMoviesUrl = `${url}?format=json`.replace('#', '');
 
-    showRatingNotesHandler() // отображения оценок
-    fillMovieCard(allMovies); // отрисовки большого постера
-    selectOptionHandler(allMovies) // применение опции к фильму
+const allMovies = await Request.send('get', getMoviesUrl);
 
-}).catch(e => {
-    console.error(e)
-})
-
+paintBookedMovies() // меняем иконку у всех фильмов в закладках
+showRatingNotesHandler() // отображение оценок
+fillMovieCard(allMovies); // отрисовки большого постера
+selectOptionHandler(allMovies) // применение опции к фильму
 

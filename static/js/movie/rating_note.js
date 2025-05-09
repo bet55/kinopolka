@@ -1,6 +1,9 @@
-import {createToast} from "../utils/create_toast.js";
+import {Request} from "../utils/request.js";
 
+// Создаём новый стикер с оценкой фильма
 const createNoteElement = (movieId, userId, rating, comment) => {
+
+    // Если стикер уже есть, просто меняем значение оценки
     const userNote = document.querySelector(`.note-container[data-kp-id="${movieId}"] .note[data-user-id="${userId}"]`)
     if (userNote) {
         const noteH2 = userNote.querySelector('h2');
@@ -9,11 +12,12 @@ const createNoteElement = (movieId, userId, rating, comment) => {
         noteH2.textContent = rating;
         return false
     }
+
+    // Создаём новый стикер
     const noteContainer = document.querySelector(`.note-container[data-kp-id="${movieId}"] `);
     const noteDiv = document.createElement('div');
     const noteH2 = document.createElement('h2');
     const noteP = document.createElement('p');
-
 
     noteP.textContent = comment;
     noteH2.textContent = rating;
@@ -21,39 +25,31 @@ const createNoteElement = (movieId, userId, rating, comment) => {
     noteDiv.classList.add('note');
     noteDiv.dataset.userId = userId;
 
-    noteContainer.addEventListener('contextmenu', (e) => {
+    // Создаём обработчик удаления стикера
+    noteContainer.addEventListener('contextmenu', async (e) => {
         noteContainer.remove();
-        removeRateRequest(movieId, userId);
+        await removeRateRequest(movieId, userId);
     })
 
     noteContainer.append(noteDiv);
     return true;
 }
 
+// Удаляем запись с оценкой фильма
 const removeRateRequest = async (movieId, userId) => {
-    const removeUrl = '/movies/rate/remove/';
+    const url = '/movies/rate/remove/';
     const sendData = {
         user: userId,
         film: movieId
     }
-    try {
-        const response = await fetch(removeUrl, {
-            method: "DELETE",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(sendData),
-        });
-        console.log(await response.json());
-    } catch (e) {
-        console.error(sendData);
-        console.error(e);
-    }
+    await Request.send('delete', url, {}, sendData);
+
 }
 
 
+// Создаём запись с оценкой фильма
 const rateRequest = async (movieId, userId, rating, comment) => {
-    const rateUrl = '/movies/rate/';
+    const url = '/movies/rate/';
     const sendData = {
         user: userId,
         movie: movieId,
@@ -64,25 +60,7 @@ const rateRequest = async (movieId, userId, rating, comment) => {
         sendData['text'] = comment;
     }
 
-
-    try {
-        const response = await fetch(rateUrl, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(sendData),
-        });
-
-        const responseJson = await response.json();
-        if (responseJson['success'] === false) {
-            createToast(data['error'], 'error');
-        }
-    } catch (e) {
-        createToast('Ошибка добавления оценки', 'error');
-        console.error(sendData);
-        console.error(e);
-    }
+    await Request.send('post', url, {}, sendData);
 }
 
 export {createNoteElement, rateRequest}

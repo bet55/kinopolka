@@ -7,5 +7,5 @@ const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstra
 
 settingUserHandler(); // выбор пользователя
 cartMoviesHandler(); // корзина с выбранными фильмами
-// showScrollButtonHandler() // кнопка скролла наверх
+
 

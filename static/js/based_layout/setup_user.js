@@ -12,17 +12,19 @@ const changeUserView = () => {
     const currentUser = getCookie('user');
 
     if (!currentUser) {
-        return '';
+        return null;
     }
     const userName = usersPanel.querySelector(`button[data-user-id="${currentUser}"]`).textContent;
 
+    // Кривая кука, удалим её
     if (!userName) {
         deleteCookie('user');
-        return '';
+        return null;
     }
 
     usersSetButton.textContent = userName;
 
+    // Красим кнопку отображения оценок в цвет пользователя
     if(rateToggler) {
         rateToggler.src = rateToggler.src.replace(/note\d*\.png/, `note${currentUser}.png`);
     }

@@ -1,3 +1,5 @@
+// Получаем дату следующей субботы, для генерации открытки
+
 const MONTH_NAMES = [
   'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
   'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
@@ -8,6 +10,8 @@ function getNextSaturday(format = 'text') {
   const daysToAdd = (6 - today.getDay() + 7) % 7 || 7;
   const nextSaturday = new Date(today);
   nextSaturday.setDate(today.getDate() + daysToAdd);
+  nextSaturday.setHours(14);
+  nextSaturday.setMinutes(0);
 
   const formats = {
     text: () => {
@@ -16,7 +20,7 @@ function getNextSaturday(format = 'text') {
       return `${day} ${month}`;
     },
     iso: () => {
-      return nextSaturday.toISOString().split('T')[0];
+      return nextSaturday.toISOString().split('.')[0].replace('T', ' ');
     },
     full: () => nextSaturday.toLocaleDateString('ru-RU')
   };

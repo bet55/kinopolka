@@ -26,17 +26,17 @@ stars.forEach(star => {
 
 
 // // Закрываем модалку
-saveButton.addEventListener('click', (e) => {
+saveButton.addEventListener('click', async (e) => {
     const movieId = modalForm.dataset.kpId;
-    closeModal(movieId, true);
+    await closeModal(movieId, true);
 })
-closeButton.addEventListener('click', (e) => {
+closeButton.addEventListener('click', async (e) => {
     const movieId = modalForm.dataset.kpId;
-    closeModal(movieId);
+    await closeModal(movieId);
 })
 
 
-const closeModal = (movieId, isSaved = false) => {
+const closeModal = async (movieId, isSaved = false) => {
 
     const star = Array.from(stars).filter((star) => Boolean(star.checked) === true).pop();
     const comment = 'no comment';
@@ -50,7 +50,7 @@ const closeModal = (movieId, isSaved = false) => {
         const userId = getCookie('user');
 
         createNoteElement(movieId, userId, rating, comment);
-        rateRequest(movieId, userId, rating, comment);
+        await rateRequest(movieId, userId, rating, comment);
     }
 
 

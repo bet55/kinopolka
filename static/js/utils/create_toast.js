@@ -1,3 +1,5 @@
+// Создаём значок в правом углу со статусом выполнения действия
+
 export function createToast(text, status) {
     const toast = document.querySelector('#toast');
 

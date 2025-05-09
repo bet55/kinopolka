@@ -9,6 +9,7 @@ const titlesContainer = document.querySelector('#invitation');
 const MAX_MOVIES_COUNT = 4;
 let currentMoviesCount = 0;
 
+// Добавляем марку с постером фильма на открытку
 const addMovieToPostcard = (movieItem, movieId) => {
 
     // Параметры выбранного фильма
@@ -55,7 +56,7 @@ const addMovieToPostcard = (movieItem, movieId) => {
 
 }
 
-
+// Обрабатываем нажатия на постеры в корзине
 export const cartHandler = () => {
 
 

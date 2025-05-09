@@ -9,7 +9,7 @@ const cardRealiseDate = document.querySelector('.card-realise')
 const cardDuration = document.querySelector('.card-duration')
 const cardLink = document.querySelector('.card-link a')
 
-
+// Отображение большого постера с описанием в правой части страницы
 const showMoviePoster = (movieInfo) => {
 
     cardImg.src = movieInfo.poster;
@@ -25,7 +25,6 @@ const showMoviePoster = (movieInfo) => {
 }
 
 export function fillMovieCard(allMovies) {
-
 
     // Возможность раскрывать/прятать текст описания
     cardDescription.addEventListener('click', e => {

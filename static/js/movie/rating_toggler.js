@@ -29,7 +29,7 @@ const visibilityToggler = changeNotesVisibility()
 
 export function showRatingNotesHandler() {
     if (!rateToggler) {
-        return ''
+        return null;
     }
 
     rateToggler.addEventListener('click', (event) => {
