@@ -1,0 +1,33 @@
+#postcards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    overflow: scroll;
+    max-height: 100%;
+}
+
+.postcard {
+    max-width: 45%;
+    position: relative;
+
+    img {
+        max-width: 100%;
+        /*box-shadow: 10px 5px 5px var(--black-color);*/
+    }
+
+    &:not(.active):hover {
+        img {
+            filter: contrast(115%);
+            cursor: pointer;
+        }
+
+    }
+}
+
+.postcard.active {
+    img {
+        box-shadow: 0 2px 8px 8px var(--green-color);
+    }
+
+}

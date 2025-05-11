@@ -49,7 +49,8 @@ class Request {
             try {
                 responseData = await response.json();
             } catch (e) {
-                // Пустой ответ - это не обязательно ошибка
+                // Пустой ответ - вроде, норм
+                createToast(`Успешно!`, 'success');
                 return {};
             }
 

@@ -62,11 +62,8 @@
              data-bs-toggle="tooltip"
              data-bs-placement="top"
              data-bs-title="Разослать открытку">
-    
-        {% block confirmation %}
-            {% include "elements/confirmation_tooltip.html" %}
-        {% endblock %}
 
+            {% include "elements/confirmation_tooltip.html" with title="Отправить рассылку?" %}
     </div>
 {% endif %}
 

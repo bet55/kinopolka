@@ -1,0 +1,49 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/postcards_archive.css' %}">
+{% endblock %}
+
+{% block title %}Архивные открытки{% endblock %}
+
+{% block center-content %}
+
+    <div id="postcards-container">
+
+
+        {% for p in postcards %}
+
+            {% if p.is_active %}
+                <figure class="postcard active">
+                    <img src="{{ p.screenshot }}" alt="открытка">
+                    <figcaption><b>Собрание: </b>{{ p.meeting_date }}</figcaption>
+                    <figcaption><b>Создание:</b> {{ p.created_at }}</figcaption>
+                </figure>
+            {% else %}
+                <figure class="postcard" 
+                        data-postcard-id="{{ p.id }}"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="Нажмите, чтобы удалить открытку">
+                
+                    <img src="{{ p.screenshot }}" alt="открытка">
+                    <figcaption><b>Собрание: </b>{{ p.meeting_date }}</figcaption>
+                    <figcaption><b>Создание:</b> {{ p.created_at }}</figcaption>
+                
+                    {% include "elements/confirmation_tooltip.html" with title="Удалить открытку?" %}
+                </figure>
+            {% endif %}
+
+
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
+{% block script %}
+        <script type="module" src="{% static 'js/features/postcards_archive.js' %}"></script>
+{% endblock %}
+
+

@@ -7,7 +7,6 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import DatabaseError
 from asgiref.sync import sync_to_async
 
-
 # Configure logger
 logger = logging.getLogger('kinopolka')
 
@@ -41,6 +40,7 @@ class PostcardHandler:
                 postcard = await sync_to_async(serializer.save)()
                 serializer = PostcardSerializer(postcard)  # Reserialize saved instance
                 logger.info("Created postcard with data: %s", postcard_data)
+
                 return await sync_to_async(lambda: serializer.data)(), True
 
             errors = await sync_to_async(lambda: serializer.errors)()

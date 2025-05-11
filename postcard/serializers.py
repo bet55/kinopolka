@@ -6,13 +6,16 @@ from postcard.models import Postcard
 
 class PostcardSerializer(serializers.ModelSerializer):
     movies = MovieSerializer
+    created_at = serializers.DateTimeField(format="%d.%m.%Y", read_only=True)
+    meeting_date = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Postcard
-        fields = ["meeting_date", "movies", "is_active", "screenshot", "title"]
+        fields = ["id", "meeting_date", "movies", "is_active", "screenshot", "title", "created_at"]
 
     def create(self, validated_data):
         postcard = Postcard(
+            title=validated_data['title'],
             meeting_date=validated_data["meeting_date"],
             screenshot=validated_data["screenshot"],
         )

@@ -90,6 +90,7 @@ class PostCardViewSet(APIView):
                 logger.error("Missing postcard ID in delete request")
                 return Response({"error": "Postcard ID required"}, status=status.HTTP_400_BAD_REQUEST)
 
+            postcard_id = int(postcard_id)
             success = await PostcardHandler.delete_postcard(postcard_id)  # Updated to handle bool return
             if success:
                 logger.info("Deleted postcard with id: %s", postcard_id)
