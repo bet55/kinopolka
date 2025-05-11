@@ -37,6 +37,7 @@
 /* Параметры иконок */
 .postcard-option {
 
+    position: relative;
     height: 100%;
     display: flex;
     align-items: center;
@@ -51,6 +52,3 @@
 
     }
 }
-
-
-

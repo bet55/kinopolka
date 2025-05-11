@@ -1,0 +1,42 @@
+.confirmation {
+    background-color: #ffe5ba;
+    display: none; /* Скрываем по умолчанию */
+    position: absolute; /* Абсолютное позиционирование относительно родителя */
+    top: 80%; /* Располагаем под родительским элементом */
+    left: -4em;
+    margin-top: 10px; /* Небольшой отступ сверху */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Чтобы перекрывал другие элементы */
+    min-width: 200px; /* Чтобы не было слишком узким */
+
+    h4 {
+        font-size: 1.5em;
+    }
+
+    #confirm-yes {
+        background-color: var(--green-color);
+    }
+
+    #confirm-no {
+        background-color: var(--red-color);
+    }
+
+    button {
+        width: 4em;
+        height: 2em;
+        border: 1px solid black;
+    }
+
+    button:hover {
+        font-weight: bold;
+        border: 2px solid black;
+        filter: brightness(1.5);
+    }
+}
+
+.confirmation.active {
+    display: block;
+}
