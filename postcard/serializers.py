@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from lists.serializers import MovieSerializer
+from lists.serializers import MovieDictSerializer
 from postcard.models import Postcard
 
 
 class PostcardSerializer(serializers.ModelSerializer):
-    movies = MovieSerializer
+    movies = MovieDictSerializer
     created_at = serializers.DateTimeField(format="%d.%m.%Y", read_only=True)
     meeting_date = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
 

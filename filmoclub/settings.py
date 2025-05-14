@@ -184,7 +184,7 @@ class LogFilter(logging.Filter):
         return True
 
 
-loki_url = os.getenv('LOKI_URL') + '/loki/api/v1/push'
+loki_url = os.getenv('LOKI_URL', '') + '/loki/api/v1/push'
 application = os.getenv('APP_NAME')
 service = os.getenv('SERVICE_NAME')
 
@@ -221,12 +221,12 @@ LOGGING = {
 
     'loggers': {
         'kinopolka': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console', 'loki'],
         },
 
         'django': {
-            'level': 'INFO',
+            'level': 'WARNING',
             'handlers': ['console', 'loki'],
             'propagate': False,
         },

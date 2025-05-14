@@ -11,8 +11,8 @@ async function sendPostcard() {
 
     // Запрос на отправку открытки
     const url = '/invitation/';
-    // await Request.send({method: 'post', url: url});
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await Request.send({method: 'post', url: url});
+    // await new Promise(resolve => setTimeout(resolve, 3000));
 
     sendButton.classList.remove('active_option');
 }

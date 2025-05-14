@@ -12,14 +12,13 @@ const createFilmsList = (filmsStorage) => {
     // Создаём новый элемент списка для каждого фильма
     filmsStorage.forEach(film => {
 
-
         title = document.createElement('span');
         poster = document.createElement('img');
         removeBtn = document.createElement('span');
         filmContainer = document.createElement('li');
 
         title.textContent = film['name'];
-        poster.src = film['poster'];
+        poster.src = film['poster_local'];
         removeBtn.innerHTML = '&#10006';
 
         title.classList.add('film-title');
@@ -66,7 +65,6 @@ const getStorageFilmIds = () => {
 
     }
 
-
     return lsValues;
 }
 
@@ -80,8 +78,6 @@ const addToCart = (filmId, film) => {
 const removeFromCart = (filmId) => {
     console.log(filmId);
     localStorage.removeItem(filmId);
-
-
 
     const filmContainer = document.querySelector(`li[data-kp-id="${filmId}"]`);
     if(filmContainer) {

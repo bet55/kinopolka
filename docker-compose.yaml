@@ -18,7 +18,16 @@ services:
       - "8001:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=filmoclub.settings
+    networks:
+      - default
+      - loki-net
     restart: unless-stopped
-    
+
+networks:
+  default:
+  loki-net:
+    external: true
+    name: grafana-loki-default
+
 volumes:
   sqlite_data:

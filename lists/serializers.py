@@ -10,6 +10,12 @@ from django.db import models
 from lists.models import Movie, Genre, User, Note
 
 
+class GenreSerializer(ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = "__all__"
+
+
 class MovieListSerializer(ListSerializer):
     def to_representation(self, data):
         iterable = data.all() if isinstance(data, models.manager.BaseManager) else data
@@ -27,8 +33,9 @@ class MovieListSerializer(ListSerializer):
         return ReturnDict(ret, serializer=self)
 
 
-class MovieSerializer(ModelSerializer):
+class MovieDictSerializer(ModelSerializer):
     premiere = DateTimeField(format="%d/%m/%Y")
+    genres = GenreSerializer(many=True)
 
     class Meta:
         list_serializer_class = MovieListSerializer
@@ -37,40 +44,54 @@ class MovieSerializer(ModelSerializer):
             "kp_id",
             "name",
             "poster",
+            "poster_local",
             "premiere",
             "description",
             "duration",
             "rating_kp",
             "rating_imdb",
+            "genres",
             "is_archive",
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        representation['genres'] = [genre['name'] for genre in representation['genres']]
+        representation['poster_local'] = instance.poster_local.url if instance.poster_local else '/media/posters/default.jpg'
+        return representation
 
 
 class MovieRatingSerializer(ModelSerializer):
     class Meta:
         model = Movie
-        fields = ["kp_id", "rating_imdb", "rating_kp", "poster", "name"]
+        fields = ["kp_id", "rating_imdb", "rating_kp", "poster", "poster_local", "name"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['poster_local'] = instance.poster_local.url if instance.poster_local else '/media/posters/default.jpg'
+        return representation
 
 
-class MovieSmallSerializer(ModelSerializer):
+class MoviePosterSerializer(ModelSerializer):
+    genres = GenreSerializer(many=True)
+
     class Meta:
         model = Movie
         fields = [
             "kp_id",
             "poster",
+            "poster_local",
+            "genres",
         ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         notes = instance.note_set.all()
         representation["notes"] = NoteSerializer(notes, many=True).data
+        representation['genres'] = [genre['name'] for genre in representation['genres']]
+        representation['poster_local'] = instance.poster_local.url if instance.poster_local else '/media/posters/default.jpg'
         return representation
-
-
-class GenreSerializer(ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = "__all__"
 
 
 class UserSerializer(ModelSerializer):

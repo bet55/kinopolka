@@ -54,6 +54,5 @@ class UserHandler:
             return serialized_all_app_users.data
 
         except Exception as e:
-            from icecream import ic
             logger.error("Failed to retrieve all users: %s", str(e))
             return []
