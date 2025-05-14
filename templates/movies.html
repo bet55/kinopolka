@@ -6,17 +6,23 @@
     <link rel="stylesheet" href="{% static 'css/movies.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/rating_notes.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/rating_modal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/filter.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/user_requirement_modal.css' %}">
 {% endblock %}
 
 {% block title %}Кино{% endblock %}
 
+{# Кнопка в верху #}
 {% block header-button %}
+
+    {% include "elements/filter.html" with fields=genres %}
+
     {% if is_archive %}
         {% include "elements/rating_notes.html" %}
     {% endif %}
 {% endblock %}
 
+{# Основной блок с постерами#}
 {% block center-content %}
 
     <div class="row posters-grid" data-kp-id="{{ i.kp_id }}">
@@ -25,8 +31,17 @@
 
             <div class="poster-container" data-kp-id="{{ i.kp_id }}">
 
-                <img class="poster-img " src="{{ i.poster }}" alt="" loading="lazy" data-kp-id="{{ i.kp_id }}">
+                <img class="poster-img " 
+                     src="{% static "img/poster_placeholder.jpg" %}"
+                     data-src="{{ i.poster }}"
+                     alt="" 
+                     loading="lazy" 
+                     data-kp-id="{{ i.kp_id }}"
+                     onerror="this.src={% static 'img/poster_placeholder.jpg' %}">
+            
+{#                <img class="poster-img " src="{{ i.poster }}" alt="" loading="lazy" data-kp-id="{{ i.kp_id }}">#}
 
+                {# Стикеры с оценками#}
                 <div class="note-container" data-kp-id="{{ i.kp_id }}">
 
                     {% for note in i.notes %}
@@ -51,6 +66,7 @@
                 </div>
 
 
+                {# Опции под постерами #}
                 <div class="poster-settings">
 
                     <img class="opt opt-booked" src="{% static 'img/poster_options/bookmark4.png' %}" alt=""
@@ -90,6 +106,7 @@
 
 {% endblock %}
 
+{# Большой постер с описанием фильма #}
 {% block right-content %}
     <div class="card-container">
         <img class="card-img" src="{{ random.poster }}">
@@ -101,12 +118,13 @@
     </div>
 {% endblock %}
 
-
+{# Скрытые элементы/модалки #}
 {% block fixed %}
     {% include "elements/rating_modal.html" %}
     {% include "elements/user_requirement_modal.html" %}
 {% endblock %}
 
+{# Подключаем js #}
 {% block script %}
     <script type="module" src="{% static 'js/movies.js' %}"></script>
 {% endblock %}

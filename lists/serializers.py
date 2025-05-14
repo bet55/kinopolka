@@ -9,6 +9,11 @@ from django.db import models
 
 from lists.models import Movie, Genre, User, Note
 
+class GenreSerializer(ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = "__all__"
+
 
 class MovieListSerializer(ListSerializer):
     def to_representation(self, data):
@@ -27,8 +32,9 @@ class MovieListSerializer(ListSerializer):
         return ReturnDict(ret, serializer=self)
 
 
-class MovieSerializer(ModelSerializer):
+class MovieDictSerializer(ModelSerializer):
     premiere = DateTimeField(format="%d/%m/%Y")
+    genres = GenreSerializer(many=True)
 
     class Meta:
         list_serializer_class = MovieListSerializer
@@ -42,8 +48,15 @@ class MovieSerializer(ModelSerializer):
             "duration",
             "rating_kp",
             "rating_imdb",
+            "genres",
             "is_archive",
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        representation['genres'] = [genre['name'] for genre in representation['genres']]
+        return representation
 
 
 class MovieRatingSerializer(ModelSerializer):
@@ -52,25 +65,24 @@ class MovieRatingSerializer(ModelSerializer):
         fields = ["kp_id", "rating_imdb", "rating_kp", "poster", "name"]
 
 
-class MovieSmallSerializer(ModelSerializer):
+class MoviePosterSerializer(ModelSerializer):
+    genres = GenreSerializer(many=True)
+
     class Meta:
         model = Movie
         fields = [
             "kp_id",
             "poster",
+            "genres",
         ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         notes = instance.note_set.all()
         representation["notes"] = NoteSerializer(notes, many=True).data
+        representation['genres'] = [genre['name'] for genre in representation['genres']]
         return representation
 
-
-class GenreSerializer(ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = "__all__"
 
 
 class UserSerializer(ModelSerializer):

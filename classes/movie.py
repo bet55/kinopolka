@@ -4,7 +4,7 @@ from enum import Enum
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import IntegrityError
 from lists.models import Movie, Actor, Director, Writer, Genre
-from lists.serializers import MovieSerializer, MovieSmallSerializer, MovieRatingSerializer
+from lists.serializers import MovieDictSerializer, MoviePosterSerializer, MovieRatingSerializer
 from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
 from classes.kp import KP_Movie
 from asgiref.sync import sync_to_async
@@ -28,9 +28,22 @@ class MovieHandler:
     """
     Класс для работы с фильмами в базе данных
     """
+    @classmethod
+    def extract_genres(cls, movies: List[Dict]):
+        """
+        Получаем список уникальных жанров у переданных фильмов
+        :param movies: Список фильмов, содержащий поле "genres"
+        :return: list
+        """
+
+        genres = []
+        for movie in movies:
+            genres += movie.get('genres', [])
+        return list(set(genres))
 
     @classmethod
-    async def get_movie(cls, kp_id: Union[int, str]) -> Optional[Dict]:
+    @sync_to_async
+    def get_movie(cls, kp_id: Union[int, str]) -> Optional[Dict]:
         """
         Retrieve a movie by its Kinopoisk ID.
 
@@ -45,8 +58,8 @@ class MovieHandler:
             return None
 
         try:
-            film_model = await Movie.mgr.aget(kp_id=kp_id)
-            serialized = MovieSerializer(film_model)
+            film_model = Movie.mgr.get(kp_id=kp_id) # aget не работает ))))))))
+            serialized = MovieDictSerializer(film_model)
             logger.info("Retrieved movie with kp_id: %s", kp_id)
             return serialized.data
 
@@ -77,13 +90,13 @@ class MovieHandler:
 
             if info_type == MoviesStructure.posters.value:
                 logger.debug("Serializing movies with MovieSmallSerializer")
-                serializer = MovieSmallSerializer(raw_films, many=True)
+                serializer = MoviePosterSerializer(raw_films, many=True)
             elif info_type == MoviesStructure.rating.value:
                 logger.debug("Serializing movies with MovieRatingSerializer")
                 serializer = MovieRatingSerializer(raw_films, many=True)
             else:
                 logger.debug("Serializing movies with MovieSerializer")
-                serializer = MovieSerializer(raw_films, many=True)
+                serializer = MovieDictSerializer(raw_films, many=True)
 
             logger.info("Retrieved %d movies (is_archive=%s, info_type=%s)", raw_films.count(), is_archive, info_type)
             return serializer.data

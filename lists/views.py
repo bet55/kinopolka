@@ -65,10 +65,12 @@ class MoviesView(APIView):
 
             movies = await MovieHandler.get_all_movies(info_type=MoviesStructure.posters.value, is_archive=is_archive)
             users = await UserHandler.get_all_users()
+            genres = MovieHandler.extract_genres(movies)
 
             context = {
                 "movies": movies,
                 "users": users,
+                "genres": genres,
                 "is_archive": is_archive,
                 "random": Tools.get_random_images(),
             }

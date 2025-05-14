@@ -12,7 +12,6 @@ const createFilmsList = (filmsStorage) => {
     // Создаём новый элемент списка для каждого фильма
     filmsStorage.forEach(film => {
 
-
         title = document.createElement('span');
         poster = document.createElement('img');
         removeBtn = document.createElement('span');
@@ -66,7 +65,6 @@ const getStorageFilmIds = () => {
 
     }
 
-
     return lsValues;
 }
 
@@ -80,8 +78,6 @@ const addToCart = (filmId, film) => {
 const removeFromCart = (filmId) => {
     console.log(filmId);
     localStorage.removeItem(filmId);
-
-
 
     const filmContainer = document.querySelector(`li[data-kp-id="${filmId}"]`);
     if(filmContainer) {

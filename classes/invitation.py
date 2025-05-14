@@ -90,8 +90,7 @@ class Invitation:
                 logger.warning("No valid email addresses found for invitation")
 
             telegram_result = await self.send_telegram(screenshot)
-            email_result = 'ok'
-            # email_result = self.send_email(screenshot, meeting_date, emails)
+            email_result = self.send_email(screenshot, meeting_date, emails)
 
             logger.info("Invitation sent: telegram=%s, email=%s", telegram_result, email_result)
             return {"telegram": telegram_result, "email": email_result}
