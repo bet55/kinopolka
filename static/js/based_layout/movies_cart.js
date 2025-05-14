@@ -18,7 +18,7 @@ const createFilmsList = (filmsStorage) => {
         filmContainer = document.createElement('li');
 
         title.textContent = film['name'];
-        poster.src = film['poster'];
+        poster.src = film['poster_local'];
         removeBtn.innerHTML = '&#10006';
 
         title.classList.add('film-title');

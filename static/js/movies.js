@@ -1,7 +1,7 @@
 import {fillMovieCard} from "./movie/card_filling.js";
 import {selectOptionHandler} from "./movie/select_options.js";
 import {showRatingNotesHandler} from "./movie/rating_toggler.js";
-import {paintBookedMovies} from "./movie/paintBookedMovies.js";
+import {paintBookedMovies} from "./movie/paint_booked_movies.js";
 import {showFilter, filterMovies} from "./movie/filter.js";
 import {posterLoadingPlaceholder} from "./movie/poster_placeholder.js";
 import {Request} from "./utils/request.js";

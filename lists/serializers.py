@@ -9,6 +9,7 @@ from django.db import models
 
 from lists.models import Movie, Genre, User, Note
 
+
 class GenreSerializer(ModelSerializer):
     class Meta:
         model = Genre
@@ -43,6 +44,7 @@ class MovieDictSerializer(ModelSerializer):
             "kp_id",
             "name",
             "poster",
+            "poster_local",
             "premiere",
             "description",
             "duration",
@@ -56,13 +58,19 @@ class MovieDictSerializer(ModelSerializer):
         representation = super().to_representation(instance)
 
         representation['genres'] = [genre['name'] for genre in representation['genres']]
+        representation['poster_local'] = instance.poster_local.url if instance.poster_local else '/media/posters/default.jpg'
         return representation
 
 
 class MovieRatingSerializer(ModelSerializer):
     class Meta:
         model = Movie
-        fields = ["kp_id", "rating_imdb", "rating_kp", "poster", "name"]
+        fields = ["kp_id", "rating_imdb", "rating_kp", "poster", "poster_local", "name"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['poster_local'] = instance.poster_local.url if instance.poster_local else '/media/posters/default.jpg'
+        return representation
 
 
 class MoviePosterSerializer(ModelSerializer):
@@ -73,6 +81,7 @@ class MoviePosterSerializer(ModelSerializer):
         fields = [
             "kp_id",
             "poster",
+            "poster_local",
             "genres",
         ]
 
@@ -81,8 +90,8 @@ class MoviePosterSerializer(ModelSerializer):
         notes = instance.note_set.all()
         representation["notes"] = NoteSerializer(notes, many=True).data
         representation['genres'] = [genre['name'] for genre in representation['genres']]
+        representation['poster_local'] = instance.poster_local.url if instance.poster_local else '/media/posters/default.jpg'
         return representation
-
 
 
 class UserSerializer(ModelSerializer):

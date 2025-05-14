@@ -12,7 +12,7 @@ const cardLink = document.querySelector('.card-link a')
 // Отображение большого постера с описанием в правой части страницы
 const showMoviePoster = (movieInfo) => {
 
-    cardImg.src = movieInfo.poster;
+    cardImg.src = movieInfo.poster_local;
     cardImg.style.visibility = 'visible';
     cardTitle.textContent = movieInfo.name;
     cardDescription.textContent = movieInfo.description;

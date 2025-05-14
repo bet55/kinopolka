@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master    # Triggers on push to master branch
+  pull_request:
+    branches:
+      - master
+    types: [ closed ]  # Срабатывает при закрытии PR (если мержится)
   workflow_dispatch: # Allows manual trigger
 
 jobs:

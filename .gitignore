@@ -11,3 +11,10 @@ start.sh
 requests.http
 
 .ipynb_checkpoints
+
+# media файлы. Но оставим по одному, чтобы были папки
+media/posters/*
+!media/posters/default.png
+
+media/postcards/*
+!media/postcards/screenshot.png

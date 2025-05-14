@@ -3,6 +3,8 @@ from typing import Dict, List, Optional, Tuple, Union, NamedTuple
 from enum import Enum
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import IntegrityError
+from django.core.files.base import ContentFile
+import httpx
 from lists.models import Movie, Actor, Director, Writer, Genre
 from lists.serializers import MovieDictSerializer, MoviePosterSerializer, MovieRatingSerializer
 from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
@@ -226,12 +228,32 @@ class MovieHandler:
 
             converted_response = cls._response_preprocess(api_response)
             movie_model, success = await cls._a_save_movie_to_db(converted_response)
+
+            if success and api_response.get("poster", {}).get("url"):
+                await cls._download_and_save_poster(movie_model, api_response["poster"]["url"], kp_id)
+
             logger.info("Asynchronously downloaded and saved movie %s: success=%s", kp_id, success)
             return api_response.get("id", -1), success
 
         except Exception as e:
             logger.error("Failed to asynchronously download movie %s: %s", kp_id, str(e))
             return -1, False
+
+    @classmethod
+    async def _download_and_save_poster(cls, movie_model: Movie, poster_url: str, kp_id: str) -> bool:
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(poster_url)
+                response.raise_for_status()
+                file_name = f"poster_{kp_id}.jpg"
+                movie_model.poster_local.save(file_name, ContentFile(response.content), save=True)
+                logger.info("Downloaded and saved poster for movie %s", kp_id)
+                return True
+        except Exception as e:
+            logger.error("Failed to download poster for movie %s: %s", kp_id, str(e))
+            movie_model.poster_local = 'posters/default.jpg'
+            await movie_model.asave()
+            return False
 
     @classmethod
     def _save_movie_to_db(cls, movie_info: KPEntities) -> Tuple[Movie, bool]:

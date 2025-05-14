@@ -4,20 +4,12 @@
 - Запустить докер контейнер
 
 # Django
-- классовые вьюхи
-
-- Формирование карточки
 - Заменить create_or_update на get_or_create ( в методах добавления фильма)
 - Обработка ошибок в кастомных классах
 - Кэширование запросов в бд
 
 
 # Front
-- Частичная загрузка постеров
-    - https://imagekit.io/blog/lazy-loading-images-complete-guide/
-    - https://css-loaders.com/time/
-    - https://projects.lukehaas.me/css-loaders/
-
 - Класс обработок ошибок
 - Анимированные иконки
 - Аватарки для пользователей

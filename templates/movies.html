@@ -31,15 +31,14 @@
 
             <div class="poster-container" data-kp-id="{{ i.kp_id }}">
 
-                <img class="poster-img " 
+                <img class="poster-img "
                      src="{% static "img/poster_placeholder.jpg" %}"
-                     data-src="{{ i.poster }}"
-                     alt="" 
-                     loading="lazy" 
+                     data-src="{{ i.poster_local }}"
+                     alt=""
+                     loading="lazy"
                      data-kp-id="{{ i.kp_id }}"
                      onerror="this.src={% static 'img/poster_placeholder.jpg' %}">
             
-{#                <img class="poster-img " src="{{ i.poster }}" alt="" loading="lazy" data-kp-id="{{ i.kp_id }}">#}
 
                 {# Стикеры с оценками#}
                 <div class="note-container" data-kp-id="{{ i.kp_id }}">
