@@ -251,7 +251,7 @@ class MovieHandler:
                 return True
         except Exception as e:
             logger.error("Failed to download poster for movie %s: %s", kp_id, str(e))
-            movie_model.poster_local = 'posters/default.jpg'
+            movie_model.poster_local = None #default value
             await movie_model.asave()
             return False
 

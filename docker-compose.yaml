@@ -14,6 +14,7 @@ services:
     volumes:
       - .:/app
       - sqlite_data:/app/db
+      - /app/.venv/
     ports:
       - "8001:8000"
     environment:
@@ -27,7 +28,7 @@ networks:
   default:
   loki-net:
     external: true
-    name: grafana-loki-default
+    name: grafana-loki_default
 
 volumes:
   sqlite_data:
