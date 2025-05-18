@@ -52,8 +52,8 @@ class Statistic:
             .head(cls.TOP_MOVIES)
         )
 
-        top_movies["poster"] = top_movies.apply(
-            lambda row: df[df.kp_id == row.kp_id]["poster"].values[0], axis=1
+        top_movies["poster_local"] = top_movies.apply(
+            lambda row: df[df.kp_id == row.kp_id]["poster_local"].values[0], axis=1
         )
         top_movies["name"] = top_movies.apply(
             lambda row: df[df.kp_id == row.kp_id]["name"].values[0], axis=1

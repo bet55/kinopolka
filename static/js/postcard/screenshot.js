@@ -1,5 +1,5 @@
-import {createToast} from "./create_toast.js";
-import {Request} from "./request.js";
+import {createToast} from "../utils/create_toast.js";
+import {Request} from "../utils/request.js";
 
 
 async function sendToServer(picture, posters, title, meeting_date, screenName) {
@@ -8,25 +8,14 @@ async function sendToServer(picture, posters, title, meeting_date, screenName) {
     const date = new Date();
     const timestampScreenName = screenName.replace('.', date.getTime() + '.');
 
-    const url = '';
-    // const url = document.baseURI.split('/', 3).join('/') + '/';
-
     const formdata = new FormData();
     formdata.append("title", title);
     formdata.append("meeting_date", meeting_date);
     formdata.append("screenshot", picture, timestampScreenName);
     posters.forEach(p => formdata.append("movies", p));
 
-
-    const response = await Request.send({method: 'post', url: url, body: formdata});
-
-    // Если ошибка выполнения запроса, то ничего не делаем
-    if (response === null) {
-        return null;
-    }
-
-    // Перезагружаем страницу
-    setTimeout(() => window.location.reload(), 1000);
+    const response = await Request.post({url: '', body: formdata});
+    return response !== null; // request is success ?
 
 }
 
@@ -43,7 +32,7 @@ async function clientUpload(container, screenName) {
 // Сохраняем скриншот в бд
 async function serverUpload(container, posters, title, meeting_date, screenName) {
     const blob = await modernScreenshot.domToBlob(container);
-    await sendToServer(blob, posters, title, meeting_date, screenName)
+    return await sendToServer(blob, posters, title, meeting_date, screenName)
 }
 
 // Функция для создания скриншота элементов страницы
@@ -52,14 +41,15 @@ async function screenshot(container, posters, title, meeting_date = '2001-09-11'
     try {
 
         if (direction === 'server') {
-            return await serverUpload(container, posters, title, meeting_date, screenName)
-        } else {
-            return await clientUpload(container, screenName)
+            return await serverUpload(container, posters, title, meeting_date, screenName);
         }
 
+        return await clientUpload(container, screenName);
 
     } catch (error) {
+        createToast('Открытка не сохранилась!', 'error');
         console.error('Screenshot failed:', error);
+        return null;
     }
 }
 

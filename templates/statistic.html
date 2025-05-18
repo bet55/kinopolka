@@ -14,7 +14,7 @@
         {% for m in movies %}
 
             <div class="movie" data-kp-id="{{ m.kp_id }}">
-                <img src="{{ m.poster }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
+                <img src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
                 <h4>{{ m.name }}</h4>
             </div>
 
@@ -28,7 +28,7 @@
         {% for m in imdb_movies %}
 
             <div class="movie" data-kp-id="{{ m.kp_id }}">
-                <img src="{{ m.poster }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
+                <img src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
                 <h4>{{ m.name }}</h4>
             </div>
 

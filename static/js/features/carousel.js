@@ -31,7 +31,7 @@ tickSound.playbackRate = 4;
 let sleepTime = 500;
 
 // Получаем все фильмы
-const allMovies = await Request.send({method:'get', url:`/movies/?format=json`, showToast: false});
+const allMovies = await Request.get({url:`/movies/?format=json`, showToast: false});
 
 // Вычисляем случайное количество круток
 function randomTicksCount(postersCount) {

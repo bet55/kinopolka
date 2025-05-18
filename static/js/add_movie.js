@@ -19,7 +19,7 @@ async function sendData() {
     spinner.style.display = 'inline-block';
 
     // Запрос на добавление фильма
-    await Request.send({method: 'post', url: '', body: {kp_id: input.value}});
+    await Request.post({url: '', body: {kp_id: input.value}});
 
     // Возвращаем страницу в изначальное состояние
     addButton.disabled = false;

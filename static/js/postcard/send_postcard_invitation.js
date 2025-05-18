@@ -1,68 +1,40 @@
 import {Request} from "../utils/request.js";
+import {confirmModalAction} from "../utils/confirm_modal_action.js";
 
-// Кнопка для отправки приглашения
-const sendButton = document.querySelector('#postcard-send-button');
 
 // Отправляем приглашение с открыткой (email, telegram)
-async function sendPostcard() {
+async function sendPostcard(sendButton) {
 
     // Отображаем выполнение запроса
     sendButton.classList.add('active_option');
 
     // Запрос на отправку открытки
-    const url = '/invitation/';
-    await Request.send({method: 'post', url: url});
-    // await new Promise(resolve => setTimeout(resolve, 3000));
+    await Request.post({url: '/invitation/'});
 
     sendButton.classList.remove('active_option');
 }
 
 
 // Запрашиваем подтверждение на отправку приглашения
-export async function confirmSaving() {
+export async function confirmAndSend() {
+
+    const sendButton = document.querySelector('#postcard-send-button');   // Кнопка для отправки приглашения
+    const confirmContainer = document.querySelector('.confirmation');  // Окно подтверждения отправления
 
     // Не нашли кнопку
     if (!sendButton) {
         return null;
     }
 
-    // Контейнер с подтверждением отправления
-    const confirmContainer = document.querySelector('.confirmation');
-    const confirmYes = confirmContainer.querySelector('#confirm-yes');
-    const confirmNo = confirmContainer.querySelector('#confirm-no');
+    // Отображаем окно подтверждения отправки
+    const confirmModalOptions = {
+        triggerNode: sendButton,
+        modalNode: confirmContainer,
+        confirmAction: async () => {await sendPostcard(sendButton)}
+    }
 
-    // Флаг выполнения запроса
-    let isPending = false;
+    confirmModalAction(confirmModalOptions);
 
-
-    // Отрисовка формы подтверждения
-    sendButton.addEventListener('click', () => {
-        if (isPending) {
-            return null;
-        }
-        confirmContainer.classList.toggle('active');
-    })
-
-
-    // Отправка
-    confirmYes.addEventListener('click', async () => {
-
-        if (isPending) {
-            return null;
-        }
-        confirmContainer.classList.remove('active');
-
-        isPending = true;
-
-        await sendPostcard(isPending);
-
-        isPending = false;
-    })
-
-    // Отмена отправки
-    confirmNo.addEventListener('click', () => {
-        confirmContainer.classList.remove('active');
-    })
 
 }
 

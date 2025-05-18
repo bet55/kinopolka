@@ -1,5 +1,5 @@
 import {createToast} from "../utils/create_toast.js";
-import {screenshot} from "../utils/screenshot.js";
+import {screenshot} from "./screenshot.js";
 import {getNextSaturday} from "../utils/next_saturday.js";
 
 
@@ -41,7 +41,12 @@ export async function savePostcard() {
         title.contentEditable = false;
         const posters = document.querySelectorAll('.poster');
         const posters_ids = Array.from(posters).map(p => p.dataset.kpId);
-        await screenshot(postcard, posters_ids, title.innerText, getNextSaturday('iso'));
+        const screenSuccess = await screenshot(postcard, posters_ids, title.innerText, getNextSaturday('iso'));
+
+        // Перезагрузим страницу, если успешно
+        if (screenSuccess) {
+            setTimeout(() => window.location.reload(), 1000);
+        }
 
         // Возвращаем изначальное положение
         isPending = false;

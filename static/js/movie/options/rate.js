@@ -5,12 +5,14 @@ import {showRatingModal} from "../rating_modal.js";
 // Показываем модальное окно для оценки или просьбу выбрать пользователя
 export const rateMovie = (allMovies, movieId, target, posterContainer) => {
 
-    const user = getCookie('user')
+    target.addEventListener('click', () => {
+        const user = getCookie('user');
 
-    if (!user) {
-        showUserRequiredModal();
-    } else {
-        showRatingModal(movieId, allMovies);
-    }
+        if (!user) {
+            showUserRequiredModal();
+        } else {
+            showRatingModal(movieId, allMovies);
+        }
+    })
 
 }

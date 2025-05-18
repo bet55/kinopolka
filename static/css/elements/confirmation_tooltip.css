@@ -3,24 +3,24 @@
     display: none; /* Скрываем по умолчанию */
     position: absolute; /* Абсолютное позиционирование относительно родителя */
     top: 80%; /* Располагаем под родительским элементом */
-    left: -4em;
+    left: -1em;
     margin-top: 10px; /* Небольшой отступ сверху */
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 100; /* Чтобы перекрывал другие элементы */
+    z-index: -1; /* Чтобы не перекрывал другие элементы */
     min-width: 200px; /* Чтобы не было слишком узким */
 
     h4 {
         font-size: 1.5em;
     }
 
-    #confirm-yes {
+    .confirm-yes {
         background-color: var(--green-color);
     }
 
-    #confirm-no {
+    .confirm-no {
         background-color: var(--red-color);
     }
 
@@ -39,4 +39,5 @@
 
 .confirmation.active {
     display: block;
+    z-index: 100;
 }
