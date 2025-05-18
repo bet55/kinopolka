@@ -43,8 +43,7 @@ const removeRateRequest = async (movieId, userId) => {
         film: movieId
     }
 
-    const requestOption = {method: 'delete', url: url, body: sendData}
-    await Request.send(requestOption);
+    await Request.delete( {url: url, body: sendData});
 }
 
 
@@ -60,9 +59,7 @@ const rateRequest = async (movieId, userId, rating, comment) => {
     if (comment) {
         sendData['text'] = comment;
     }
-
-    const requestOption = {method: 'post', url: url, body: sendData}
-    await Request.send(requestOption);
+    await Request.post({url: url, body: sendData});
 }
 
 export {createNoteElement, rateRequest}

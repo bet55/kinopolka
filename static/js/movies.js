@@ -10,10 +10,8 @@ import {Request} from "./utils/request.js";
 posterLoadingPlaceholder(); // заглушка на постеры до загрузки
 
 // Получаем все фильмы
-const url = window.location.pathname;
-const getMoviesUrl = `${url}?format=json`;
-
-const allMovies = await Request.send({method: 'get', url: getMoviesUrl, showToast: false});
+const url = window.location.pathname + '?format=json';
+const allMovies = await Request.get({url: url, showToast: false});
 
 paintBookedMovies(); // меняем иконку у всех фильмов в закладках
 showRatingNotesHandler(); // отображение оценок

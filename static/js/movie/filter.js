@@ -64,17 +64,55 @@ function filterMovies(movies) {
     let genres = []; // выбранные фильтры/жанры
 
     genresList.forEach(li => {
-
-        li.addEventListener('click', () => {
             const genre = li.innerText;
+            let isLongPress = false;
             let shownMovies = allMoviesIds;
 
-            genres = li.classList.contains('active') ? genres.filter(g => g !== genre) : genres.concat([genre])
-            filterPoster(genresMap, genres, shownMovies);
-            li.classList.toggle('active');
-        })
-    })
+            // Обработчик клика
+            li.addEventListener('click', () => {
+                // При длинном нажатии не обрабатываем клик
+                if (isLongPress) {
+                    isLongPress = false;
+                    return;
+                }
+
+                genres = li.classList.contains('active') ? genres.filter(g => g !== genre) : genres.concat([genre])
+                filterPoster(genresMap, genres, shownMovies);
+                li.classList.toggle('active');
+            })
+
+            // Обработчики для длительного нажатия
+            let pressTimer;
+            li.addEventListener('mousedown', () => {
+                isLongPress = false;
+
+                pressTimer = window.setTimeout(() => {
+
+                    isLongPress = true;
+
+                    // Сбросить все активные жанры
+                    genresList.forEach(item => item.classList.remove('active'));
+
+                    // Установить только текущий жанр
+                    genres = [genre]
+                    filterPoster(genresMap, genres, shownMovies);
+                    li.classList.add('active');
+
+                }, 1000);
+            });
+
+            li.addEventListener('mouseup', () => {
+                clearTimeout(pressTimer);
+            });
+
+            li.addEventListener('mouseleave', () => {
+                clearTimeout(pressTimer);
+            });
+
+        }
+    )
 
 }
+
 
 export {showFilter, filterMovies}

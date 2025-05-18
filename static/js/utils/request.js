@@ -4,6 +4,25 @@ import {createToast} from "./create_toast.js";
 
 class Request {
 
+    static async get({url, body = null, headers = {}, showToast = true}) {
+        return await Request.send({method: 'get', url: url, body: body, headers: headers, showToast: showToast})
+    }
+
+    static async post({url, body = null, headers = {}, showToast = true}) {
+        return await Request.send({method: 'post', url: url, body: body, headers: headers, showToast: showToast})
+    }
+
+    static async delete({url, body = null, headers = {}, showToast = true}) {
+        return await Request.send({method: 'delete', url: url, body: body, headers: headers, showToast: showToast})
+    }
+
+    static async put({url, body = null, headers = {}, showToast = true}) {
+        return await Request.send({method: 'put', url: url, body: body, headers: headers, showToast: showToast})
+    }
+
+    static async patch({url, body = null, headers = {}, showToast = true}) {
+        return await Request.send({method: 'patch', url: url, body: body, headers: headers, showToast: showToast})
+    }
 
     static async send({method, url, body = null, headers = {}, showToast = true}) {
 
@@ -11,8 +30,10 @@ class Request {
         const successEmo = '🌟';
         const errorEmo = '☠';
 
+        method = method.toUpperCase()
+
         const requestOptions = {
-            method: method.toUpperCase(),
+            method: method,
             headers: {
                 'Accept': 'application/json',
                 ...headers
@@ -36,24 +57,29 @@ class Request {
         try {
             const response = await fetch(url, requestOptions);
 
-            // Ошибка HTTP (4xx, 5xx)
-            if (!response.ok) {
-                const errorText = await response.text();
-                createToast(`Ошибка сервера: ${response.status} ${response.statusText}`, 'error');
-                console.error(`${method} ${url} failed: ${response.status}\n${errorText}`);
-                return null;
-            }
-
             // Пытаемся распарсить JSON, даже если ответ 204 No Content
             let responseData;
             try {
                 responseData = await response.json();
             } catch (e) {
-                // Пустой ответ - вроде, норм
+                responseData = {};
+            }
+
+            // Ошибка HTTP (4xx, 5xx)
+            if (!response.ok) {
+                const networkErrorText = await response.text();
+                const serverErrorText = responseData?.error;
+                const errorText = serverErrorText ? serverErrorText : networkErrorText;
+                createToast(`Ошибка сервера: ${response.status} ${errorText}`, 'error');
+                console.error(`${method} ${url} failed: ${response.status}\n${errorText}`);
+                return null;
+            }
+
+            // Пустой ответ - вроде, норм
+            if (responseData === {} && showToast) {
                 createToast(`Успешно!`, 'success');
                 return {};
             }
-
 
             // Ошибка логики приложения (success: false)
             if (responseData && responseData.success === false) {
@@ -63,6 +89,7 @@ class Request {
                 return null;
             }
 
+            // Теперь точно, всё норм
             if (showToast) {
                 createToast(`Успешно!`, 'success');
             }

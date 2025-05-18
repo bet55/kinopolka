@@ -18,18 +18,10 @@ export async function createPostcard() {
             return null;
         }
 
+        isPending = true;
         createButton.classList.add('active_option')
 
-        const url = document.baseURI.split('/', 3).join('/') + '/';
-
-        const requestOptions = {
-            method: "PUT",
-            redirect: "follow"
-        };
-
-        isPending = true;
-
-        const response = await Request.send({method: 'put', url: url});
+        const response = await Request.put({url: ''});
 
         // Ошибка при выполнении запроса
         if (response === null) {

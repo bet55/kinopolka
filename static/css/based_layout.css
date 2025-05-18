@@ -63,7 +63,24 @@ body {
     .dropdown-menu {
         color: var(--black-color);
         background-color: var(--white-color);
+        height: 16em;
     }
+
+    .user-name {
+        height: 25%;
+
+        .dropdown-item {
+            /*height: 3em;*/
+            font-size: 1.5em;
+        }
+
+        img {
+            height: 99%;
+            object-fit: contain;
+        }
+
+    }
+
 
     @media (min-width: 2500px) {
         border-radius: 8%;
@@ -93,21 +110,21 @@ body {
     }
 }
 
-.user-name:nth-child(1) {
-    background-color: var(--red-color);
-}
+/*.user-name:nth-child(1) {*/
+/*    background-color: var(--red-color);*/
+/*}*/
 
-.user-name:nth-child(2) {
-    background-color: var(--yellow-color);
-}
+/*.user-name:nth-child(2) {*/
+/*    background-color: var(--yellow-color);*/
+/*}*/
 
-.user-name:nth-child(3) {
-    background-color: var(--white-color);
-}
+/*.user-name:nth-child(3) {*/
+/*    background-color: var(--white-color);*/
+/*}*/
 
-.user-name:nth-child(4) {
-    background-color: var(--orange-color);
-}
+/*.user-name:nth-child(4) {*/
+/*    background-color: var(--orange-color);*/
+/*}*/
 
 
 /* Кнопка корзины - выпадающий список с фильмами */

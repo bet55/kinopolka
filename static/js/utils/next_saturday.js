@@ -10,7 +10,7 @@ function getNextSaturday(format = 'text') {
   const daysToAdd = (6 - today.getDay() + 7) % 7 || 7;
   const nextSaturday = new Date(today);
   nextSaturday.setDate(today.getDate() + daysToAdd);
-  nextSaturday.setHours(14);
+  nextSaturday.setHours(18);
   nextSaturday.setMinutes(0);
 
   const formats = {

@@ -1,42 +1,39 @@
 import {Request} from "../utils/request.js";
+import {confirmModalAction} from "../utils/confirm_modal_action.js";
 
+// Функция удаления открытки
+async function removePostcard(postcardNode, postcardId) {
+
+    const response = await Request.delete({url: '/', body: {id: postcardId}})
+
+    if (response !== null) {
+
+        // удаляем подсказку
+        const tooltip = document.querySelector('.tooltip');
+        if (tooltip) {
+            tooltip.remove()
+        }
+
+        postcardNode.remove();
+    }
+
+}
 
 // Для каждой открытки создаем слушателя на удаление
 const postcards = document.querySelectorAll('.postcard:not(.active)');
 
 postcards.forEach(p => {
 
-    const img = p.querySelector('img');
-    img.addEventListener('click', () => {
+    const img = p.querySelector('img');  //
+    const confirmContainer = p.querySelector('.confirmation');   // Окно подтверждения удаления
 
-        // Контейнер с подтверждением отправления
-        const confirmContainer = p.querySelector('.confirmation');
-        const confirmYes = confirmContainer.querySelector('#confirm-yes');
-        const confirmNo = confirmContainer.querySelector('#confirm-no');
-
-        // отображение модалки с подтверждением
-        confirmContainer.classList.toggle('active');
-
-        // Удаляем
-        confirmYes.addEventListener('click', async () => {
-            confirmContainer.classList.remove('active');
-
-            const postcardId = p.dataset.postcardId;
-            const response = await Request.send({method: 'delete', url: '/', body: {id: postcardId}})
-
-            if (response !== null) {
-                document.querySelector('.tooltip').remove() // удаляем подсказку
-                p.remove();
-            }
-
-        })
-
-        // Не удаляем
-        confirmNo.addEventListener('click', () => {
-            confirmContainer.classList.remove('active');
-        })
-
-    })
+    // Отображаем окно подтверждения удаления
+    const confirmModalOptions = {
+        triggerNode: img,
+        modalNode: confirmContainer,
+        confirmAction: async () => await removePostcard(p, p.dataset.postcardId)
+    }
+    confirmModalAction(confirmModalOptions);
 
 })
 
