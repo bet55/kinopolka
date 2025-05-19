@@ -3,7 +3,7 @@
     flex-wrap: wrap;
     justify-content: space-around;
 
-    overflow: scroll;
+    overflow: auto;
     max-height: 100%;
 }
 

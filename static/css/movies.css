@@ -1,8 +1,9 @@
 /* Основной блок с фильмами ========================================================*/
 .posters-grid {
-    overflow: scroll;
+    overflow: auto;
     height: 100%;
 }
+
 
 .poster-container.hidden {
     display: none;

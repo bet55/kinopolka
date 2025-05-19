@@ -132,10 +132,10 @@
 /* Текстовое описание приглашения */
 #invitation {
     position: absolute;
-    height: 49%;
-    width: 47%;
+    height: 48%;
+    width: 45%;
     top: 39%;
-    left: 52%;
+    left: 53%;
     font-size: 1.8em;
     font-weight: bold;
 
@@ -143,12 +143,14 @@
     span {
         display: block;
         margin-bottom: 0.9em;
-        /*border-bottom: 2px solid black;*/
+        border-bottom: 2px dashed var(--red-color);
+        line-height: 1.4;
 
         overflow: hidden;
         text-overflow: ellipsis;
         text-wrap: nowrap;
         max-width: 100%;
+
 
     }
 
