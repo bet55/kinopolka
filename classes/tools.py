@@ -34,19 +34,19 @@ class Tools:
             return Themes.default.value
 
     @classmethod
-    def get_random_images(cls) -> dict:
+    def get_random_images(cls, theme: str = None) -> dict:
         """
         Получаем набор путей до изображений для размещения на странице приложения
 
         :return: Словарь с путями к изображениям для каждого блока на html странице.
         """
-        theme = cls._get_current_theme()
+
+        # Вычисляем текущую тему или используем из аргумента функции
+        theme = theme if hasattr(Themes, str(theme)) else cls._get_current_theme()
 
         return {
             "poster": cls._choose_random_image(theme, ImageFolders.poster.value),
-            "navigation": cls._choose_random_image(
-                theme, ImageFolders.navigation.value
-            ),
+            "navigation": cls._choose_random_image(theme, ImageFolders.navigation.value),
             "header": cls._choose_random_image(theme, ImageFolders.header.value),
             "postcard": cls._choose_random_image(theme, ImageFolders.postcard.value),
         }

@@ -7,12 +7,13 @@ from rest_framework import status
 from adrf.views import APIView
 from classes import MovieHandler, NoteHandler, Tools, UserHandler
 from classes.movie import MoviesStructure
+from mixins import GlobalDataMixin
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
 
 
-class MoviesView(APIView):
+class MoviesView(GlobalDataMixin, APIView):
     """
     Запросы на получение списков фильмов и их изменение
     """
@@ -64,18 +65,15 @@ class MoviesView(APIView):
                 )
 
             movies = await MovieHandler.get_all_movies(info_type=MoviesStructure.posters.value, is_archive=is_archive)
-            users = await UserHandler.get_all_users()
             genres = MovieHandler.extract_genres(movies)
 
             context = {
                 "movies": movies,
-                "users": users,
                 "genres": genres,
                 "is_archive": is_archive,
-                "random": Tools.get_random_images(),
             }
             logger.info("Rendering movies.html with %d movies (is_archive=%s)", len(movies), is_archive)
-            return render(request, "movies.html", context=context)
+            return render(request, "movies.html", context=await self.add_context_data(request, context))
 
         except Exception as e:
             logger.error("Failed to process GET request: %s", str(e))
@@ -310,7 +308,7 @@ class MovieRatingView(APIView):
             )
 
 
-class MovieAdditionView(APIView):
+class MovieAdditionView(GlobalDataMixin, APIView):
     """
     Обработка добавления фильмов
     """
@@ -326,12 +324,8 @@ class MovieAdditionView(APIView):
             Rendered HTML page for adding a movie.
         """
         try:
-            context = {
-                "random": Tools.get_random_images(),
-                "users": await UserHandler.get_all_users(),
-            }
             logger.info("Rendering add_movie.html")
-            return render(request, "add_movie.html", context=context)
+            return render(request, "add_movie.html", context=await self.add_context_data(request, {}))
 
         except Exception as e:
             logger.error("Failed to render add_movie.html: %s", str(e))

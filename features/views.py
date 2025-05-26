@@ -1,34 +1,26 @@
-from django.shortcuts import render
-from adrf.decorators import api_view
+from adrf.views import APIView
 from django.shortcuts import render
 from rest_framework.request import Request
-from classes import Tools, MovieHandler, UserHandler, PostcardHandler
-from lists.models import User
-from lists.serializers import UserSerializer
+from classes import MovieHandler, PostcardHandler
+from mixins import GlobalDataMixin
+
+class CarouselView(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
+        movies = await MovieHandler.get_all_movies(info_type="posters")
+
+        return render(
+            request,
+            "features/carousel.html",
+            context = await self.add_context_data(request, {"movies": movies}),
+        )
 
 
-@api_view(["GET"])
-async def carousel(request: Request):
-    movies = await MovieHandler.get_all_movies(info_type="posters")
-    users = await UserHandler.get_all_users()
+class PostcardsView(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
+        postcards = await PostcardHandler.get_all_postcards()
 
-    random_images = Tools.get_random_images()
-    return render(
-        request,
-        "features/carousel.html",
-        context={"movies": movies, "users": users, "random": random_images},
-    )
-
-
-@api_view(['GET'])
-async def postcards_archive(request: Request):
-    postcards = await PostcardHandler.get_all_postcards()
-    users = await UserHandler.get_all_users()
-
-
-    random_images = Tools.get_random_images()
-    return render(
-        request,
-        "features/postcards_archive.html",
-        context={"postcards": postcards,  "users": users, "random": random_images},
-    )
+        return render(
+            request,
+            "features/postcards_archive.html",
+            context = await self.add_context_data(request, {"postcards": postcards}),
+        )
