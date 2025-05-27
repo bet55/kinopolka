@@ -75,11 +75,6 @@ class Request {
                 return null;
             }
 
-            // Пустой ответ - вроде, норм
-            if (responseData === {} && showToast) {
-                createToast(`Успешно!`, 'success');
-                return {};
-            }
 
             // Ошибка логики приложения (success: false)
             if (responseData && responseData.success === false) {
@@ -89,9 +84,10 @@ class Request {
                 return null;
             }
 
-            // Теперь точно, всё норм
-            if (showToast) {
+            // Пустой ответ - но, статус норм
+            if (responseData === {} && showToast) {
                 createToast(`Успешно!`, 'success');
+                return {};
             }
 
             return responseData?.data ?? responseData;

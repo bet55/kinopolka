@@ -1,7 +1,12 @@
 body {
     background-image: url('../../static/img/background.jpg');
     background-size: 100%;
-    overflow: scroll;
+
+
+    overflow-y: auto;
+    overflow-x: hidden; /* чтобы не было горизонтального скролла */
+    scrollbar-gutter: stable; /* предотвращает "прыгание" контента */
+    padding-right: 4px; /* место для скроллбара */
 }
 
 /* 1 row =====================================================  */
@@ -154,7 +159,7 @@ body {
     right: 6vw;
     width: 22em;
     max-height: 60vh;
-    overflow: scroll;
+    overflow: auto;
 
     backdrop-filter: blur(15px);
 
@@ -234,6 +239,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    overflow: hidden;
 
     .nav-link {
         font-weight: bold;

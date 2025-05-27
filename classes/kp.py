@@ -15,8 +15,10 @@ class KP:
     Класс для работы с неофициальным api кинопоиска https://kinopoisk.dev
     """
 
-    cache_duration: int = 60 * 2  # 2 minutes
-    cache: Caching = Caching("app_cache", cache_duration)
+    CACHE_DIRECTORY: str = 'app_cache'
+    CACHE_DURATION: int = 60 * 2  # 2 minutes
+    cache: Caching = Caching(CACHE_DIRECTORY, CACHE_DURATION)
+
     error: Optional[str] = None
     BASE_URL: ClassVar[str] = "https://api.kinopoisk.dev/v1.4/"
     headers: ClassVar[Dict[str, str]] = None  # Initialized in __post_init__

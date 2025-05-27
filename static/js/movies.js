@@ -6,7 +6,6 @@ import {showFilter, filterMovies} from "./movie/filter.js";
 import {posterLoadingPlaceholder} from "./movie/poster_placeholder.js";
 import {Request} from "./utils/request.js";
 
-
 posterLoadingPlaceholder(); // заглушка на постеры до загрузки
 
 // Получаем все фильмы

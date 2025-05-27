@@ -1,5 +1,4 @@
-__all__ = ["movies_ids", "archive_movies_ids", "get_movie"]
+__all__ = ["create_theme_calendar"]
 
 
-from .movies_ids import movies_ids, archive_movies_ids
-from .request_kp_movie import get_movie
+from .create_theme_calendar import create_theme_calendar

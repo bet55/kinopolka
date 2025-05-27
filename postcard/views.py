@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from classes import Tools, UserHandler, PostcardHandler, Invitation
+from mixins import GlobalDataMixin
 import logging
 
 # Configure logger
@@ -23,14 +24,14 @@ class InvitationViewSet(APIView):
             logger.error("Failed to send invitation: %s", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class PostCardViewSet(APIView):
+class PostCardViewSet(GlobalDataMixin, APIView):
     async def get(self, request: Request):
         """
         Retrieve the page with the current event's postcard.
         """
         try:
-            users = await UserHandler.get_all_users()
-            random_images = Tools.get_random_images()
+            theme = request.query_params.get("theme")
+            random_images = Tools.get_random_images(theme)
             postcard, is_active = await PostcardHandler.get_postcard()
 
             # Берем активную открытку или пустой бланк
@@ -41,11 +42,10 @@ class PostCardViewSet(APIView):
             context = {
                 "postcard": postcard_url,
                 "random": random_images,
-                "users": users,
                 "is_active": is_active,
             }
             logger.info("Retrieved postcard page with is_active: %s", is_active)
-            return render(request, "postcard.html", context=context)
+            return render(request, "postcard.html", context=await self.add_context_data(request, context))
         except Exception as e:
             logger.error("Failed to retrieve postcard page: %s", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

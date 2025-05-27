@@ -42,6 +42,9 @@ function mapGenresToMovies(movies) {
 
 // Показываем только постеры по выбранным фильтрам
 function filterPoster(genresMap, activeGenres, shownMovies) {
+    console.log(genresMap)
+    console.log(activeGenres)
+
     const postersList = document.querySelectorAll('.poster-container');
 
     // Выбираем id фильмов, соответствующие выбранным жанрам
@@ -58,15 +61,17 @@ function filterPoster(genresMap, activeGenres, shownMovies) {
 // Оставляем фильмы соответствующие выбранному жанру в фильтре
 function filterMovies(movies) {
 
-    const genresList = document.querySelectorAll('#filter li'); // элементы списка
+    const genresList = document.querySelectorAll('#filter-list li'); // элементы списка
     const allMoviesIds = Object.keys(movies); // список id всех фильмов
     let genresMap = mapGenresToMovies(movies); // соотносим жанр: фильмы
     let genres = []; // выбранные фильтры/жанры
 
+
     genresList.forEach(li => {
-            const genre = li.innerText;
+            let genre = li.textContent; // почему-то innerText перестал работать
             let isLongPress = false;
             let shownMovies = allMoviesIds;
+
 
             // Обработчик клика
             li.addEventListener('click', () => {
@@ -77,6 +82,8 @@ function filterMovies(movies) {
                 }
 
                 genres = li.classList.contains('active') ? genres.filter(g => g !== genre) : genres.concat([genre])
+
+
                 filterPoster(genresMap, genres, shownMovies);
                 li.classList.toggle('active');
             })
