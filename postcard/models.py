@@ -12,3 +12,6 @@ class Postcard(models.Model):
     )
     is_active = models.BooleanField(default=True)
     screenshot = models.ImageField(upload_to="media/postcards/", null=True)
+
+    class Meta:
+        ordering = ["-meeting_date"]

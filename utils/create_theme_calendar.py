@@ -31,5 +31,3 @@ def create_theme_calendar() -> dict[str, str]:
     return calendar
 
 
-res = create_theme_calendar()
-print(res)

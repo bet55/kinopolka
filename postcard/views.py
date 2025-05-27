@@ -30,7 +30,8 @@ class PostCardViewSet(GlobalDataMixin, APIView):
         Retrieve the page with the current event's postcard.
         """
         try:
-            random_images = Tools.get_random_images()
+            theme = request.query_params.get("theme")
+            random_images = Tools.get_random_images(theme)
             postcard, is_active = await PostcardHandler.get_postcard()
 
             # Берем активную открытку или пустой бланк
