@@ -25,7 +25,7 @@
     left: -5em;
     width: 14em;
     max-height: 60vh;
-    overflow: scroll;
+    overflow: auto;
 
     padding-left: 0;
     list-style: none;

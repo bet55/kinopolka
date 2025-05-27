@@ -131,7 +131,7 @@ class Invitation:
 
         try:
             html_content = render_to_string(
-                "email.html", {"postcard": screenshot.url, "date": meeting_date}
+                "elements/email.html", {"postcard": screenshot.url, "date": meeting_date}
             )
             text_content = strip_tags(html_content)
 
