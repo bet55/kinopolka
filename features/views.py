@@ -1,10 +1,34 @@
 from adrf.views import APIView
 from django.shortcuts import render
 from rest_framework.request import Request
-from classes import MovieHandler, PostcardHandler
+from classes import Statistic, MovieHandler
 from mixins import GlobalDataMixin
 
-class CarouselView(GlobalDataMixin, APIView):
+
+class MoviesStatistic(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
+
+        # fig = await Statistic.draw()
+
+        statistic = await Statistic.get_movies_statistic()
+        top_imdb_movies = await Statistic.most_rated_imdb_movies()
+        top_users_movies = await Statistic.most_rated_users_movies()
+
+        context = {
+            # "graph_div": fig,
+            "statistic": statistic,
+            "movies": top_users_movies,
+            "imdb_movies": top_imdb_movies,
+        }
+
+        return render(
+            request,
+            template_name="features/statistic.html",
+            context=await self.add_context_data(request, context),
+        )
+
+
+class Carousel(GlobalDataMixin, APIView):
     async def get(self, request: Request):
         movies = await MovieHandler.get_all_movies(info_type="posters")
 
@@ -15,12 +39,10 @@ class CarouselView(GlobalDataMixin, APIView):
         )
 
 
-class PostcardsView(GlobalDataMixin, APIView):
+class Tarots(GlobalDataMixin, APIView):
     async def get(self, request: Request):
-        postcards = await PostcardHandler.get_all_postcards()
-
         return render(
             request,
-            "features/postcards_archive.html",
-            context = await self.add_context_data(request, {"postcards": postcards}),
+            "features/tarot.html",
+            context = await self.add_context_data(request, {}),
         )

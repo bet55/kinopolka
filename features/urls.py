@@ -1,8 +1,9 @@
 from django.urls import path
 
-from features.views import CarouselView, PostcardsView
+from features.views import Carousel, MoviesStatistic, Tarots
 
 urlpatterns = [
-    path("carousel/", CarouselView.as_view(), name='carousel'),
-    path("postcards_archive/", PostcardsView.as_view(), name='postcards_archive'),
+    path("carousel/", Carousel.as_view(), name='carousel'),
+    path("statistic/", MoviesStatistic.as_view(), name="statistic"),
+    path("tarot/", Tarots.as_view(), name="tarot"),
 ]

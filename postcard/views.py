@@ -3,12 +3,23 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from classes import Tools, UserHandler, PostcardHandler, Invitation
+from classes import Tools, PostcardHandler, Invitation
 from mixins import GlobalDataMixin
 import logging
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
+
+class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
+        postcards = await PostcardHandler.get_all_postcards()
+
+        return render(
+            request,
+            "postcards_archive.html",
+            context = await self.add_context_data(request, {"postcards": postcards}),
+        )
+
 
 class InvitationViewSet(APIView):
     async def post(self, request: Request):
@@ -24,7 +35,7 @@ class InvitationViewSet(APIView):
             logger.error("Failed to send invitation: %s", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class PostCardViewSet(GlobalDataMixin, APIView):
+class PostcardViewSet(GlobalDataMixin, APIView):
     async def get(self, request: Request):
         """
         Retrieve the page with the current event's postcard.
