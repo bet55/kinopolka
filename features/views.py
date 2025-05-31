@@ -5,9 +5,17 @@ from classes import Statistic, MovieHandler
 from mixins import GlobalDataMixin
 
 
+class Catalog(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
+        return render(
+            request,
+            template_name="features/catalog.html",
+            context=await self.add_context_data(request, {}),
+        )
+
+
 class MoviesStatistic(GlobalDataMixin, APIView):
     async def get(self, request: Request):
-
         # fig = await Statistic.draw()
 
         statistic = await Statistic.get_movies_statistic()
@@ -35,7 +43,7 @@ class Carousel(GlobalDataMixin, APIView):
         return render(
             request,
             "features/carousel.html",
-            context = await self.add_context_data(request, {"movies": movies}),
+            context=await self.add_context_data(request, {"movies": movies}),
         )
 
 
@@ -44,5 +52,5 @@ class Tarots(GlobalDataMixin, APIView):
         return render(
             request,
             "features/tarot.html",
-            context = await self.add_context_data(request, {}),
+            context=await self.add_context_data(request, {}),
         )

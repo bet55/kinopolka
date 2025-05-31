@@ -1,0 +1,47 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+        <link rel="stylesheet" href="{% static 'css/features/catalog.css' %}">
+{% endblock %}
+
+{% block title %}Фишки{% endblock %}
+
+{% block center-content %}
+
+    <div id="features_catalog">
+
+        <div id="statistic" class="feature">
+            <a href="/features/statistic/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/statistics1.png' %}" alt="">
+                    <figcaption>СТАТИСТИКА</figcaption>
+                </figure>
+            </a>
+
+        </div>
+
+        <div id="postcard-archive" class="feature">
+            <a href="/features/carousel/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/carousel1.png' %}" alt="">
+                    <figcaption>КАРУСЕЛЬ</figcaption>
+                </figure>
+            </a>
+
+        </div>
+
+        <div id="tarots" class="feature">
+            <a href="/features/tarot/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/tarots3.jpg' %}" alt="">
+                    <figcaption>ТАРО</figcaption>
+                </figure>
+            </a>
+
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -24,10 +24,16 @@ class Statistic:
         df.loc[:, ['duration', 'rating_kp', 'rating_imdb']] = (
             df.loc[:, ['duration', 'rating_kp', 'rating_imdb']].astype(np.float16))
 
+
+        notes = await NoteHandler.get_all_notes("list")
+        notes = pd.DataFrame(notes)
+        users_mean_rating = notes.groupby(['movie']).agg({'rating': 'mean'}).rating.mean().round(2)
+
         stats = {
             "total_duration": df["duration"].sum(),
-            "rating_kp": round(df["rating_kp"].mean(), 2),
-            "rating_imdb": round(df["rating_imdb"].mean(), 2),
+            "rating_kp": df["rating_kp"].mean().round(2),
+            "rating_imdb": df["rating_imdb"].mean().round(2),
+            "rating_kinopolka": users_mean_rating,
             "count": len(df),
         }
 
