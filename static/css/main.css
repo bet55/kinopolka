@@ -1,0 +1,39 @@
+/* Base */
+@import 'variables.css';
+@import 'base/typography.css';
+@import 'global_settings.css';
+@import 'animations.css';
+
+/* Components */
+@import 'components/buttons.css';
+@import 'components/cards.css';
+
+/* Utils */
+@import 'utils/layout.css';
+
+/* Features */
+@import 'features/carousel.css';
+@import 'features/postcards_archive.css';
+
+/* Elements */
+@import 'elements/rating_modal.css';
+@import 'elements/rating_notes.css';
+@import 'elements/postcard_header.css';
+@import 'elements/scroll_up_button.css';
+@import 'elements/toast.css';
+@import 'elements/filter.css';
+@import 'elements/confirmation_tooltip.css';
+@import 'elements/user_requirement_modal.css';
+
+/* Pages */
+@import 'movies.css';
+@import 'add_movie.css';
+@import 'statistic.css';
+
+/* Custom styles */
+body {
+    background-image: url('../img/background.jpg');
+    background-size: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+} 
