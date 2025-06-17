@@ -1,0 +1,16 @@
+{% load static %}
+
+<div id="order">
+    <img id="order-img" src="{% static 'img/movies_header/order.png' %}" alt=""
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"
+         data-bs-title="Порядок фильмов">
+    <ul id="order-list">
+        <li data-order="rating-imdb">Оценки imdb</li>
+        <li data-order="rating-kp">Оценки кинопоиск</li>
+        <li data-order="rating-user">Оценки пользователя</li>
+        <li data-order="name">Название</li>
+        <li data-order="duration">Длительность</li>
+        <li data-order="premiere">Дата выхода</li>
+    </ul>
+</div>

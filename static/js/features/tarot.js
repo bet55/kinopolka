@@ -187,8 +187,10 @@ function cardsAnimation() {
         const cardBack = document.createElement('div');
         cardBack.className = 'card-face card-back';
 
+        // Лицевая часть карт. Половина карт будет перевернута
         const cardFront = document.createElement('div');
-        cardFront.className = 'card-face card-front';
+        const frontPosition = Math.random() < 0.5 ? 'card-front' : 'card-front-spin';
+        cardFront.className = `card-face ${frontPosition}`;
         cardFront.style.backgroundImage = `url('/static/img/tarots/${randomCard}.png')`;
 
         // Добавляем обработчик клика для открытия модального окна
@@ -203,7 +205,7 @@ function cardsAnimation() {
         cardElement.appendChild(cardFront);
         readingArea.appendChild(cardElement);
 
-        // Добавляем небольшую задержку перед переворотом для лучшего визуального эффекта
+        // Добавляем класс переворота с задержкой
         setTimeout(() => {
             cardElement.classList.add('flipped');
         }, 100);

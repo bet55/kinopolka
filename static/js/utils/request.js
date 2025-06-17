@@ -56,14 +56,19 @@ class Request {
 
         try {
             const response = await fetch(url, requestOptions);
-
-            // Пытаемся распарсить JSON, даже если ответ 204 No Content
-            let responseData;
-            try {
-                responseData = await response.json();
-            } catch (e) {
-                responseData = {};
+            let responseData = {};
+            // Пытаемся распарсить JSON
+            if (response.status !== 204) {
+                try {
+                    responseData = await response.json();
+                } catch (e) {
+                    responseData = {};
+                    createToast('Ошибка чтения ответа', 'error');
+                    console.error(`parse json: ${e}`)
+                    showToast = false;
+                }
             }
+
 
             // Ошибка HTTP (4xx, 5xx)
             if (!response.ok) {
@@ -83,11 +88,9 @@ class Request {
                 console.error(`API error: ${errorMsg}`);
                 return null;
             }
-
-            // Пустой ответ - но, статус норм
-            if (responseData === {} && showToast) {
+            // Уведомление об успехе
+            if (showToast) {
                 createToast(`Успешно!`, 'success');
-                return {};
             }
 
             return responseData?.data ?? responseData;
@@ -95,7 +98,8 @@ class Request {
         } catch (e) {
             // Ошибка сети или другая непредвиденная ошибка
             createToast('Не удалось выполнить запрос', 'error');
-            console.error(`Request failed: ${e}`);
+            console.error(`Request failed`);
+            console.error(e);
             return null;
         }
 

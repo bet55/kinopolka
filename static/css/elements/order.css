@@ -1,4 +1,4 @@
-#filter {
+#order {
     height: 100%;
     display: flex;
     align-items: center;
@@ -6,8 +6,8 @@
     position: relative;
 }
 
-#filter-img {
-    height: 45%;
+#order-img {
+    height: 30%;
 
     &:hover {
         cursor: pointer;
@@ -15,7 +15,7 @@
 
 }
 
-#filter-list {
+#order-list {
     visibility: hidden;
 
     position: absolute;
@@ -24,7 +24,7 @@
     top: 20vh;
     left: -5em;
     width: 14em;
-    max-height: 70vh;
+    max-height: 60vh;
     overflow: auto;
 
     padding-left: 0;
@@ -40,7 +40,7 @@
         background-color: var(--black-color);
         color: var(--white-color);
         border-bottom: 2px solid black;
-        padding: 0.3em;
+        padding: 1em;
     }
 
     li.active {
