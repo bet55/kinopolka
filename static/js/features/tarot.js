@@ -207,6 +207,11 @@ function cardsAnimation() {
 
         // Добавляем класс переворота с задержкой
         setTimeout(() => {
+            if (randomCard === 'world') {
+                const sound = new Audio("/static/sound/za_warudo.mp3");
+                sound.play();
+            }
+
             cardElement.classList.add('flipped');
         }, 100);
     });

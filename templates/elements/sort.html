@@ -1,0 +1,34 @@
+{% load static %}
+
+<div id="sorting">
+    <img id="sorting-img" src="{% static 'img/movies_header/sorting.png' %}" alt=""
+         data-bs-toggle="tooltip"
+         data-bs-placement="top"
+         data-bs-title="Порядок фильмов">
+    <ul id="sorting-list">
+        <li data-sorting="rating-imdb">
+            <span>Оценки imdb</span>
+            <img class="desc" src="{% static 'img/movies_header/sort_down.png' %} ">
+        </li>
+        <li data-sorting="rating-kp" class="active">
+            <span>Оценки кинопоиск</span>
+            <img class="desc" src="{% static 'img/movies_header/sort_down.png' %} ">
+        </li>
+        <li data-sorting="rating-user">
+            <span>Оценки мои</span>
+            <img class="desc" src="{% static 'img/movies_header/sort_down.png' %} ">
+        </li>
+        <li data-sorting="name">
+            <span>Название</span>
+            <img class="desc" src="{% static 'img/movies_header/sort_down.png' %} ">
+        </li>
+        <li data-sorting="duration">
+            <span>Длительность</span>
+            <img class="desc" src="{% static 'img/movies_header/sort_down.png' %} ">
+        </li>
+        <li data-sorting="premiere">
+            <span>Дата выхода</span>
+            <img class="desc" src="{% static 'img/movies_header/sort_down.png' %} ">
+        </li>
+    </ul>
+</div>
