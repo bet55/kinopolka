@@ -36,6 +36,7 @@
         filter: contrast(60%);
 
     }
+
 }
 
 @media (min-width: 2000px) {
@@ -69,6 +70,7 @@
             font-size: 4em;
         }
     }
+
 
 
 }

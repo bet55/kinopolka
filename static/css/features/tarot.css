@@ -1,4 +1,5 @@
 /* Звёздное небо =====================================*/
+
 body {
     background: linear-gradient(to bottom, #0a0e24, #12122e, #1a1342);
     overflow: hidden;
@@ -22,7 +23,9 @@ body {
     }
 }
 
+
 /*  Таро  =================*/
+
 .tarot-container {
     display: flex;
     gap: 2rem;
@@ -31,7 +34,9 @@ body {
 }
 
 .deck {
+
     width: 13em;
+
     perspective: 1000px;
     cursor: pointer;
     flex-shrink: 0;
@@ -47,6 +52,7 @@ body {
     @media (min-width: 3000px) {
         width: 20em;
     }
+
 }
 
 .deck-card {
@@ -64,8 +70,10 @@ body {
 }
 
 .reading-area {
+
     min-height: 50vh;
     max-height: 70vh;
+
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
@@ -77,6 +85,7 @@ body {
 }
 
 .tarot-card {
+
     width: 7vw;
     height: 20vh;
     position: relative;
@@ -91,11 +100,13 @@ body {
     @media (min-width: 3000px) {
         margin-left: 4.5em;
     }
+
 }
 
 .tarot-card.flipped {
     transform: rotateY(180deg);
 }
+
 
 
 .card-face {
@@ -105,6 +116,7 @@ body {
     backface-visibility: hidden;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
 
 }
 

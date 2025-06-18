@@ -212,8 +212,6 @@ function cardsAnimation() {
                 sound.play();
             }
 
-            cardElement.classList.add('flipped');
-        }, 100);
     });
 }
 
