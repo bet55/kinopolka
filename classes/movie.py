@@ -241,12 +241,18 @@ class MovieHandler:
 
     @classmethod
     async def _download_and_save_poster(cls, movie_model: Movie, poster_url: str, kp_id: str) -> bool:
+        from icecream import ic
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=10) as client:
                 response = await client.get(poster_url)
                 response.raise_for_status()
+
                 file_name = f"poster_{kp_id}.jpg"
-                movie_model.poster_local.save(file_name, ContentFile(response.content), save=True)
+                content_file = ContentFile(response.content)
+
+                save_file = sync_to_async(movie_model.poster_local.save, thread_sensitive=True)
+                await save_file(file_name, content_file, save=True)
+
                 logger.info("Downloaded and saved poster for movie %s", kp_id)
                 return True
         except Exception as e:

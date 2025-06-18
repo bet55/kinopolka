@@ -13,7 +13,7 @@ from mixins import GlobalDataMixin
 logger = logging.getLogger('kinopolka')
 
 
-class MoviesView(GlobalDataMixin, APIView):
+class Movies(GlobalDataMixin, APIView):
     """
     Запросы на получение списков фильмов и их изменение
     """
@@ -173,7 +173,7 @@ class MoviesView(GlobalDataMixin, APIView):
             )
 
 
-class MovieRatingView(APIView):
+class MovieRating(APIView):
     """
     Запросы на выставление и изменение рейтинга фильма
     """
@@ -308,7 +308,7 @@ class MovieRatingView(APIView):
             )
 
 
-class MovieAdditionView(GlobalDataMixin, APIView):
+class MovieAdding(GlobalDataMixin, APIView):
     """
     Обработка добавления фильмов
     """
