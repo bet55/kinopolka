@@ -1,3 +1,5 @@
+/* Звёздное небо =====================================*/
+
 body {
     background: linear-gradient(to bottom, #0a0e24, #12122e, #1a1342);
     overflow: hidden;
@@ -21,7 +23,9 @@ body {
     }
 }
 
-/*    =================*/
+
+/*  Таро  =================*/
+
 .tarot-container {
     display: flex;
     gap: 2rem;
@@ -30,8 +34,9 @@ body {
 }
 
 .deck {
-    width: 233px;
-    height: 350px;
+
+    width: 13em;
+
     perspective: 1000px;
     cursor: pointer;
     flex-shrink: 0;
@@ -39,6 +44,15 @@ body {
     img {
         width: 100%;
     }
+
+    @media (min-width: 2000px) {
+        width: 15em;
+    }
+
+    @media (min-width: 3000px) {
+        width: 20em;
+    }
+
 }
 
 .deck-card {
@@ -56,8 +70,10 @@ body {
 }
 
 .reading-area {
-    min-height: 400px;
-    max-height: 80vh;
+
+    min-height: 50vh;
+    max-height: 70vh;
+
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
@@ -69,17 +85,29 @@ body {
 }
 
 .tarot-card {
-    width: 150px;
-    height: 220px;
+
+    width: 7vw;
+    height: 20vh;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.8s;
-    margin-left: 2.5em;
+    margin-left: 1.5em;
+
+    @media (min-width: 2000px) {
+        margin-left: 2.5em;
+    }
+
+    @media (min-width: 3000px) {
+        margin-left: 4.5em;
+    }
+
 }
 
 .tarot-card.flipped {
     transform: rotateY(180deg);
 }
+
+
 
 .card-face {
     position: absolute;
@@ -88,6 +116,8 @@ body {
     backface-visibility: hidden;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
+
 }
 
 .card-back {
@@ -98,6 +128,17 @@ body {
 
 .card-front {
     transform: rotateY(180deg);
+    background-size: cover;
+    background-position: center;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+
+.card-front-spin {
+    transform: rotateX(180deg);
     background-size: cover;
     background-position: center;
 

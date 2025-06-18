@@ -33,6 +33,14 @@ export async function savePostcard() {
             return null;
         }
 
+        // Подбаним кое-какой фильм
+        if(document.querySelector('.poster[data-kp-id="7561"]')) {
+            const sound = new Audio("/static/sound/error.mp3");
+            await sound.play();
+            createToast('Присутствует запрещенный фильм...', 'error')
+            return null;
+        }
+
         // Отображаем выполнение
         saveButton.classList.add('active_option')
         isPending = true;

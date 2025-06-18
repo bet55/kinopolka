@@ -2,7 +2,7 @@ import {createToast} from "../utils/create_toast.js";
 
 
 // Отображаем список с жанрами фильмов
-function showFilter() {
+function toggleFilterList() {
 
     const filter = document.querySelector('#filter img');
     const filterOptions = document.querySelector('#filter ul');
@@ -25,6 +25,7 @@ function showFilter() {
         filterOptions.style.visibility = visibility;
     })
 
+
 }
 
 // Делаем словарик - жанр:[список фильмов]
@@ -41,10 +42,7 @@ function mapGenresToMovies(movies) {
 }
 
 // Показываем только постеры по выбранным фильтрам
-function filterPoster(genresMap, activeGenres, shownMovies) {
-    console.log(genresMap)
-    console.log(activeGenres)
-
+function hideFilteredPosters(genresMap, activeGenres, shownMovies) {
     const postersList = document.querySelectorAll('.poster-container');
 
     // Выбираем id фильмов, соответствующие выбранным жанрам
@@ -59,7 +57,7 @@ function filterPoster(genresMap, activeGenres, shownMovies) {
 }
 
 // Оставляем фильмы соответствующие выбранному жанру в фильтре
-function filterMovies(movies) {
+function handleFilterChoice(movies) {
 
     const genresList = document.querySelectorAll('#filter-list li'); // элементы списка
     const allMoviesIds = Object.keys(movies); // список id всех фильмов
@@ -84,7 +82,7 @@ function filterMovies(movies) {
                 genres = li.classList.contains('active') ? genres.filter(g => g !== genre) : genres.concat([genre])
 
 
-                filterPoster(genresMap, genres, shownMovies);
+                hideFilteredPosters(genresMap, genres, shownMovies);
                 li.classList.toggle('active');
             })
 
@@ -102,7 +100,7 @@ function filterMovies(movies) {
 
                     // Установить только текущий жанр
                     genres = [genre]
-                    filterPoster(genresMap, genres, shownMovies);
+                    hideFilteredPosters(genresMap, genres, shownMovies);
                     li.classList.add('active');
 
                 }, 1000);
@@ -121,5 +119,10 @@ function filterMovies(movies) {
 
 }
 
+function filterMovies(allMovies) {
+    toggleFilterList(); // отрисовка списка
+    handleFilterChoice(allMovies); // фильтрация
+}
 
-export {showFilter, filterMovies}
+
+export {filterMovies}

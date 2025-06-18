@@ -4,7 +4,7 @@ import {confirmModalAction} from "./utils/confirm_modal_action.js";
 // Функция удаления открытки
 async function removePostcard(postcardNode, postcardId) {
 
-    const response = await Request.delete({url: 'archive/', body: {id: postcardId}})
+    const response = await Request.delete({url: '/', body: {id: postcardId}})
 
     if (response !== null) {
 

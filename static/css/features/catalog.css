@@ -36,4 +36,41 @@
         filter: contrast(60%);
 
     }
+
+}
+
+@media (min-width: 2000px) {
+    .feature {
+        height: 20em;
+        width: 30em;
+
+        img {
+            max-height: 20em;
+        }
+
+        figcaption {
+            font-weight: bold;
+            font-size: 3em;
+        }
+    }
+
+
+}
+
+@media (min-width: 3000px) {
+    .feature {
+        height: 30em;
+        width: 40em;
+
+        img {
+            max-height: 30em;
+        }
+
+        figcaption {
+            font-size: 4em;
+        }
+    }
+
+
+
 }

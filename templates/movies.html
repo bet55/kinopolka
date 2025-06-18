@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{% static 'css/elements/rating_notes.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/rating_modal.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/filter.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/sort.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/user_requirement_modal.css' %}">
 {% endblock %}
 
@@ -14,6 +15,7 @@
 
 {# Кнопка в верху #}
 {% block header-button %}
+    {% include "elements/sort.html" with fields=genres %}
 
     {% include "elements/filter.html" with fields=genres %}
 

@@ -1,4 +1,4 @@
-#filter {
+#sorting {
     height: 100%;
     display: flex;
     align-items: center;
@@ -6,8 +6,8 @@
     position: relative;
 }
 
-#filter-img {
-    height: 45%;
+#sorting-img {
+    height: 30%;
 
     &:hover {
         cursor: pointer;
@@ -15,7 +15,7 @@
 
 }
 
-#filter-list {
+#sorting-list {
     visibility: hidden;
 
     position: absolute;
@@ -24,7 +24,7 @@
     top: 20vh;
     left: -5em;
     width: 14em;
-    max-height: 70vh;
+    max-height: 60vh;
     overflow: auto;
 
     padding-left: 0;
@@ -32,12 +32,38 @@
 
 
     li {
+        position: relative;
         background-color: var(--black-color);
         color: var(--white-color);
         border-bottom: 2px solid black;
-        padding: 0.3em;
+        padding: 1em;
         font-weight: bold;
         font-size: 1em;
+
+        img {
+            display: inline-block;
+            position: absolute;
+            height: 1.5em;
+            right: 1em;
+            transition: transform 0.3s ease;
+        }
+
+        .asc {
+            filter: hue-rotate(100deg);
+            transform: rotate(180deg);
+
+            &:hover {
+                filter: hue-rotate(0);
+            }
+        }
+
+        .desc {
+            transform: rotate(0);
+
+            &:hover {
+                filter: hue-rotate(100deg);
+            }
+        }
     }
 
     li.active {
@@ -54,8 +80,9 @@
 
 }
 
+
 @media (min-width: 2500px) {
-    #filter-list {
+    #sorting-list {
         right: 5vw;
         width: 33em;
 
@@ -69,8 +96,7 @@
 
 
 @media (min-width: 3000px) {
-    #filter-list {
-
+    #sorting-list {
         right: 8vw;
         width: 41em;
 
@@ -78,5 +104,6 @@
             font-size: 3em;
         }
     }
+
 
 }
