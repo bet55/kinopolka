@@ -31,7 +31,9 @@
 {# Колода #}
 {% block right-content %}
     <div class="deck" id="deck">
-        <img class=deck-card" src="{% static 'img/tarots/back.jpg' %}" alt="deck">
+        <img class="deck-card" src="{% static 'img/tarots/back.jpg' %}" alt="deck">
+        <ul id="open-cards-list">
+        </ul>
     </div>
 {% endblock %}
 

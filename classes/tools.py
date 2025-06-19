@@ -5,7 +5,7 @@ import json
 import asyncio
 import os
 import random
-from filmoclub.calendar.theme_images import ImageFolders, Themes, IMAGES_PATH
+from filmoclub.calendar.theme_settings import ImageFolders, Themes, IMAGES_PATH
 from filmoclub.calendar.theme_calendar import CALENDAR
 from django.conf import settings
 import pendulum

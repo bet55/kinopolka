@@ -147,8 +147,10 @@ function cardsAnimation() {
         'devil', 'tower', 'star', 'moon', 'sun', 'judgement', 'world'
     ];
 
-    const deck = document.getElementById('deck');
+    const deck = document.querySelector('.deck-card');
     const readingArea = document.getElementById('readingArea');
+    const openCardsList = document.querySelector('#open-cards-list');
+
     const modal = document.getElementById('cardModal');
     const modalImage = document.getElementById('modalCardImage');
     const modalTitle = document.getElementById('modalCardTitle');
@@ -168,7 +170,7 @@ function cardsAnimation() {
         }
     };
 
-    deck.addEventListener('click', () => {
+    deck.addEventListener('click', (e) => {
         if (drawnCards.length >= cards.length) {
             alert('Все карты уже вытянуты!');
             return;
@@ -189,7 +191,7 @@ function cardsAnimation() {
 
         // Лицевая часть карт. Половина карт будет перевернута
         const cardFront = document.createElement('div');
-        const frontPosition = Math.random() < 0.5 ? 'card-front' : 'card-front-spin';
+        const frontPosition = Math.random() <= 0.5 ? 'card-front' : 'card-front-spin';
         cardFront.className = `card-face ${frontPosition}`;
         cardFront.style.backgroundImage = `url('/static/img/tarots/${randomCard}.png')`;
 
@@ -205,14 +207,46 @@ function cardsAnimation() {
         cardElement.appendChild(cardFront);
         readingArea.appendChild(cardElement);
 
+        // Добавляем список надписей с выбранными картами
+        const cardNameLi = document.createElement('li');
+        const cardNameSpan = document.createElement('span');
+        cardNameSpan.innerText = cardDescriptions[randomCard].title;
+        cardNameSpan.classList.add('card-name');
+        cardNameLi.appendChild(cardNameSpan);
+
+        if (frontPosition.includes('spin')) {
+            const cardReversedSpan = document.createElement('span');
+            cardReversedSpan.innerText = ' перевёрнут';
+            cardReversedSpan.classList.add('card-reversed');
+            cardNameLi.appendChild(cardReversedSpan);
+        }
+
+        openCardsList.appendChild(cardNameLi);
+
         // Добавляем класс переворота с задержкой
         setTimeout(() => {
             if (randomCard === 'world') {
                 const sound = new Audio("/static/sound/za_warudo.mp3");
                 sound.play();
             }
+            cardElement.classList.add('flipped');
+        }, 100);
+    })
+}
 
-    });
+function countRandom() {
+    let zero = 0;
+    let one = 0;
+    let rand = 0;
+    for (let i = 0; i < 1000000; i++) {
+        rand = Math.random();
+        if(rand < 0.5) {
+            zero += 1;
+        } else {
+            one += 1;
+        }
+    }
+    return {'zero': zero, 'one': one}
 }
 
 starsAnimation();

@@ -1,5 +1,5 @@
 import pendulum
-from filmoclub.calendar.theme_images import THEMES_RANGES
+from filmoclub.calendar.theme_settings import THEMES_RANGES
 
 
 def create_theme_calendar() -> dict[str, str]:
@@ -29,5 +29,17 @@ def create_theme_calendar() -> dict[str, str]:
             calendar[day_str.format("DD.MM")] = theme
 
     return calendar
+
+
+from collections import OrderedDict
+
+res = create_theme_calendar()
+
+# Сортируем словарь по ключам (датам)
+sorted_items = sorted(res.items(), key=lambda x: (x[1], x[0]))
+ordered_dict = OrderedDict(sorted_items)
+
+print(dict(ordered_dict))
+
 
 

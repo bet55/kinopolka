@@ -43,6 +43,7 @@ THEMES_RANGES = {
     "02.06-08.06": Themes.summer.value,
     "01.09-08.09": Themes.fall.value,
 
+    "21.03-21.03": Themes.Nikita.value,
     "01.06-01.06": Themes.Lexa.value,
     "19.06-19.06": Themes.Sanya.value,
     "18.12-18.12": Themes.Danya.value,
