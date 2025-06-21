@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "postcard",
     "features",
     "tools",
+    "bar",
 ]
 
 MIDDLEWARE = [

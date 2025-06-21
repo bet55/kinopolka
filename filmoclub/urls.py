@@ -28,5 +28,6 @@ urlpatterns = [
     path("tools/", include("tools.urls")),
 
     path("features/", include("features.urls")),
+    path("bar/", include("bar.urls")),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
