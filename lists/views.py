@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from adrf.views import APIView
-from classes import MovieHandler, NoteHandler, Tools, UserHandler
+from classes import MovieHandler, NoteHandler
 from classes.movie import MoviesStructure
 from mixins import GlobalDataMixin
 
@@ -21,13 +21,6 @@ class Movies(GlobalDataMixin, APIView):
     async def get(self, request: Request, kp_id: Optional[int] = None) -> Response:
         """
         Получение списка фильмов или по id
-
-        Args:
-            request: HTTP request object.
-            kp_id: Kinopoisk ID of a specific movie (optional).
-
-        Returns:
-            Response with movie data or rendered HTML page.
         """
 
         try:
@@ -85,12 +78,6 @@ class Movies(GlobalDataMixin, APIView):
     async def patch(self, request: Request) -> Response:
         """
         Изменение архивного статуса
-
-        Args:
-            request: HTTP request object containing kp_id and is_archive.
-
-        Returns:
-            Response indicating success or failure.
         """
         try:
             kp_id = int(request.data.get("kp_id", -1))
@@ -134,12 +121,6 @@ class Movies(GlobalDataMixin, APIView):
     async def delete(self, request: Request) -> Response:
         """
         Удаление фильма
-
-        Args:
-            request: HTTP request object containing kp_id.
-
-        Returns:
-            Response indicating success or failure.
         """
         try:
             kp_id = int(request.data.get("kp_id", -1))
@@ -181,12 +162,6 @@ class MovieRating(APIView):
     async def delete(self, request: Request) -> Response:
         """
         Удаление заметки с рейтингом фильма
-
-        Args:
-            request: HTTP request object containing user_id and movie_kp_id.
-
-        Returns:
-            Response indicating success or failure.
         """
         try:
             user_id = int(request.data.get("user_id", -1))
@@ -230,12 +205,6 @@ class MovieRating(APIView):
     async def post(self, request: Request) -> Response:
         """
         Создание заметки с рейтингом
-
-        Args:
-            request: HTTP request object containing note data (user, movie, rating, optional text).
-
-        Returns:
-            Response indicating success or failure.
         """
         try:
             note_data = request.data
@@ -270,12 +239,6 @@ class MovieRating(APIView):
     async def put(self, request: Request) -> Response:
         """
         Изменение оценки или текста заметки с рейтингом
-
-        Args:
-            request: HTTP request object containing updated note data (user, movie, rating, optional text).
-
-        Returns:
-            Response indicating success or failure.
         """
         try:
             note_data = request.data
@@ -316,12 +279,6 @@ class MovieAdding(GlobalDataMixin, APIView):
     async def get(self, request: Request) -> Response:
         """
         Форма для добавления
-
-        Args:
-            request: HTTP request object.
-
-        Returns:
-            Rendered HTML page for adding a movie.
         """
         try:
             logger.info("Rendering add_movie.html")
@@ -337,12 +294,6 @@ class MovieAdding(GlobalDataMixin, APIView):
     async def post(self, request: Request) -> Response:
         """
         Запрос на добавление
-
-        Args:
-            request: HTTP request object containing kp_id.
-
-        Returns:
-            Response indicating success or failure of movie addition.
         """
         try:
             kp_id = request.data.get("kp_id", "-1")

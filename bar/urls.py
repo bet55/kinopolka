@@ -1,19 +1,19 @@
 from django.urls import path
 from .views import (
-    IngredientListCreateAPIView,
-    IngredientDetailAPIView,
-    CocktailListCreateAPIView,
-    CocktailDetailAPIView,
-    CocktailAvailabilityAPIView
+    Bar,
+    IngredientListCreate,
+    IngredientDetail,
+    CocktailListCreate,
+    CocktailDetail,
+    CocktailAvailability
 )
 
 urlpatterns = [
     # Ингредиенты
-    path('ingredients/', IngredientListCreateAPIView.as_view()),
-    path('ingredients/<int:pk>/', IngredientDetailAPIView.as_view()),
-
-    # Коктейли
-    path('cocktails/', CocktailListCreateAPIView.as_view()),
-    path('cocktails/<int:pk>/', CocktailDetailAPIView.as_view()),
-    path('cocktails/<int:pk>/availability/', CocktailAvailabilityAPIView.as_view()),
+    path('', Bar.as_view(), name='bar'),
+    path('ingredients/', IngredientListCreate.as_view(), name='ingredient'),
+    path('ingredients/<int:pk>/', IngredientDetail.as_view(), name='ingredient-detail'),
+    path('cocktails/', CocktailListCreate.as_view(), name='cocktail'),
+    path('cocktails/<int:pk>/', CocktailDetail.as_view(), name='cocktail-detail'),
+    path('cocktails/<int:pk>/availability/', CocktailAvailability.as_view(), name='cocktail-availability'),
 ]

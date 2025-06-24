@@ -10,6 +10,7 @@
 .postcard {
     max-width: 45%;
     position: relative;
+    margin-top: 1em;
 
     img {
         max-width: 100%;

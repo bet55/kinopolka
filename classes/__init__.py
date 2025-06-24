@@ -9,6 +9,9 @@ __all__ = [
     "Tools",
     "PostcardHandler",
     "Invitation",
+    "IngredientHandler",
+    "CocktailHandler",
+    "Error"
 ]
 
 from .user import UserHandler
@@ -20,3 +23,6 @@ from .statistic import Statistic
 from .tools import Tools
 from .postcard import PostcardHandler
 from .invitation import Invitation
+from .ingredient import IngredientHandler
+from .cocktail import CocktailHandler
+from .error import Error
