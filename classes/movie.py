@@ -170,37 +170,6 @@ class MovieHandler:
             return False
 
     @classmethod
-    def download(cls, kp_id: Union[int, str]) -> Tuple[int, bool]:
-        """
-        Download movie data from Kinopoisk API and save it to the database.
-
-        Args:
-            kp_id: Kinopoisk ID of the movie (integer or string).
-
-        Returns:
-            Tuple of (movie ID, success status). Returns (-1, False) if an error occurs.
-        """
-        if not kp_id or not isinstance(kp_id, (int, str)) or (isinstance(kp_id, int) and kp_id <= 0):
-            logger.error("Invalid kp_id: %s", kp_id)
-            return -1, False
-
-        try:
-            kp_client = KP_Movie()
-            api_response = kp_client.get_movie_by_id(kp_id)
-            if not api_response:
-                logger.warning("No data returned from KP API for kp_id: %s", kp_id)
-                return -1, False
-
-            converted_response = cls._response_preprocess(api_response)
-            movie_model, success = cls._save_movie_to_db(converted_response)
-            logger.info("Downloaded and saved movie %s: success=%s", kp_id, success)
-            return api_response.get("id", -1), success
-
-        except Exception as e:
-            logger.error("Failed to download movie %s: %s", kp_id, str(e))
-            return -1, False
-
-    @classmethod
     async def a_download(cls, kp_id: Union[int, str], kp_scheme: Optional[Dict] = None) -> Tuple[int, bool]:
         """
         Asynchronously download movie data from Kinopoisk API or provided scheme and save it to the database.
@@ -241,7 +210,6 @@ class MovieHandler:
 
     @classmethod
     async def _download_and_save_poster(cls, movie_model: Movie, poster_url: str, kp_id: str) -> bool:
-        from icecream import ic
         try:
             async with httpx.AsyncClient(timeout=10) as client:
                 response = await client.get(poster_url)
@@ -261,46 +229,6 @@ class MovieHandler:
             await movie_model.asave()
             return False
 
-    @classmethod
-    def _save_movie_to_db(cls, movie_info: KPEntities) -> Tuple[Movie, bool]:
-        """
-        Save movie data to the database (synchronous).
-
-        Args:
-            movie_info: KPEntities tuple containing movie, persons, and genres data.
-
-        Returns:
-            Tuple of (Movie model instance, success status). Returns (None, False) if an error occurs.
-        """
-        try:
-            movie, persons, genres = movie_info
-            movie_model, m_status = Movie.mgr.update_or_create(**movie)
-
-            actors, directors, writers, genres = cls._create_models_constructor_list(persons, genres)
-            Actor.mgr.bulk_create(
-                actors, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
-            )
-            Director.mgr.bulk_create(
-                directors, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
-            )
-            Writer.mgr.bulk_create(
-                writers, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
-            )
-            Genre.mgr.bulk_create(
-                genres, update_conflicts=True, update_fields=["watch_counter"], unique_fields=["name"]
-            )
-
-            movie_model.actors.set(actors)
-            movie_model.directors.set(directors)
-            movie_model.writers.set(writers)
-            movie_model.genres.set(genres)
-
-            logger.debug("Saved movie to database: kp_id=%s, status=%s", movie.get("kp_id"), m_status)
-            return movie_model, True
-
-        except (IntegrityError, Exception) as e:
-            logger.error("Failed to save movie to database: %s", str(e))
-            return None, False
 
     @classmethod
     async def _a_save_movie_to_db(cls, movie_info: KPEntities) -> Tuple[Optional[Movie], bool]:
