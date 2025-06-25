@@ -32,4 +32,7 @@
 
 
 
-
+# Исправление дат в открытках
+UPDATE postcard_postcard
+SET meeting_date = '2025-06-22 11:00:00', created_at = '2025-06-18 16:00:00'
+WHERE id = 26;

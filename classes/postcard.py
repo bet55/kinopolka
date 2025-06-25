@@ -1,6 +1,6 @@
 import logging
 from typing import Dict
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, SynchronousOnlyOperation
 from django.db import DatabaseError
 from asgiref.sync import sync_to_async
 from postcard.models import Postcard
@@ -17,7 +17,6 @@ def handle_exceptions(method_name: str):
     :param method_name: Название сущности для логов (например, 'Открытка').
     :return: Результат метода или объект Error.
     """
-
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -25,26 +24,29 @@ def handle_exceptions(method_name: str):
                 return func(*args, **kwargs)
             except Postcard.DoesNotExist:
                 logger.error(f"{method_name} не найден: {args}, {kwargs}")
-                return Error(message=f"{method_name} не найден", status=404)
+                return Error(message="Открытка не найдена", status=404)
             except ValidationError as e:
                 logger.error(f"Ошибка валидации в {method_name}: {str(e)}")
                 return Error(message=str(e), status=400)
             except DatabaseError as e:
                 logger.error(f"Ошибка базы данных в {method_name}: {str(e)}")
                 return Error(message=f"Ошибка базы данных: {str(e)}", status=500)
+            except SynchronousOnlyOperation as e:
+                logger.error(f"Синхронная операция в асинхронном контексте в {method_name}: {str(e)}")
+                return Error(message="Внутренняя ошибка: синхронная операция в асинхронном контексте", status=500)
             except Exception as e:
                 logger.error(f"Ошибка в {method_name}: {str(e)}")
-                return Error(message=f"Ошибка в {method_name}: {str(e)}")
-
+                return Error(message=f"Ошибка в {method_name}: {str(e)}", status=500)
         return wrapper
-
     return decorator
 
 
 class PostcardHandler:
+
     @classmethod
+    @sync_to_async
     @handle_exceptions("Открытка")
-    async def create_postcard(cls, data: Dict, request=None) -> dict:
+    def create_postcard(cls, data: Dict, request=None) -> dict:
         """
         Создание новой открытки. Деактивирует все предыдущие открытки.
         :param data: Словарь с данными открытки (title, meeting_date, screenshot, movies).
@@ -56,24 +58,40 @@ class PostcardHandler:
         if not data.get('meeting_date'):
             raise ValidationError("Поле 'meeting_date' обязательно")
 
-        await cls.deactivate_postcard()  # Деактивируем все открытки
+        cls.deactivate_postcard()  # Деактивируем все открытки
+
         serializer = PostcardSerializer(data=data, context={'request': request})
-        if not await sync_to_async(serializer.is_valid)():
+        if not serializer.is_valid():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
 
-        postcard = await sync_to_async(serializer.save)()
+        postcard = serializer.save()
         return PostcardSerializer(postcard).data
 
     @classmethod
-    @handle_exceptions("Активная открытка")
     @sync_to_async
+    @handle_exceptions("Активная открытка")
     def get_postcard(cls) -> dict:
         """
         Получение активной открытки.
         :return: Сериализованные данные активной открытки или Error.
         """
+
         postcard = Postcard.objects.filter(is_active=True).latest("created_at")
         return PostcardSerializer(postcard).data
+
+    @classmethod
+    @sync_to_async
+    @handle_exceptions("Активная открытка")
+    def get_postcard_tmp(cls):
+        """
+        Получение активной открытки.
+        :return: Сериализованные данные активной открытки или Error.
+        """
+
+        postcard = Postcard.objects.filter(is_active=True).latest("created_at")
+        return PostcardSerializer(postcard)
+
+
 
     @classmethod
     @handle_exceptions("Открытка")
@@ -83,14 +101,16 @@ class PostcardHandler:
         :param postcard_id: ID открытки.
         :return: Сериализованные данные открытки или Error.
         """
-        if not isinstance(postcard_id, int) or postcard_id <= 0:
+        postcard_id = int(postcard_id)
+        if postcard_id <= 0:
             raise ValidationError("Некорректный ID открытки")
+
         postcard = await Postcard.objects.aget(id=postcard_id)
         return PostcardSerializer(postcard).data
 
     @classmethod
-    @handle_exceptions("Открытки")
     @sync_to_async
+    @handle_exceptions("Открытки")
     def get_all_postcards(cls) -> list[dict]:
         """
         Получение всех открыток.
@@ -126,7 +146,8 @@ class PostcardHandler:
         :param postcard_id: ID открытки.
         :return: True если удаление успешно, иначе Error.
         """
-        if not isinstance(postcard_id, int) or postcard_id <= 0:
+        postcard_id = int(postcard_id)
+        if postcard_id <= 0:
             raise ValidationError("Некорректный ID открытки")
 
         postcard = await Postcard.objects.aget(id=postcard_id)
@@ -134,8 +155,8 @@ class PostcardHandler:
         return True
 
     @classmethod
-    @handle_exceptions("Открытки")
     @sync_to_async
+    @handle_exceptions("Открытки")
     def deactivate_postcard(cls, postcard_id: int = None, update_all: bool = True) -> bool:
         """
         Деактивация одной или всех открыток.

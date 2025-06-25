@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -17,6 +18,7 @@ class Bar(APIView):
         """
         Получение заполненности бара (коктейли + ингредиенты)
         """
+        return render(request, "features/bar.html")
         ingredients = IngredientHandler.get_all_ingredients()
         cocktails = CocktailHandler.get_all_cocktails()
 

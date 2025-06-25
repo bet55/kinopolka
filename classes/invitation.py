@@ -12,6 +12,9 @@ from .postcard import PostcardHandler
 from .user import UserHandler
 from postcard.models import Postcard
 from email.mime.image import MIMEImage
+from asgiref.sync import sync_to_async
+from .error import Error
+from icecream import ic
 
 # Configure logger
 logger = logging.getLogger('kinopolka')
@@ -41,23 +44,23 @@ class Invitation:
 
         Returns:
             An initialized Invitation instance with the active postcard.
-
-        Raises:
-            Exception: If fetching the postcard fails, logs the error and initializes with None.
         """
-        try:
-            postcard, is_active = await PostcardHandler.get_postcard()
-            from icecream import ic
-            ic(postcard.id, postcard.meeting_date)
-            if not postcard:
-                logger.warning("No active postcard found for Invitation")
-            else:
-                logger.info("Fetched active postcard with id=%s for Invitation", postcard.id)
-            return cls(postcard, is_active)
-
-        except Exception as e:
-            logger.error("Failed to fetch postcard for Invitation: %s", str(e))
+        postcard_data = await PostcardHandler.get_postcard()
+        if isinstance(postcard_data, Error):
+            logger.warning("No active postcard found for Invitation: %s", postcard_data.message)
             return cls(postcard=None, is_active=False)
+
+        try:
+            # Получаем объект Postcard по ID из сериализованных данных
+            postcard = await Postcard.objects.aget(id=postcard_data['id'])
+            is_active = postcard_data.get('is_active', False)
+            logger.info("Fetched active postcard with id=%s for Invitation", postcard.id)
+            return cls(postcard=postcard, is_active=is_active)
+        except Postcard.DoesNotExist:
+            logger.warning("Postcard with id=%s not found", postcard_data.id)
+            return cls(postcard=None, is_active=False)
+
+
 
     async def send_invitation(self) -> Dict[str, str]:
         """
@@ -65,7 +68,7 @@ class Invitation:
 
         :return: словарь результатов отправки
         """
-        if not self.is_active or not self.postcard:
+        if not self.is_active:
             logger.warning("No active postcard available for invitation")
             return {
                 "telegram": "Ошибка: активная открытка не найдена",
@@ -85,12 +88,13 @@ class Invitation:
 
             users = await UserHandler.get_all_users()
             emails = [user.get("email") for user in users if user.get("email")]
+            emails = []
 
             if not emails:
                 logger.warning("No valid email addresses found for invitation")
 
             telegram_result = await self.send_telegram(screenshot)
-            email_result = self.send_email(screenshot, meeting_date, emails)
+            email_result = self.send_email(screenshot, meeting_date, emails) if emails else 'ok'
 
             logger.info("Invitation sent: telegram=%s, email=%s", telegram_result, email_result)
             return {"telegram": telegram_result, "email": email_result}
@@ -105,7 +109,7 @@ class Invitation:
     @classmethod
     def send_email(
         cls,
-        screenshot: ImageFieldFile,
+        screenshot,
         meeting_date: datetime,
         emails: List[str],
     ) -> str:
@@ -117,7 +121,7 @@ class Invitation:
         :param emails: список email для отправки
         :return: результат отправки
         """
-        if not screenshot or not isinstance(screenshot, ImageFieldFile):
+        if not screenshot:
             logger.error("Invalid screenshot provided for email")
             return "Ошибка: некорректная открытка"
 
@@ -161,14 +165,14 @@ class Invitation:
             return f"Ошибка: {str(e)}"
 
     @classmethod
-    async def send_telegram(cls, screenshot: ImageFieldFile) -> str: 
+    async def send_telegram(cls, screenshot) -> str:
         """
         Отправляем открытку в телеграм группу киноклуба
 
         :param screenshot: картинка открытки
         :return: результат отправки
         """
-        if not screenshot or not isinstance(screenshot, ImageFieldFile):
+        if not screenshot:
             logger.error("Invalid screenshot provided for Telegram")
             return "Ошибка: некорректная открытка"
 

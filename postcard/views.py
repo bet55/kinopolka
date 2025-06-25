@@ -63,10 +63,10 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         """
         theme = request.query_params.get("theme")
         random_images = Tools.get_random_images(theme)
+        # postcard_data = Error(message='lol')
         postcard_data = await PostcardHandler.get_postcard()
 
         if isinstance(postcard_data, Error):
-            logger.error("Failed to retrieve postcard: %s", postcard_data.message)
             postcard_url = random_images.get("postcard")
             is_active = False
         else:
