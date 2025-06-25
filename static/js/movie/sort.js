@@ -113,7 +113,7 @@ function handeSortChoice(allMovies) {
             }, {});
 
             // Указываем порядок постера
-            postersElements.forEach(poster => {poster.style.order = sortedMoviesMap[poster.dataset.kpId]})
+            postersElements.forEach(poster => poster.style.order = sortedMoviesMap[poster.dataset.kpId]);
 
 
         })

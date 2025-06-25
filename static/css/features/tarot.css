@@ -26,44 +26,63 @@ body {
 
 /*  Таро  =================*/
 
-.tarot-container {
-    display: flex;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
 
 .deck {
 
-    width: 13em;
+    width: 90%;
 
     perspective: 1000px;
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
     flex-shrink: 0;
-
-    img {
-        width: 100%;
-    }
-
-    @media (min-width: 2000px) {
-        width: 15em;
-    }
-
-    @media (min-width: 3000px) {
-        width: 20em;
-    }
 
 }
 
 .deck-card {
-    width: 170px;
+    width: 65%;
     height: 100%;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
     background-image: url('/static/img/tarots/back.jpg');
     background-size: cover;
     transition: transform 0.3s ease;
 }
+
+#open-cards-list {
+    width: 100%;
+    max-height: 30vh;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: nowrap;
+    overflow: auto;
+    padding: 0;
+
+    span {
+        font-weight: bold;
+    }
+
+    .card-name {
+        color: var(--yellow-color);
+    }
+
+    .card-reversed {
+        color: var(--white-color);
+    }
+
+    @media (min-width: 2000px) {
+        font-size: 2em;
+    }
+    @media (min-width: 3000px) {
+        font-size: 3em;
+    }
+}
+
+/* Центральная зона с картами ==========================*/
+
 
 .deck:hover .deck-card {
     transform: translateY(-10px);
@@ -107,8 +126,6 @@ body {
     transform: rotateY(180deg);
 }
 
-
-
 .card-face {
     position: absolute;
     width: 100%;
@@ -136,7 +153,6 @@ body {
     }
 }
 
-
 .card-front-spin {
     transform: rotateX(180deg);
     background-size: cover;
@@ -147,11 +163,8 @@ body {
     }
 }
 
-.instructions {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #ccc;
-}
+
+/* Модалка ==================================================*/
 
 .modal {
     display: none;
