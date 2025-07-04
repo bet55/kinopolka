@@ -51,9 +51,11 @@ class CocktailHandler:
         Получение всех коктейлей с предзагрузкой ингредиентов
         :return: список сериализованных коктейлей
         """
-        cocktails = Cocktail.objects.prefetch_related(
-            'ingredient_amounts__ingredient'
-        ).select_related('image').all().order_by('name')
+        cocktails = Cocktail.objects.all().prefetch_related('ingredients')
+        # cocktails = Cocktail.objects.prefetch_related(
+        #     'ingredient_amounts__ingredient'
+        # ).select_related('image').all().order_by('name')
+
         return CocktailSerializer(cocktails, many=True).data
 
     @staticmethod

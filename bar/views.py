@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework import status
 
 from classes import CocktailHandler, IngredientHandler, Error
-
+from mixins import GlobalDataMixin
 
 def handle_response(data, success_status=status.HTTP_200_OK):
     if isinstance(data, Error):
@@ -18,7 +18,7 @@ class Bar(APIView):
         """
         Получение заполненности бара (коктейли + ингредиенты)
         """
-        return render(request, "features/bar.html")
+
         ingredients = IngredientHandler.get_all_ingredients()
         cocktails = CocktailHandler.get_all_cocktails()
 
@@ -26,7 +26,11 @@ class Bar(APIView):
         if errors:
             return Response({'error': '\n'.join(errors)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'cocktails': cocktails, 'ingredients': ingredients})
+        # context = await self.add_context_data(request, {"postcards": postcards})
+        # return render(request, "postcards_archive.html", context=context)
+
+        return render(request, "bar.html", context={'cocktails': cocktails, 'ingredients': ingredients})
+
 
 
 class IngredientDetail(APIView):
