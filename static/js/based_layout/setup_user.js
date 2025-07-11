@@ -14,6 +14,7 @@ const changeUserView = () => {
     if (!currentUser) {
         return null;
     }
+    console.log(currentUser)
     const userName = usersPanel.querySelector(`button[data-user-id="${currentUser}"]`).textContent;
 
     // Кривая кука, удалим её

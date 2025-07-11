@@ -3,214 +3,7 @@
 {% load static %}
 
 {% block style %}
-    <style>
-
-        #cocktails, #ingredients {
-            max-height: 65vh;
-
-            h2 {
-                font-weight: bold;
-                color: var(--red-color);
-            }
-
-            ul {
-                list-style: none;
-            }
-
-        }
-
-        .add {
-            background: none;
-            color: grey;
-            border-radius: 6%;
-            border-width: 2px;
-            border-color: rgba(0, 0, 0, 0);
-            margin: 1em;
-
-            &:hover {
-                color: black;
-                border-color: rgba(0, 0, 0);
-                background: var(--green-color);
-                box-shadow: 3px 4px 4px;
-
-            }
-        }
-
-        #cocktails-list, #ingredients-list {
-            overflow: auto;
-            max-height: 70vh;
-        }
-
-        #ingredients-list {
-            display: grid;
-            grid-template-columns: auto auto;
-        }
-
-        .cocktail, .ingredient {
-        {#border: 2px solid var(--black-color);#}
-        }
-
-        .cocktail {
-            display: flex;
-            padding: 1em;
-
-            img {
-                width: 25%;
-                flex-grow: 1;
-                height: 8em;
-            }
-
-            h3 {
-                font-weight: bold;
-                color: var(--black-color);
-            }
-
-            .description {
-                display: flex;
-                flex-direction: column;
-                width: 50%;
-                flex-grow: 2;
-            }
-
-            .instruction {
-                overflow: auto;
-                max-height: 20vh;
-                width: 25%;
-                flex-grow: 1;
-                padding: 1em;
-            }
-
-        }
-
-        .ingredient {
-            img {
-                height: 4em;
-                width: 3em;
-            }
-        }
-
-        /* Новые стили для формы */
-
-        /* Новые стили для формы */
-        #new-ingredient-form {
-            margin: 1em;
-            padding: 1em;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            position: relative;
-        }
-
-        .form-header {
-            position: absolute;
-            top: 0.5em;
-            right: 0.5em;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #999;
-            padding: 0 0.5em;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
-            color: #333;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1em;
-            align-items: center;
-        }
-
-        .image-upload {
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
-
-        .image-upload-label {
-            width: 100%;
-            height: 100%;
-            border: 2px dashed #ccc;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .image-upload-label span {
-            font-size: 24px;
-            color: #ccc;
-        }
-
-        .image-upload-label:hover {
-            border-color: #999;
-        }
-
-        .image-upload-label:hover span {
-            color: #999;
-        }
-
-        #ingredient-image {
-            display: none;
-        }
-
-        #ingredient-name {
-            width: 70%;
-            border-width: 0 0 1px 0;
-            background: #f9f9f9;
-        }
-
-        #image-preview {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .fields-group {
-            flex: 1;
-        }
-
-        .form-group {
-            margin-bottom: 1em;
-            display: flex;
-        }
-
-        .form-group.availability {
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-        }
-        
-        .save-btn {
-            position: absolute;
-            right: 1em;
-            bottom: 1em;
-            padding: 0.3em;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: var(--green-color);
-            color: white;
-            height: fit-content;
-            margin-left: auto;
-        }
-
-        .save-btn:hover {
-            opacity: 0.9;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/bar.css' %}">
 {% endblock %}
 
 {% block title %}Бар{% endblock %}
@@ -256,7 +49,7 @@
         <button class="add">+ добавить</button>
 
         <!-- Форма для добавления нового ингредиента (изначально скрыта) -->
-        <div id="new-ingredient-form" style="display: none;">
+        <div id="new-ingredient-form" class="hide">
             <form id="ingredient-form" method="post" enctype="multipart/form-data">
                 <div class="form-header">
                     <button type="button" class="close-btn">&times;</button>
@@ -265,7 +58,7 @@
                     <div class="image-upload">
                         <label for="ingredient-image" class="image-upload-label">
                             <span>+</span>
-                            <img id="image-preview" style="display: none;" alt="">
+                            <img id="image-preview" class="hide" alt="">
                             <input type="file" id="ingredient-image" name="image" accept="image/*">
                         </label>
                     </div>
@@ -286,9 +79,11 @@
 
         <ul id="ingredients-list">
             {% for i in ingredients %}
-                <li class="ingredient" data-availabe="{{ i.is_available }}">
+                <li class="ingredient" data-availabe="{{ i.is_available }}" data-ingredient-id="{{ i.id }}">
                     <img src="{{ i.image }}" alt="">
                     <h6>{{ i.name }}</h6>
+                    <button type="button" class="update"><img src="{% static 'img/bar/box.png' %}" alt=""></button>
+                    <button type="button" class="remove">&times;</button>
                 </li>
             {% endfor %}
         </ul>
@@ -299,60 +94,5 @@
 
 {# Подключаем js #}
 {% block script %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const addButton = document.querySelector('#ingredients .add');
-            const formContainer = document.getElementById('new-ingredient-form');
-            const cancelButton = formContainer.querySelector('.close-btn');
-            const imageInput = document.getElementById('ingredient-image');
-            const imagePreview = document.getElementById('image-preview');
-
-            // Показываем форму при нажатии на кнопку "+добавить"
-            addButton.addEventListener('click', function () {
-                formContainer.style.display = 'block';
-            });
-
-            // Скрываем форму при нажатии на "Отменить"
-            cancelButton.addEventListener('click', function () {
-                formContainer.style.display = 'none';
-                // Сбрасываем форму
-                document.getElementById('ingredient-form').reset();
-                imagePreview.style.display = 'none';
-                formContainer.querySelector('.image-upload-label span').style.display = 'block';
-            });
-
-            // Обработка загрузки изображения
-            imageInput.addEventListener('change', function () {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imagePreview.style.display = 'block';
-                        formContainer.querySelector('.image-upload-label span').style.display = 'none';
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // Обработка отправки формы
-            const form = document.getElementById('ingredient-form');
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                // Здесь должна быть логика отправки данных на сервер
-                // Например, с помощью fetch или AJAX
-
-                // После успешного сохранения:
-                // 1. Скрываем форму
-                formContainer.style.display = 'none';
-                // 2. Сбрасываем форму
-                form.reset();
-                imagePreview.style.display = 'none';
-                formContainer.querySelector('.image-upload-label span').style.display = 'block';
-                // 3. Обновляем список ингредиентов
-                // location.reload(); // или более сложная логика обновления
-            });
-        });
-    </script>
+    <script type="module" src="{% static 'js/bar.js' %}"></script>
 {% endblock %}
