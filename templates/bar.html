@@ -79,13 +79,16 @@
 
         <ul id="ingredients-list">
             {% for i in ingredients %}
-                <li class="ingredient" data-availabe="{{ i.is_available }}" data-ingredient-id="{{ i.id }}">
+                <li class="ingredient" data-available="{{ i.is_available }}" data-ingredient-id="{{ i.id }}">
                     <img src="{{ i.image }}" alt="">
                     <h6>{{ i.name }}</h6>
-                    <button type="button" class="update"><img src="{% static 'img/bar/box.png' %}" alt=""></button>
-                    <button type="button" class="remove">&times;</button>
+                    <button class="update"><img src="{% static 'img/bar/box.png' %}" alt=""></button>
+                    <button class="remove">&times;</button>
+                    {% include "elements/confirmation_tooltip.html" with title="Удалить ингредиент?" position="left" %}
                 </li>
             {% endfor %}
+
+
         </ul>
     </div>
 {% endblock %}

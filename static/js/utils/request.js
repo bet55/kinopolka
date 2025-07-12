@@ -56,38 +56,46 @@ class Request {
 
         try {
             const response = await fetch(url, requestOptions);
+
+            // Парсим ответ сервера. Если пришел не json - значит ошибка не в логике работы (указан неверный url и т.д.)
             let responseData = {};
-            // Пытаемся распарсить JSON
-            if (response.status !== 204) {
-                try {
-                    responseData = await response.json();
-                } catch (e) {
-                    responseData = {};
-                    createToast('Ошибка чтения ответа', 'error');
-                    console.error(`parse json: ${e}`)
-                    showToast = false;
-                }
+            let responseEmpty = true;
+            try {
+                responseData = await response.json();
+                responseEmpty = false;
+            } catch (e) {
+                console.error('Не распарсился отверт: ', e);
             }
 
 
             // Ошибка HTTP (4xx, 5xx)
             if (!response.ok) {
-                const networkErrorText = await response.text();
-                const serverErrorText = responseData?.error;
-                const errorText = serverErrorText ? serverErrorText : networkErrorText;
-                createToast(`Ошибка сервера: ${response.status} ${errorText}`, 'error');
-                console.error(`${method} ${url} failed: ${response.status}\n${errorText}`);
+                const status = response.status;
+                let errorText = 'беда!';
+                let toastText = '';
+                let logText = '';
+                try {
+                    errorText = await response.text();
+                } catch (e) {
+                    console.error('Не распарсили ошибку: ', e)
+                }
+
+                if (responseEmpty) {
+                    toastText = `Ошибка сервера: ${status} ${errorText}`;
+                    logText = `server ${method} ${url} failed: ${status}\n${errorText}`;
+                } else {
+                    errorText = responseData.error ?? 'Неизвестная ошибка';
+
+                    toastText = `Ошибка запроса: ${errorText}`;
+                    logText = `api ${method} ${url} failed: ${status}\n${errorText}`;
+                }
+
+
+                createToast(toastText, 'error');
+                console.error(logText);
                 return null;
             }
 
-
-            // Ошибка логики приложения (success: false)
-            if (responseData && responseData.success === false) {
-                const errorMsg = responseData.error || 'Неизвестная ошибка';
-                createToast(`Ошибка: ${errorMsg}`, 'error');
-                console.error(`API error: ${errorMsg}`);
-                return null;
-            }
             // Уведомление об успехе
             if (showToast) {
                 createToast(`Успешно!`, 'success');

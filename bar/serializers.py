@@ -10,6 +10,12 @@ class IngredientSerializer(serializers.ModelSerializer):
             'image': {'required': False, 'allow_null': True}
         }
 
+    def validate_image(self, value):
+        # If no image is provided, the model will use the default image
+        if not value:
+            return None
+        return value
+
 
 class CocktailIngredientSerializer(serializers.ModelSerializer):
     ingredient = IngredientSerializer()
@@ -42,6 +48,12 @@ class CocktailSerializer(serializers.ModelSerializer):
             'image': {'required': False, 'allow_null': True}
         }
 
+    def validate_image(self, value):
+        # If no image is provided, the model will use the default image
+        if not value:
+            return None
+        return value
+
     def get_is_available(self, obj):
         """Метод для получения значения is_available"""
         return obj.is_available
@@ -67,4 +79,10 @@ class CocktailCreateUpdateSerializer(serializers.ModelSerializer):
         for item in value:
             if 'ingredient' not in item:
                 raise serializers.ValidationError("Каждый ингредиент должен содержать ID ингредиента")
+        return value
+
+    def validate_image(self, value):
+        # If no image is provided, the model will use the default image
+        if not value:
+            return None
         return value

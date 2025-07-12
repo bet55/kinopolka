@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+import os
 
 
 class Ingredient(models.Model):
@@ -16,6 +17,7 @@ class Ingredient(models.Model):
         upload_to='media/ingredients/',
         blank=True,
         null=True,
+        default='media/ingredients/default.png',
         verbose_name='Изображение'
     )
 
@@ -28,6 +30,10 @@ class Ingredient(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
+        # Delete associated image if it exists and is not the default image
+        if self.image and 'default.png' not in self.image.name:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
         if self.cocktail_ingredients.exists():
             raise ValidationError(
                 "Нельзя удалить ингредиент, который используется в коктейлях. "
@@ -55,6 +61,7 @@ class Cocktail(models.Model):
         upload_to='media/cocktails/',
         blank=True,
         null=True,
+        default='media/cocktails/default.png',
         verbose_name='Изображение коктейля'
     )
 
@@ -65,6 +72,13 @@ class Cocktail(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self, *args, **kwargs):
+        # Delete associated image if it exists and is not the default image
+        if self.image and 'default.png' not in self.image.name:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+        super().delete(*args, **kwargs)
 
     @property
     def is_available(self):

@@ -83,6 +83,7 @@ class CocktailHandler:
         :return: сериализованные данные коктейля
         """
         cocktail = Cocktail.objects.get(pk=cocktail_id)
+        old_image = cocktail.image.name if cocktail.image else None
         serializer = CocktailCreateUpdateSerializer(cocktail, data=data, partial=True, context={'request': request})
         if not serializer.is_valid():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
@@ -103,6 +104,12 @@ class CocktailHandler:
                     amount=ingredient_data.get('amount', 1),
                     unit=ingredient_data.get('unit', 'ml')
                 )
+
+        # Delete old image if it was changed and is not the default image
+        if old_image and old_image != cocktail.image.name and old_image != 'media/default.png':
+            import os
+            if os.path.isfile(old_image):
+                os.remove(old_image)
 
         return CocktailSerializer(cocktail).data
 

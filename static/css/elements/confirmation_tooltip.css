@@ -12,6 +12,7 @@
     z-index: -1; /* Чтобы не перекрывал другие элементы */
     min-width: 200px; /* Чтобы не было слишком узким */
 
+
     h4 {
         font-size: 1.5em;
     }
@@ -35,6 +36,21 @@
         border: 2px solid black;
         filter: brightness(1.5);
     }
+}
+
+.confirmation.top {
+    top: -100%;
+    left: -3em;
+}
+
+.confirmation.left {
+    top: -10%;
+    left: -1em;
+}
+
+.confirmation.bot {
+    top: 80%;
+    left: -1em;
 }
 
 .confirmation.active {

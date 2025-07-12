@@ -63,10 +63,18 @@ class IngredientHandler:
         :return: сериализованные данные ингредиента
         """
         ingredient = Ingredient.objects.get(pk=ingredient_id)
+        old_image = ingredient.image.name if ingredient.image else None
         serializer = IngredientSerializer(ingredient, data=data, partial=True, context={'request': request})
         if not serializer.is_valid():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
         updated_ingredient = serializer.save()
+
+        # Delete old image if it was changed and is not the default image
+        if old_image and old_image != updated_ingredient.image.name and 'default.png' not in  old_image:
+            import os
+            if os.path.isfile(old_image):
+                os.remove(old_image)
+
         return IngredientSerializer(updated_ingredient).data
 
     @staticmethod
