@@ -14,25 +14,89 @@
     <div id="cocktails">
         <h2>Коктейли</h2>
         <button class="add">+ добавить</button>
+
+        <!-- Форма для добавления нового коктейля (изначально скрыта) -->
+        <div id="new-cocktail-form" class="hide">
+            <form id="cocktail-form" method="post" enctype="multipart/form-data">
+
+                <div class="form-header">
+                    <button type="button" class="close-btn">&times;</button>
+                </div>
+
+
+                <div class="form-row">
+                    <div class="image-upload">
+                        <label for="cocktail-image" class="image-upload-label">
+                            <span>+</span>
+                            <img id="cocktail-image-preview" class="hide" alt="">
+                            <input type="file" id="cocktail-image" name="image" accept="image/*">
+                        </label>
+                    </div>
+                    <div class="form-group tmp">
+                        <label for="cocktail-name">
+                            <input type="text" id="cocktail-name" name="name" placeholder="название" required>
+                        </label>
+                        <textarea id="cocktail-instructions"
+                                  name="instructions"
+                                  placeholder="инструкция приготовления"
+                                  required></textarea>
+                    </div>
+
+                    <div class="ingredients-section">
+                        <div class="ingredient-selector">
+                            <select id="ingredient-select">
+                                {% for i in ingredients %}
+                                    <option value="{{ i.id }}">{{ i.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="number" id="ingredient-amount" min="1" step="1">
+                            <select id="ingredient-unit">
+                                <option value="ml">мл</option>
+                                <option value="g">гр</option>
+                                <option value="pcs">шт</option>
+                                <option value="pinch">щп</option>
+                                <option value="slice">дл</option>
+                            </select>
+                            <button type="button" class="add-ingredient-btn">+</button>
+                        </div>
+
+                        <ul id="selected-ingredients-list" class="selected-ingredients">
+                            <!-- Здесь будут отображаться выбранные ингредиенты -->
+                        </ul>
+                    </div>
+
+                </div>
+
+
+                <button type="submit" class="save-btn">Сохранить</button>
+            </form>
+        </div>
+
         <ul id="cocktails-list">
             {% for c in cocktails %}
-                <li class="cocktail" data-available="{{ c.is_available }}">
+                <li class="cocktail" data-available="{{ c.is_available }}" data-cocktail-id="{{ c.id }}">
+
                     <img src="{{ c.image }}" alt="">
                     <div class="description">
-                        <h3>{{ c.name }}</h3>
+                        {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
+                        <h3>
+                            <img src="{% static 'img/bar/pencil.png' %}">
+                            {{ c.name }}
+                            <span class="remove">&times;</span>
+                        </h3>
                         <ul class="cocktail-ingredients">
                             {% for ci in c.ingredients %}
-                                <li>
+                                <li data-ingredient-id="{{ ci.ingredient.id }}">
                                     <span>{{ ci.ingredient.name }}</span>
-                                    <span>{{ ci.amount }}</span>
+                                    <span><b>{{ ci.amount }}</b></span>
                                     <span>{{ ci.unit }}</span>
                                 </li>
                             {% endfor %}
                         </ul>
                     </div>
-                    {#                    <p class="instruction">#}
-                    {#                        {{ c.instructions }}#}
-                    {#                    </p>#}
+                    <p class="instruction">
+                        {{ c.instructions }}
+                    </p>
                 </li>
             {% endfor %}
         </ul>

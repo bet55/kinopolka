@@ -1,5 +1,10 @@
 import {createIngredient, updateIngredient, removeIngredient} from "./bar/ingredients.js";
+import {createCocktail, updateCocktail, removeCocktail} from "./bar/cocktails.js";
 
-createIngredient()
-updateIngredient()
-removeIngredient()
+createCocktail();
+updateCocktail();
+removeCocktail();
+
+createIngredient();
+updateIngredient();
+removeIngredient();

@@ -38,6 +38,11 @@
     }
 }
 
+.confirmation.center {
+    top: 10%;
+    left: -3em;
+}
+
 .confirmation.top {
     top: -100%;
     left: -3em;

@@ -6,7 +6,7 @@ import {confirmModalAction} from "../utils/confirm_modal_action.js";
 function createNode(capitalizeName, imagSrc, isAvailable, id) {
     // Руками создаем элементы для созданного ингредиента
 
-    const ingredientsList = document.querySelector('#ingredients-list');
+    const ingredientsList = document.querySelector('#new-ingredient-form #ingredients-list');
 
     // Добавляем в ингредиент на страницу, чтобы не делать перезагрузку
     const li = document.createElement('li');
@@ -64,12 +64,12 @@ function createIngredient() {
 
     // Элементы формы
     const formContainer = document.querySelector('#new-ingredient-form');
-    const form = document.querySelector('#ingredient-form');
+    const form = formContainer.querySelector('#ingredient-form');
     const cancelButton = formContainer.querySelector('.close-btn');
-    const imageInput = document.querySelector('#ingredient-image');
-    const imagePreview = document.querySelector('#image-preview');
-    const nameInput = document.querySelector('#ingredient-name');
-    const availabilityInput = document.querySelector('#ingredient-available');
+    const imageInput = formContainer.querySelector('#ingredient-image');
+    const imagePreview = formContainer.querySelector('#image-preview');
+    const nameInput = formContainer.querySelector('#ingredient-name');
+    const availabilityInput = formContainer.querySelector('#ingredient-available');
 
     // Показываем форму при нажатии на кнопку "+добавить"
     addButton.addEventListener('click', function () {
@@ -151,14 +151,36 @@ function updateIngredient(ingredient) {
         ing.querySelector('.update').addEventListener('click', async (e) => {
             const ingredientId = ing.dataset.ingredientId;
             const isAvailable = ing.dataset.available === 'True';
-            const response = await Request.put({
+            let response = await Request.put({
                 url: `/bar/ingredients/${ingredientId}/`,
                 body: {is_available: !isAvailable}
             });
 
-            if (response) {
-                ing.dataset.available = isAvailable ? 'False' : 'True';
+            if (response === null) {
+                return null
             }
+
+            // Изменим статус ингредиента на странице
+            ing.dataset.available = isAvailable ? 'False' : 'True';
+
+            // Запросим заново информацию о коктейлях, чтобы отобразить корректный статус
+            const cocktails = await Request.get({url: '/bar/cocktails/'});
+            if (cocktails === null) {
+                return null
+            }
+
+            const availabilityMap = cocktails.reduce((acc, cocktail) => {
+                acc[cocktail.id] = cocktail.is_available;
+                return acc;
+            }, {});
+
+
+            const cocktailsElements = document.querySelectorAll('.cocktail');
+            cocktailsElements.forEach(cock => {
+              cock.dataset.available = availabilityMap[cock.dataset.cocktailId] ? 'Ture': 'False';
+            })
+
+
         })
     });
 }

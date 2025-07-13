@@ -20,6 +20,7 @@ class CocktailHandler:
         :param request: HTTP-запрос для контекста сериализатора
         :return: сериализованные данные коктейля
         """
+        print(data)
         if not data.get('name'):
             raise ValidationError("Поле 'name' обязательно")
         serializer = CocktailCreateUpdateSerializer(data=data, context={'request': request})
