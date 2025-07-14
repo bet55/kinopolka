@@ -147,10 +147,12 @@ function createCocktail() {
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        if (selectedIngredients.length === 0) {
-            createToast('Добавьте хотя бы один ингредиент', 'error');
+        const existingCocktails = Array.from(document.querySelectorAll('.description h3')).map(h => h.innerText.toLowerCase().trim());
+        if (existingCocktails.includes(nameInput.value.toLowerCase())) {
+            createToast('Такое название уже есть!', 'error');
             return;
         }
+
 
         const formData = new FormData();
         formData.append('name', nameInput.value);
@@ -162,7 +164,7 @@ function createCocktail() {
             unit: ing.unit
         }));
 
-    // Добавляем ingredients как JSON-строку
+        // Добавляем ingredients как JSON-строку
         formData.append('ingredients', JSON.stringify(ingredients));
 
         if (imageInput.files[0]) {

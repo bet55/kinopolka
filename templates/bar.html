@@ -23,7 +23,6 @@
                     <button type="button" class="close-btn">&times;</button>
                 </div>
 
-
                 <div class="form-row">
                     <div class="image-upload">
                         <label for="cocktail-image" class="image-upload-label">
@@ -32,13 +31,11 @@
                             <input type="file" id="cocktail-image" name="image" accept="image/*">
                         </label>
                     </div>
-                    <div class="form-group tmp">
+                    <div class="form-group text-section">
                         <label for="cocktail-name">
                             <input type="text" id="cocktail-name" name="name" placeholder="название" required>
                         </label>
-                        <textarea id="cocktail-instructions"
-                                  name="instructions"
-                                  placeholder="инструкция приготовления"
+                        <textarea id="cocktail-instructions" name="instructions" placeholder="инструкция"
                                   required></textarea>
                     </div>
 
@@ -49,7 +46,8 @@
                                     <option value="{{ i.id }}">{{ i.name }}</option>
                                 {% endfor %}
                             </select>
-                            <input type="number" id="ingredient-amount" min="1" step="1">
+                            <input type="text" id="ingredient-amount" pattern="[0-9]{0,3}*" maxlength="3"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             <select id="ingredient-unit">
                                 <option value="ml">мл</option>
                                 <option value="g">гр</option>
@@ -67,7 +65,6 @@
 
                 </div>
 
-
                 <button type="submit" class="save-btn">Сохранить</button>
             </form>
         </div>
@@ -80,7 +77,7 @@
                     <div class="description">
                         {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
                         <h3>
-                            <img src="{% static 'img/bar/pencil.png' %}">
+                            <img src="{% static 'img/bar/pencil.png' %}" class="update">
                             {{ c.name }}
                             <span class="remove">&times;</span>
                         </h3>

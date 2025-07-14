@@ -6,7 +6,7 @@ import {confirmModalAction} from "../utils/confirm_modal_action.js";
 function createNode(capitalizeName, imagSrc, isAvailable, id) {
     // Руками создаем элементы для созданного ингредиента
 
-    const ingredientsList = document.querySelector('#new-ingredient-form #ingredients-list');
+    const ingredientsList = document.querySelector('#ingredients-list');
 
     // Добавляем в ингредиент на страницу, чтобы не делать перезагрузку
     const li = document.createElement('li');
@@ -125,7 +125,6 @@ function createIngredient() {
 
         const response = await Request.post({url: '/bar/ingredients/', body: formData});
         if (response === null || !response.id) {
-            // setTimeout(() => window.location.reload(), 600);
             return null;
         }
 
