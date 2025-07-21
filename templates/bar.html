@@ -51,9 +51,7 @@
                             <select id="ingredient-unit">
                                 <option value="ml">мл</option>
                                 <option value="g">гр</option>
-                                <option value="pcs">шт</option>
-                                <option value="pinch">щп</option>
-                                <option value="slice">дл</option>
+                                <option value="pcs">штк</option>
                             </select>
                             <button type="button" class="add-ingredient-btn">+</button>
                         </div>
@@ -68,6 +66,8 @@
                 <button type="submit" class="save-btn">Сохранить</button>
             </form>
         </div>
+    
+    
 
         <ul id="cocktails-list">
             {% for c in cocktails %}
@@ -78,6 +78,7 @@
                         {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
                         <h3>
                             <img src="{% static 'img/bar/pencil.png' %}" class="update">
+{#                            <button class="update"><img src="{% static 'img/bar/pencil.png' %}" /></button>#}
                             {{ c.name }}
                             <span class="remove">&times;</span>
                         </h3>
@@ -86,7 +87,7 @@
                                 <li data-ingredient-id="{{ ci.ingredient.id }}">
                                     <span>{{ ci.ingredient.name }}</span>
                                     <span><b>{{ ci.amount }}</b></span>
-                                    <span>{{ ci.unit }}</span>
+                                    <span>{{ ci.unit_display }}</span>
                                 </li>
                             {% endfor %}
                         </ul>

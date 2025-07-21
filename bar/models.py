@@ -98,11 +98,9 @@ class Cocktail(models.Model):
 
 class CocktailIngredient(models.Model):
     MEASUREMENT_UNITS = [
-        ('ml', 'миллилитры'),
-        ('g', 'граммы'),
-        ('pcs', 'штуки'),
-        ('pinch', 'щепотка'),
-        ('slice', 'долька'),
+        ('ml', 'мл'),
+        ('g', 'гр'),
+        ('pcs', 'штк'),
     ]
 
     cocktail = models.ForeignKey(

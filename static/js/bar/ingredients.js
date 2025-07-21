@@ -176,7 +176,7 @@ function updateIngredient(ingredient) {
 
             const cocktailsElements = document.querySelectorAll('.cocktail');
             cocktailsElements.forEach(cock => {
-              cock.dataset.available = availabilityMap[cock.dataset.cocktailId] ? 'Ture': 'False';
+              cock.dataset.available = availabilityMap[cock.dataset.cocktailId] ? 'True': 'False';
             })
 
 

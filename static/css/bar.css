@@ -107,7 +107,7 @@
 }
 
 .cocktail:hover {
-    .remove {
+    .remove, .update {
         visibility: visible;
     }
 }

@@ -1,10 +1,12 @@
 import {createIngredient, updateIngredient, removeIngredient} from "./bar/ingredients.js";
 import {createCocktail, updateCocktail, removeCocktail} from "./bar/cocktails.js";
 
-createCocktail();
-updateCocktail();
-removeCocktail();
+document.addEventListener('DOMContentLoaded', () => {
+    createCocktail();
+    updateCocktail();
+    removeCocktail();
 
-createIngredient();
-updateIngredient();
-removeIngredient();
+    createIngredient();
+    updateIngredient();
+    removeIngredient();
+});
