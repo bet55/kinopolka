@@ -29,6 +29,11 @@ class Ingredient(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.image or self.image == '':
+            self.image = self._meta.get_field('image').get_default()
+        super().save(*args, **kwargs)
+
     def delete(self, *args, **kwargs):
         # Delete associated image if it exists and is not the default image
         if self.image and 'default.png' not in self.image.name:
@@ -55,7 +60,9 @@ class Cocktail(models.Model):
         verbose_name='Ингредиенты'
     )
     instructions = models.TextField(
-        verbose_name='Инструкция приготовления'
+        verbose_name='Инструкция приготовления',
+        blank=True,
+        default=''
     )
     image = models.ImageField(
         upload_to='media/cocktails/',
@@ -72,6 +79,11 @@ class Cocktail(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.image or self.image == '':
+            self.image = self._meta.get_field('image').get_default()
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # Delete associated image if it exists and is not the default image

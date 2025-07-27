@@ -28,6 +28,7 @@ class IngredientHandler:
         if not serializer.is_valid():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
         ingredient = serializer.save()
+        print(IngredientSerializer(ingredient).data)
         return IngredientSerializer(ingredient).data
 
     @staticmethod

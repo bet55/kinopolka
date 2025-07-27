@@ -408,3 +408,53 @@ textarea#cocktail-instructions {
     flex-direction: column;
     width: 30%;
 }
+
+/* ========== Кастомный селект ==================*/
+/* Стили для кастомного селекта */
+.custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+}
+
+.custom-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.custom-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    z-index: 1000;
+    display: none;
+}
+
+.custom-select-option {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.custom-select-option:hover {
+    background-color: #f5f5f5;
+}
+
+.custom-select-option.selected {
+    background-color: #e6f7e6; /* Светло-зеленый фон */
+    color: #2e7d32; /* Темно-зеленый текст */
+    font-weight: bold;
+}
+
+/* Скрываем оригинальный select */
+.original-select {
+    display: none;
+}

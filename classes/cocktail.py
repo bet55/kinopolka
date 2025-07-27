@@ -20,7 +20,7 @@ class CocktailHandler:
         :param request: HTTP-запрос для контекста сериализатора
         :return: сериализованные данные коктейля
         """
-        print(data)
+
         if not data.get('name'):
             raise ValidationError("Поле 'name' обязательно")
         serializer = CocktailCreateUpdateSerializer(data=data, context={'request': request})
@@ -30,7 +30,7 @@ class CocktailHandler:
         validated_data = serializer.validated_data
         cocktail = Cocktail.objects.create(
             name=validated_data['name'],
-            instructions=validated_data['instructions'],
+            instructions=validated_data.get('instructions', ''),
             image=validated_data.get('image')
         )
 
@@ -107,7 +107,7 @@ class CocktailHandler:
                 )
 
         # Delete old image if it was changed and is not the default image
-        if old_image and old_image != cocktail.image.name and old_image != 'media/default.png':
+        if old_image and old_image != cocktail.image.name and old_image != 'media/cocktails/default.png':
             import os
             if os.path.isfile(old_image):
                 os.remove(old_image)

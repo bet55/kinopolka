@@ -35,19 +35,27 @@
                         <label for="cocktail-name">
                             <input type="text" id="cocktail-name" name="name" placeholder="название" required>
                         </label>
-                        <textarea id="cocktail-instructions" name="instructions" placeholder="инструкция"
-                                  required></textarea>
+                        <textarea id="cocktail-instructions" name="instructions" placeholder="инструкция"></textarea>
                     </div>
 
                     <div class="ingredients-section">
                         <div class="ingredient-selector">
-                            <select id="ingredient-select">
-                                {% for i in ingredients %}
-                                    <option value="{{ i.id }}">{{ i.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <input type="text" id="ingredient-amount" pattern="[0-9]{0,3}*" maxlength="3"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <div class="custom-select-wrapper">
+                                <select id="ingredient-select" class="original-select">
+                                    {% for i in ingredients %}
+                                        <option value="{{ i.id }}">{{ i.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="custom-select" id="custom-ingredient-select">Выберите ингредиент</div>
+                                <div class="custom-select-options" id="custom-ingredient-options">
+                                    {% for i in ingredients %}
+                                        <div class="custom-select-option" data-value="{{ i.id }}">{{ i.name }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <input type="text" id="ingredient-amount" maxlength="3"
+                                   oninput="this.value = this.value.replace(/[^0-9]/, '')">
                             <select id="ingredient-unit">
                                 <option value="ml">мл</option>
                                 <option value="g">гр</option>
@@ -66,8 +74,7 @@
                 <button type="submit" class="save-btn">Сохранить</button>
             </form>
         </div>
-    
-    
+
 
         <ul id="cocktails-list">
             {% for c in cocktails %}
@@ -78,7 +85,6 @@
                         {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
                         <h3>
                             <img src="{% static 'img/bar/pencil.png' %}" class="update">
-{#                            <button class="update"><img src="{% static 'img/bar/pencil.png' %}" /></button>#}
                             {{ c.name }}
                             <span class="remove">&times;</span>
                         </h3>

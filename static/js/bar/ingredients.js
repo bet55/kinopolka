@@ -1,92 +1,101 @@
 import {createToast} from "../utils/create_toast.js";
 import {Request} from "../utils/request.js";
 import {confirmModalAction} from "../utils/confirm_modal_action.js";
+import {capitalise} from "../utils/capitalise.js";
 
 
-function createNode(capitalizeName, imagSrc, isAvailable, id) {
-    // Руками создаем элементы для созданного ингредиента
+// Глобальные переменные для состояния
+let currentIngredientId = null;
 
-    const ingredientsList = document.querySelector('#ingredients-list');
-
-    // Добавляем в ингредиент на страницу, чтобы не делать перезагрузку
-    const li = document.createElement('li');
-    const img = document.createElement('img');
-    const h6 = document.createElement('h6');
-    const btnUpdate = document.createElement('button');
-    const btnIcon = document.createElement('img');
-    const btnRemove = document.createElement('button');
-
-    h6.innerText = capitalizeName;
-    img.src = imagSrc ? imagSrc : '/static/img/bar/ingredient.png';
-    btnIcon.src = '/static/img/bar/box.png';
-    btnRemove.innerText = '×';
-    btnUpdate.classList.add('update');
-    btnRemove.classList.add('remove');
-    li.classList.add('ingredient');
-    li.dataset.available = isAvailable ? 'True' : 'False';
-    li.dataset.ingredientId = id;
-
-
-    // Окно подтверждения
-    const div = document.createElement('li');
-    const h4 = document.createElement('h4');
-    const btnConf = document.createElement('button');
-    const btnDecline = document.createElement('button');
-
-    h4.innerText = 'Удалить ингредиент?';
-    btnConf.innerText = 'Да';
-    btnDecline.innerText = 'Нет';
-    btnConf.classList.add('confirm-yes');
-    btnDecline.classList.add('confirm-no');
-    div.className = 'confirmation container-fluid left';
-
-    div.appendChild(h4);
-    div.appendChild(btnConf);
-    div.appendChild(btnDecline);
-
-
-    btnUpdate.appendChild(btnIcon);
-    li.appendChild(img);
-    li.appendChild(h6);
-    li.appendChild(btnUpdate);
-    li.appendChild(btnRemove);
-    li.appendChild(div);
-    ingredientsList.appendChild(li);
-
-    // Слушатели добавленных кнопок
-    updateIngredient(li);
-    removeIngredient(li);
+export function createIngredient() {
+    setupFormToggle();
+    setupImageUpload();
+    setupFormSubmission();
 }
 
-function createIngredient() {
+export function updateIngredient() {
+    document.querySelectorAll('.ingredient .update').forEach(button => {
+        button.addEventListener('click', async function () {
+            const ingredientNode = this.closest('.ingredient');
+            const ingredientId = ingredientNode.dataset.ingredientId;
+            const isAvailable = ingredientNode.dataset.available === 'True';
 
+            try {
+                const response = await Request.put({
+                    url: `/bar/ingredients/${ingredientId}/`,
+                    body: {is_available: !isAvailable}
+                });
+
+                if (response) {
+                    // Обновляем состояние на клиенте
+                    ingredientNode.dataset.available = !isAvailable ? 'True' : 'False';
+
+                    // Обновляем доступность связанных коктейлей
+                    await updateCocktailsAvailability();
+                }
+            } catch (error) {
+                createToast('Ошибка при обновлении', 'error');
+                console.error(error);
+            }
+        });
+    });
+}
+
+export function removeIngredient() {
+    document.querySelectorAll('.ingredient').forEach(ingredientNode => {
+        const button = ingredientNode.querySelector('.remove');
+        const confirmContainer = ingredientNode.querySelector('.confirmation');
+        const ingredientName = ingredientNode.querySelector('h6').innerText.toLowerCase();
+
+        const confirmModalOptions = {
+            triggerNode: button,
+            modalNode: confirmContainer,
+            confirmAction: async () => {
+                try {
+                    // Проверяем, используется ли ингредиент
+                    const usedInCocktails = await checkIngredientUsage(ingredientName);
+                    if (usedInCocktails) {
+                        createToast('Ингредиент используется в коктейлях!', 'error');
+                        return;
+                    }
+
+                    const response = await Request.delete({url: `/bar/ingredients/${ingredientNode.dataset.ingredientId}/`});
+                    if (response) {
+                        ingredientNode.remove();
+                        createToast('Ингредиент удален', 'success');
+                        await refreshIngredientSelect();
+                    }
+                } catch (error) {
+                    createToast('Ошибка при удалении', 'error');
+                    console.error(error);
+                }
+            }
+        };
+
+        confirmModalAction(confirmModalOptions);
+    });
+}
+
+// ============== Вспомогательные функции ==============
+
+function setupFormToggle() {
     const addButton = document.querySelector('#ingredients .add');
-
-    // Элементы формы
     const formContainer = document.querySelector('#new-ingredient-form');
-    const form = formContainer.querySelector('#ingredient-form');
     const cancelButton = formContainer.querySelector('.close-btn');
-    const imageInput = formContainer.querySelector('#ingredient-image');
-    const imagePreview = formContainer.querySelector('#image-preview');
-    const nameInput = formContainer.querySelector('#ingredient-name');
-    const availabilityInput = formContainer.querySelector('#ingredient-available');
 
-    // Показываем форму при нажатии на кнопку "+добавить"
-    addButton.addEventListener('click', function () {
+    addButton.addEventListener('click', () => {
+        // resetForm();
         formContainer.classList.toggle('hide');
     });
 
-// Скрываем форму при нажатии на "Отменить"
-    cancelButton.addEventListener('click', function () {
-        formContainer.classList.add('hide');
-        // Сбрасываем форму
-        document.querySelector('#ingredient-form').reset();
-        imagePreview.classList.add('hide');
-        imagePreview.src = '';
-        formContainer.querySelector('.image-upload-label span').style.display = 'block';
-    });
+    cancelButton.addEventListener('click', resetForm);
+}
 
-// Обработка загрузки изображения
+function setupImageUpload() {
+    const imageInput = document.querySelector('#ingredient-image');
+    const imagePreview = document.querySelector('#image-preview');
+    const uploadLabel = document.querySelector('#new-ingredient-form .image-upload-label span');
+
     imageInput.addEventListener('change', function () {
         const file = this.files[0];
         if (file) {
@@ -94,131 +103,198 @@ function createIngredient() {
             reader.onload = function (e) {
                 imagePreview.src = e.target.result;
                 imagePreview.classList.remove('hide');
-                formContainer.querySelector('.image-upload-label span').style.display = 'none';
-            }
+                uploadLabel.style.display = 'none';
+            };
             reader.readAsDataURL(file);
         }
     });
+}
 
-
-// Обработка отправки формы
+function setupFormSubmission() {
+    const form = document.querySelector('#ingredient-form');
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-
-        // Делаем проверку данных
-        const existedIngredients = Array.from(document.querySelectorAll('#ingredients-list h6')).map(h => h.innerText.toLowerCase());
-        const ingredientName = nameInput.value.toLowerCase();
-        if (existedIngredients.includes(ingredientName)) {
-            createToast('Ингредиент уже существует!', 'error');
-            return null;
-        }
-
-        // Обновляем список ингредиентов
-        const capitalizeName = ingredientName[0].toUpperCase() + ingredientName.slice(1);
-        const formData = new FormData();
-        formData.append('name', capitalizeName);
-        formData.append('is_available', availabilityInput.checked);
-
-        if (imageInput.files[0]) {
-            formData.append('image', imageInput.files[0]);
-        }
-
-        const response = await Request.post({url: '/bar/ingredients/', body: formData});
-        if (response === null || !response.id) {
-            return null;
-        }
-
-        // Создаём элемент, вместо перезагрузки страницы
-        createNode(capitalizeName, imagePreview.src, availabilityInput.checked, response.id);
-
-
-        // Сбрасываем форму
-        formContainer.classList.toggle('hide');
-        form.reset();
-        imagePreview.src = '';
-        imagePreview.classList.add('hide');
-        formContainer.querySelector('.image-upload-label span').style.display = 'block';
-    });
-
-}
-
-
-function updateIngredient(ingredient) {
-    const ingredients = ingredient ? [ingredient] : document.querySelectorAll('.ingredient');
-
-    ingredients.forEach(ing => {
-        ing.querySelector('.update').addEventListener('click', async (e) => {
-            const ingredientId = ing.dataset.ingredientId;
-            const isAvailable = ing.dataset.available === 'True';
-            let response = await Request.put({
-                url: `/bar/ingredients/${ingredientId}/`,
-                body: {is_available: !isAvailable}
-            });
-
-            if (response === null) {
-                return null
-            }
-
-            // Изменим статус ингредиента на странице
-            ing.dataset.available = isAvailable ? 'False' : 'True';
-
-            // Запросим заново информацию о коктейлях, чтобы отобразить корректный статус
-            const cocktails = await Request.get({url: '/bar/cocktails/'});
-            if (cocktails === null) {
-                return null
-            }
-
-            const availabilityMap = cocktails.reduce((acc, cocktail) => {
-                acc[cocktail.id] = cocktail.is_available;
-                return acc;
-            }, {});
-
-
-            const cocktailsElements = document.querySelectorAll('.cocktail');
-            cocktailsElements.forEach(cock => {
-              cock.dataset.available = availabilityMap[cock.dataset.cocktailId] ? 'True': 'False';
-            })
-
-
-        })
+        await submitIngredientForm();
     });
 }
 
+async function submitIngredientForm() {
+    const form = document.querySelector('#ingredient-form');
+    const formData = new FormData(form);
+    const nameInput = document.querySelector('#ingredient-name');
+    const ingredientName = capitalise(nameInput.value);
+    nameInput.value = ingredientName;
 
-function removeIngredient(ingredient) {
-    const ingredients = ingredient ? [ingredient] : document.querySelectorAll('.ingredient');
+    // Проверка на существующий ингредиент
+    const existingIngredients = Array.from(document.querySelectorAll('#ingredients-list h6'))
+        .map(el => capitalise(el.innerText));
 
-    const remove = async (ingredientId, ingredientName, ingredientNode) => {
-        const existedIngredients = Array.from(document.querySelectorAll('.cocktail-ingredients span')).map(h => h.innerText.toLowerCase());
-        if (existedIngredients.includes(ingredientName)) {
-            createToast('Ингредиент используется в коктейлях!', 'error');
-            return null;
-        }
-
-        const response = await Request.delete({url: `/bar/ingredients/${ingredientId}/`});
-
-        if (response) {
-            ingredientNode.remove();
-        }
+    if (existingIngredients.includes(ingredientName)) {
+        createToast('Ингредиент уже существует!', 'error');
+        return;
     }
 
-    ingredients.forEach(ing => {
-        const button = ing.querySelector('.remove');
-        const confirmContainer = ing.querySelector('.confirmation');
-        const ingredientName = ing.querySelector('h6').innerText.toLowerCase();
+    try {
+        const response = await Request.post({
+            url: '/bar/ingredients/',
+            body: formData
+        });
 
-        // Отображаем окно подтверждения удаления
-        const confirmModalOptions = {
-            triggerNode: button,
-            modalNode: confirmContainer,
-            confirmAction: async () => await remove(ing.dataset.ingredientId, ingredientName, ing)
+        if (response) {
+            createIngredientNode(response);
+            resetForm();
+            createToast('Ингредиент добавлен', 'success');
+            await refreshIngredientSelect(); // Обновляем список в форме коктейлей
         }
-        confirmModalAction(confirmModalOptions);
-
-
-    });
-
+    } catch (error) {
+        createToast('Ошибка при сохранении', 'error');
+        console.error(error);
+    }
 }
 
+function createIngredientNode(ingredientData) {
+    const ingredientsList = document.querySelector('#ingredients-list');
+    const li = document.createElement('li');
+    li.className = 'ingredient';
+    li.dataset.available = ingredientData.is_available ? 'True' : 'False';
+    li.dataset.ingredientId = ingredientData.id;
 
-export {createIngredient, updateIngredient, removeIngredient}
+    li.innerHTML = `
+        <img src="${ingredientData.image || '/static/img/bar/ingredient.png'}" alt="${ingredientData.name}">
+        <h6>${capitalise(ingredientData.name)}</h6>
+        <button class="update"><img src="/static/img/bar/box.png" alt=""></button>
+        <button class="remove">×</button>
+        <li class="confirmation container-fluid left">
+            <h4>Удалить ингредиент?</h4>
+            <button class="confirm-yes">Да</button>
+            <button class="confirm-no">Нет</button>
+        </li>
+    `;
+
+    ingredientsList.appendChild(li);
+    updateIngredient();
+    removeIngredient();
+}
+
+async function refreshIngredientSelect() {
+    try {
+        const ingredients = await Request.get({url: '/bar/ingredients/'});
+        if (!ingredients) return;
+
+        // 1. Обновляем оригинальный select
+        const select = document.querySelector('#ingredient-select');
+        select.innerHTML = ingredients.map(ing =>
+            `<option value="${ing.id}">${capitalise(ing.name)}</option>`
+        ).join('');
+
+        // 2. Обновляем кастомный интерфейс
+        const customSelect = document.querySelector('#custom-ingredient-select');
+        const customOptions = document.querySelector('#custom-ingredient-options');
+
+        if (customSelect && customOptions) {
+            // Сохраняем текущее выбранное значение
+            const currentValue = select.value;
+            const currentText = select.options[select.selectedIndex]?.text || 'Выберите ингредиент';
+
+            // Обновляем основной текст
+            customSelect.textContent = currentText;
+
+            // Обновляем список опций
+            customOptions.innerHTML = ingredients.map(ing => `
+                <div class="custom-select-option" data-value="${ing.id}">
+                    ${capitalise(ing.name)}
+                </div>
+            `).join('');
+
+            // 3. Полностью переинициализируем обработчики
+            setupCustomSelectHandlers();
+        }
+
+    } catch (error) {
+        console.error('Ошибка при обновлении списка ингредиентов:', error);
+        createToast('Не удалось обновить список ингредиентов', 'error');
+    }
+}
+
+function setupCustomSelectHandlers() {
+    const customSelect = document.querySelector('#custom-ingredient-select');
+    const customOptions = document.querySelector('#custom-ingredient-options');
+    const originalSelect = document.querySelector('#ingredient-select');
+
+    if (!customSelect || !customOptions) return;
+
+    // Удаляем старые обработчики
+    customSelect.replaceWith(customSelect.cloneNode(true));
+    customOptions.replaceWith(customOptions.cloneNode(true));
+
+    // Получаем новые элементы после клонирования
+    const newCustomSelect = document.querySelector('#custom-ingredient-select');
+    const newCustomOptions = document.querySelector('#custom-ingredient-options');
+    const options = newCustomOptions.querySelectorAll('.custom-select-option');
+
+    // Обработчик клика по кастомному селекту
+    newCustomSelect.addEventListener('click', function (e) {
+        e.stopPropagation();
+        newCustomOptions.style.display = newCustomOptions.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Обработчики для опций
+    options.forEach(option => {
+        option.addEventListener('click', function () {
+            const value = this.getAttribute('data-value');
+            const text = this.textContent;
+
+            originalSelect.value = value;
+            newCustomSelect.textContent = text;
+            newCustomOptions.style.display = 'none';
+        });
+    });
+
+    // Закрытие при клике вне списка
+    document.addEventListener('click', function () {
+        newCustomOptions.style.display = 'none';
+    });
+}
+
+async function checkIngredientUsage(ingredientName) {
+    try {
+        const cocktails = await Request.get({url: '/bar/cocktails/'});
+        return cocktails.some(cocktail =>
+            cocktail.ingredients.some(ing =>
+                ing.ingredient.name.toLowerCase() === ingredientName.toLowerCase()
+            )
+        );
+    } catch (error) {
+        console.error('Ошибка при проверке использования ингредиента:', error);
+        return true; // В случае ошибки предполагаем, что ингредиент используется
+    }
+}
+
+async function updateCocktailsAvailability() {
+    try {
+        const cocktails = await Request.get({url: '/bar/cocktails/'});
+        if (cocktails) {
+            document.querySelectorAll('.cocktail').forEach(cocktailNode => {
+                const cocktail = cocktails.find(c => c.id == cocktailNode.dataset.cocktailId);
+                if (cocktail) {
+                    cocktailNode.dataset.available = cocktail.is_available ? 'True' : 'False';
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Ошибка при обновлении коктейлей:', error);
+    }
+}
+
+function resetForm() {
+    const form = document.querySelector('#ingredient-form');
+    const formContainer = document.querySelector('#new-ingredient-form');
+    const imagePreview = document.querySelector('#image-preview');
+
+    form.reset();
+    currentIngredientId = null;
+    imagePreview.src = '';
+    imagePreview.classList.add('hide');
+    formContainer.querySelector('.image-upload-label span').style.display = 'block';
+    formContainer.classList.add('hide');
+}

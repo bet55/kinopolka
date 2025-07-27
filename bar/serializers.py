@@ -7,14 +7,6 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ['id', 'name', 'is_available', 'image']
-        extra_kwargs = {
-            'image': {'required': False, 'allow_null': True}
-        }
-
-    def validate_image(self, value):
-        if not value:
-            return None
-        return value
 
 
 class CocktailIngredientSerializer(serializers.ModelSerializer):
@@ -44,14 +36,6 @@ class CocktailSerializer(serializers.ModelSerializer):
             'is_available',
             'ingredients',
         ]
-        extra_kwargs = {
-            'image': {'required': False, 'allow_null': True}
-        }
-
-    def validate_image(self, value):
-        if not value:
-            return None
-        return value
 
     def get_is_available(self, obj):
         return obj.is_available
@@ -99,8 +83,3 @@ class CocktailCreateUpdateSerializer(serializers.ModelSerializer):
             return ingredients
         except json.JSONDecodeError:
             raise serializers.ValidationError("Невалидный формат JSON в поле ingredients")
-
-    def validate_image(self, value):
-        if not value:
-            return None
-        return value
