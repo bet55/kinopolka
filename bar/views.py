@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from rest_framework.views import APIView
+from adrf.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-
 from classes import CocktailHandler, IngredientHandler, Error
 from mixins import GlobalDataMixin
+from asgiref.sync import sync_to_async
+
 
 def handle_response(data, success_status=status.HTTP_200_OK):
     if isinstance(data, Error):
@@ -13,112 +14,104 @@ def handle_response(data, success_status=status.HTTP_200_OK):
     return Response(data, status=success_status)
 
 
-class Bar(APIView):
-    def get(self, request: Request):
+class Bar(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
         """
         Получение заполненности бара (коктейли + ингредиенты)
         """
-
-        ingredients = IngredientHandler.get_all_ingredients()
-        cocktails = CocktailHandler.get_all_cocktails()
+        ingredients = await IngredientHandler.get_all_ingredients()
+        cocktails = await CocktailHandler.get_all_cocktails()
 
         errors = [e.message for e in [ingredients, cocktails] if isinstance(e, Error)]
         if errors:
             return Response({'error': '\n'.join(errors)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # context = await self.add_context_data(request, {"postcards": postcards})
-        # return render(request, "postcards_archive.html", context=context)
-
-        return render(request, "bar.html", context={'cocktails': cocktails, 'ingredients': ingredients})
-
+        context = {'cocktails': cocktails, 'ingredients': ingredients}
+        return render(request, "bar.html", context=await self.add_context_data(request, context))
 
 
 class IngredientDetail(APIView):
-    def get(self, request: Request, pk: int):
+    async def get(self, request: Request, pk: int):
         """
         Получение ингредиента по ID
         """
-        ingredient = IngredientHandler.get_ingredient_by_id(pk)
+        ingredient = await IngredientHandler.get_ingredient_by_id(pk)
         return handle_response(ingredient)
 
-    def put(self, request: Request, pk: int):
+    async def put(self, request: Request, pk: int):
         """
         Обновление ингредиента по ID
         """
-        ingredient = IngredientHandler.update_ingredient(pk, request.data, request)
+        ingredient = await IngredientHandler.update_ingredient(pk, request.data, request)
         return handle_response(ingredient)
 
-    def delete(self, request: Request, pk: int):
+    async def delete(self, request: Request, pk: int):
         """
         Удаление ингредиента по ID
         """
-        response_id = IngredientHandler.delete_ingredient(pk)
+        response_id = await IngredientHandler.delete_ingredient(pk)
         return handle_response(response_id, status.HTTP_204_NO_CONTENT)
 
 
 class IngredientListCreate(APIView):
-    def get(self, request: Request):
+    async def get(self, request: Request):
         """
         Получение всех ингредиентов
         """
-        ingredient = IngredientHandler.get_all_ingredients()
+        ingredient = await IngredientHandler.get_all_ingredients()
         return handle_response(ingredient)
 
-    def post(self, request: Request):
+    async def post(self, request: Request):
         """
         Создание нового ингредиента
         """
-        ingredient = IngredientHandler.create_ingredient(request.data, request)
+        ingredient = await IngredientHandler.create_ingredient(request.data, request)
         return handle_response(ingredient, status.HTTP_201_CREATED)
 
 
 class CocktailDetail(APIView):
-    def get(self, request: Request, pk: int):
+    async def get(self, request: Request, pk: int):
         """
         Получение коктейля по ID
         """
-        cocktail = CocktailHandler.get_cocktail_by_id(pk)
+        cocktail = await CocktailHandler.get_cocktail_by_id(pk)
         return handle_response(cocktail)
 
-    def put(self, request: Request, pk: int):
+    async def put(self, request: Request, pk: int):
         """
         Обновление коктейля по ID
         """
-        cocktail = CocktailHandler.update_cocktail(pk, request.data, request)
+        cocktail = await CocktailHandler.update_cocktail(pk, request.data, request)
         return handle_response(cocktail)
 
-    def delete(self, request: Request, pk: int):
+    async def delete(self, request: Request, pk: int):
         """
         Удаление коктейля по ID
         """
-        response_id = CocktailHandler.delete_cocktail(pk)
+        response_id = await CocktailHandler.delete_cocktail(pk)
         return handle_response(response_id, status.HTTP_204_NO_CONTENT)
 
 
-
 class CocktailListCreate(APIView):
-    def get(self, request: Request):
+    async def get(self, request: Request):
         """
         Получение списка всех коктейлей
         """
-        cocktails = CocktailHandler.get_all_cocktails()
+        cocktails = await CocktailHandler.get_all_cocktails()
         return handle_response(cocktails)
 
-
-    def post(self, request: Request):
+    async def post(self, request: Request):
         """
         Создание нового коктейля
         """
-        cocktail = CocktailHandler.create_cocktail(request.data, request)
+        cocktail = await CocktailHandler.create_cocktail(request.data, request)
         return handle_response(cocktail, status.HTTP_201_CREATED)
 
 
-
 class CocktailAvailability(APIView):
-    def get(self, request: Request, pk: int):
+    async def get(self, request: Request, pk: int):
         """
         Получение статуса доступности коктейля
         """
-        is_available = CocktailHandler.get_cocktail_availability(pk)
+        is_available = await CocktailHandler.get_cocktail_availability(pk)
         return handle_response(is_available)
-

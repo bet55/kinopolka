@@ -10,12 +10,12 @@ logger = logging.getLogger('kinopolka')
 
 
 def handle_exceptions(method_name: str):
-    """Обёртка над классами коктейлей и """
+    """Обёртка над классами коктейлей и ингредиентов для асинхронных функций"""
     def decorator(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs):
             try:
-                return func(*args, **kwargs)
+                return await func(*args, **kwargs)
             except (Ingredient.DoesNotExist, Cocktail.DoesNotExist):
                 logger.error(f"{method_name} не найден: {args}, {kwargs}")
                 return Error(message=f"{method_name} не найден", status=404)
@@ -27,7 +27,6 @@ def handle_exceptions(method_name: str):
                 return Error(message=f"Ошибка в {method_name}: {str(e)}")
         return wrapper
     return decorator
-
 
 def custom_exception_handler(exception, context):
     """Общий перехватчик для всего django"""
