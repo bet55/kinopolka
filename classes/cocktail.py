@@ -4,12 +4,14 @@ from bar.models import Ingredient, Cocktail, CocktailIngredient
 from bar.serializers import CocktailSerializer, CocktailCreateUpdateSerializer, CocktailIngredientSerializer
 from .exception_handler import handle_exceptions
 from asgiref.sync import sync_to_async
+import os
 
 logger = logging.getLogger('kinopolka')
 
 
-
 class CocktailHandler:
+
+
     @staticmethod
     @handle_exceptions("Коктейль")
     @sync_to_async
@@ -86,12 +88,14 @@ class CocktailHandler:
         if not await sync_to_async(serializer.is_valid)():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
 
+        # Обновляем общие сведения
         validated_data = serializer.validated_data
         for field, value in validated_data.items():
             if field != 'ingredients':
                 setattr(cocktail, field, value)
         await cocktail.asave()
 
+        # Обновляем ингредиенты
         await cocktail.ingredient_amounts.all().adelete()
         for ingredient_data in validated_data.get('ingredients', []):
             ingredient = await Ingredient.objects.aget(pk=ingredient_data['ingredient'])
@@ -102,11 +106,10 @@ class CocktailHandler:
                 unit=ingredient_data.get('unit', 'ml')
             )
 
-        if old_image and old_image != cocktail.image.name and old_image != 'media/cocktails/default.png':
-            import os
+        # Удаление старого изображения#
+        if old_image != cocktail.image.name and old_image != 'media/cocktails/default.png':
             if os.path.isfile(old_image):
                 os.remove(old_image)
-
 
         serialized_data = await sync_to_async(lambda: CocktailSerializer(cocktail).data)()
         return serialized_data

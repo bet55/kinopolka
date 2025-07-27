@@ -1,22 +1,23 @@
 import logging
 from typing import Dict, List, Optional
 from datetime import datetime
+
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from django.db.models.fields.files import ImageFieldFile
+from email.mime.image import MIMEImage
+
 from telegram import Bot
 from telegram.error import TelegramError
+
 from .postcard import PostcardHandler
 from .user import UserHandler
 from postcard.models import Postcard
-from email.mime.image import MIMEImage
-from asgiref.sync import sync_to_async
 from .error import Error
-from icecream import ic
+from .tg import Telegram
 
-# Configure logger
+
 logger = logging.getLogger('kinopolka')
 
 class Invitation:
@@ -176,28 +177,10 @@ class Invitation:
             logger.error("Invalid screenshot provided for Telegram")
             return "Ошибка: некорректная открытка"
 
-        try:
-            bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", None)
-            group_id = getattr(settings, "TELEGRAM_GROUP_ID", None)
+        tg = Telegram()
+        if not tg.is_init:
+            logger.error("Invalid Telegram connection")
+            return "Ошибка: не подключились к телеграму"
 
-            if not bot_token or not group_id:
-                logger.error("Missing Telegram configuration: bot_token=%s, group_id=%s", bot_token, group_id)
-                return "Ошибка: отсутствуют настройки Telegram"
-
-            bot = Bot(token=bot_token)
-
-            with open(screenshot.path, "rb") as img:
-                await bot.send_photo(chat_id=group_id, photo=img)
-
-            logger.info("Telegram message sent to group %s", group_id)
-            return "Открытка отправлена в телеграм!"
-
-        except FileNotFoundError:
-            logger.error("Screenshot file not found: %s", screenshot.path)
-            return "Ошибка: файл открытки не найден"
-        except TelegramError as e:
-            logger.error("Telegram API error: %s", str(e))
-            return f"Ошибка: {str(e)}"
-        except Exception as e:
-            logger.error("Failed to send Telegram message: %s", str(e))
-            return f"Ошибка: {str(e)}"
+        send = tg.send_image(screenshot.path)
+        return send

@@ -10,6 +10,7 @@ logger = logging.getLogger('kinopolka')
 
 
 class IngredientHandler:
+
     @staticmethod
     @handle_exceptions("Ингредиент")
     @sync_to_async

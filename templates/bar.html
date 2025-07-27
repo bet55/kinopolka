@@ -80,11 +80,12 @@
             {% for c in cocktails %}
                 <li class="cocktail" data-available="{{ c.is_available }}" data-cocktail-id="{{ c.id }}">
 
-                    <img src="{{ c.image }}" alt="">
+                    <img src="{{ c.image }}" alt="" class="cocktail-img">
                     <div class="description">
                         {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
                         <h3>
                             <img src="{% static 'img/bar/pencil.png' %}" class="update">
+                            <img src="{% static 'img/bar/telegram.png' %}" class="telegram">
                             {{ c.name }}
                             <span class="remove">&times;</span>
                         </h3>

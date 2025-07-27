@@ -2,6 +2,7 @@ import {createToast} from "../utils/create_toast.js";
 import {Request} from "../utils/request.js";
 import {confirmModalAction} from "../utils/confirm_modal_action.js";
 import {capitalise} from "../utils/capitalise.js";
+import {getCookie} from "../utils/cookie.js";
 
 // Глобальные переменные для состояния формы
 let selectedIngredients = [];
@@ -17,8 +18,11 @@ export function createCocktail() {
     setupCustomSelect();
 }
 
-export function updateCocktail() {
-    document.querySelectorAll('.cocktail .update').forEach(button => {
+export function updateCocktail(cocktail) {
+    const cocktailsList = cocktail ? [cocktail] : document.querySelectorAll('.cocktail');
+
+    cocktailsList.forEach(cock => {
+        const button = cock.querySelector('.update');
         button.addEventListener('click', function () {
             const cocktailNode = this.closest('.cocktail');
             loadCocktailDataIntoForm(cocktailNode);
@@ -26,7 +30,58 @@ export function updateCocktail() {
     });
 }
 
-export function removeCocktail() {
+export function telegramRequest(cocktail) {
+    const cocktailsList = cocktail ? [cocktail] : document.querySelectorAll('.cocktail');
+
+    cocktailsList.forEach(cock => {
+        const button = cock.querySelector('.telegram');
+        button.addEventListener('click', async (e) => {
+
+
+            const cockName = cock.querySelector('h3').innerText.split(' ')[2];
+            const currentUser = getCookie('user');
+            let userName = 'некто';
+
+            if (cock.dataset.available === 'True') {
+                createToast(`Для коктейля ${cockName} уже всё есть`, 'info');
+                return;
+            }
+
+            if (currentUser) {
+                userName = document.querySelector(`#users-selector button[data-user-id="${currentUser}"]`).innerText;
+            }
+
+            const cockIngredients = Array.from(cock.querySelectorAll('.cocktail-ingredients li')).map(ing => {
+                return ing.dataset.ingredientId;
+            });
+
+            const unavailableIngredient = [];
+
+            cockIngredients.forEach(ingId => {
+                const ingr = document.querySelector(`#ingredients-list li[data-ingredient-id="${ingId}"]`);
+
+                if (ingr && ingr.dataset.available === 'False') {
+                    const ingrName = ingr.querySelector('h6').innerText;
+                    unavailableIngredient.push(ingrName);
+                }
+            });
+
+
+            let text = `🌟 Хэллоу 🌟 \n До меня дошли слухи, что <b>${userName}</b> 🤡 хочет <b>${cockName}</b> 🍹\nДобудьте мне:`;
+            text += '\n — ' + unavailableIngredient.join('\n — ');
+
+            const response = await Request.post({url: `/bar/ingredients/telegram/`, body: {text: text}});
+
+            if (response) {
+                createToast('Отправили', 'info');
+            }
+        })
+    })
+}
+
+export function removeCocktail(cocktail) {
+    const cocktailsList = cocktail ? [cocktail] : document.querySelectorAll('.cocktail');
+
     // Обработчик для удаления одного коктейля (если передан элемент)
     const removeSingleCocktail = async (cocktailNode) => {
         const cocktailId = cocktailNode.dataset.cocktailId;
@@ -59,7 +114,7 @@ export function removeCocktail() {
     };
 
     // Инициализация для всех коктейлей на странице
-    document.querySelectorAll('.cocktail').forEach(cocktailNode => {
+    cocktailsList.forEach(cocktailNode => {
         setupConfirmation(cocktailNode);
     });
 
@@ -151,7 +206,7 @@ function setupImageUpload() {
             return;
         }
 
-        if(file.name === 'default.png') {
+        if (file.name === 'default.png') {
             createToast('Недопустимое название файла: default.png', 'error');
             imageCorrect = false;
         }
@@ -224,7 +279,6 @@ function setupFormSubmission() {
 async function submitCocktailForm() {
     // Заполняем форму и отправляем
 
-
     const form = document.querySelector('#cocktail-form');
     const formData = new FormData(form);
     const isEditMode = !!currentCocktailId;
@@ -248,9 +302,7 @@ async function submitCocktailForm() {
         amount: parseInt(ing.amount),
         unit: ing.unit
     }));
-
     formData.append('ingredients', JSON.stringify(ingredientsData));
-
 
     // Передаём картинку отдельно, при обновлении коктейля
     const previewImg = document.querySelector('#cocktail-image-preview').src;
@@ -281,11 +333,7 @@ async function submitCocktailForm() {
         console.log(response)
 
         if (response) {
-            if (isEditMode) {
-                updateCocktailNode(response);
-            } else {
-                createCocktailNode(response);
-            }
+            refreshCocktailNode(response);
             resetForm();
             createToast(isEditMode ? 'Коктейль обновлен' : 'Коктейль добавлен', 'success');
         }
@@ -369,14 +417,19 @@ function resetForm() {
     formContainer.classList.add('hide');
 }
 
-function createCocktailNode(cocktailData) {
-    const cocktailsList = document.querySelector('#cocktails-list');
-    const li = document.createElement('li');
-    li.className = 'cocktail';
-    li.dataset.available = cocktailData.is_available ? 'True' : 'False';
-    li.dataset.cocktailId = cocktailData.id;
+function refreshCocktailNode(cocktailData) {
+    let cocktailNode = document.querySelector(`.cocktail[data-cocktail-id="${cocktailData.id}"]`);
+    const isCreating = !!cocktailNode;
 
-    li.innerHTML = `
+    if (isCreating) {
+        cocktailNode = document.createElement('li');
+        cocktailNode.className = 'cocktail';
+        cocktailNode.dataset.available = cocktailData.is_available ? 'True' : 'False';
+        cocktailNode.dataset.cocktailId = cocktailData.id;
+    }
+
+
+    cocktailNode.innerHTML = `
         <img src="${cocktailData.image || '/static/img/bar/cocktail.png'}" alt="${cocktailData.name}">
         <div class="description">
         <div class="confirmation container-fluid center">
@@ -402,60 +455,13 @@ function createCocktailNode(cocktailData) {
         <p class="instruction">${cocktailData.instructions}</p>
     `;
 
-    cocktailsList.appendChild(li);
-    setupCocktailHandlers(li);
-}
-
-function setupCocktailHandlers(cocktailNode) {
-    // Инициализация редактирования
-    cocktailNode.querySelector('.update').addEventListener('click', function () {
-        loadCocktailDataIntoForm(cocktailNode);
-    });
-
-    // Инициализация удаления
-    const removeButton = cocktailNode.querySelector('.remove');
-    const confirmationTooltip = cocktailNode.querySelector('.confirmation');
-
-    const confirmModalOptions = {
-        triggerNode: removeButton,
-        modalNode: confirmationTooltip,
-        confirmAction: async () => {
-            const response = await Request.delete({url: `/bar/cocktails/${cocktailNode.dataset.cocktailId}/`});
-            if (response) {
-                cocktailNode.remove();
-                createToast('Коктейль удален', 'success');
-            }
-        },
-        declineAction: () => confirmationTooltip.classList.remove('show')
-    };
-
-    confirmModalAction(confirmModalOptions);
-}
-
-function updateCocktailNode(cocktailData) {
-    const cocktailNode = document.querySelector(`.cocktail[data-cocktail-id="${cocktailData.id}"]`);
-    if (!cocktailNode) return;
-
-    cocktailNode.querySelector('h3').innerHTML = `
-        <img src="/static/img/bar/pencil.png" class="update">
-        ${cocktailData.name}
-        <span class="remove">×</span>
-    `;
-
-    cocktailNode.querySelector('.instruction').textContent = cocktailData.instructions;
-
-    if (cocktailData.image) {
-        cocktailNode.querySelector('img').src = cocktailData.image;
+    if (isCreating) {
+        const cocktailsList = document.querySelector('#cocktails-list');
+        cocktailsList.appendChild(cocktailNode);
     }
 
-    const ingredientsUl = cocktailNode.querySelector('.cocktail-ingredients');
-    ingredientsUl.innerHTML = cocktailData.ingredients.map(ing => `
-        <li data-ingredient-id="${ing.ingredient.id}">
-            <span>${ing.ingredient.name}</span>
-            <span><b>${ing.amount}</b></span>
-            <span>${ing.unit_display}</span>
-        </li>
-    `).join('');
-
+    telegramRequest(cocktailNode);
+    updateCocktail(cocktailNode);
     removeCocktail(cocktailNode);
 }
+

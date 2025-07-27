@@ -3,7 +3,7 @@ from adrf.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from classes import CocktailHandler, IngredientHandler, Error
+from classes import CocktailHandler, IngredientHandler, Error, Telegram
 from mixins import GlobalDataMixin
 from asgiref.sync import sync_to_async
 
@@ -12,6 +12,18 @@ def handle_response(data, success_status=status.HTTP_200_OK):
     if isinstance(data, Error):
         return Response({'error': data.message}, status=data.status)
     return Response(data, status=success_status)
+
+
+class IngredientTelegramRequest(APIView):
+    async def post(self, request: Request):
+        tg = Telegram()
+        if not tg.is_init:
+            return Response({'error': 'Не подключились'}, status=400)
+
+        text = request.data.get('text', 'а где текст?')
+
+        good_message = await tg.send_message(text)
+        return Response({'message': good_message}, status=200)
 
 
 class Bar(GlobalDataMixin, APIView):

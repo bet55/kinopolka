@@ -11,7 +11,8 @@ __all__ = [
     "Invitation",
     "IngredientHandler",
     "CocktailHandler",
-    "Error"
+    "Error",
+    "Telegram"
 ]
 
 from .user import UserHandler
@@ -26,3 +27,4 @@ from .invitation import Invitation
 from .ingredient import IngredientHandler
 from .cocktail import CocktailHandler
 from .error import Error
+from .tg import Telegram
