@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import json
 from .models import Ingredient, Cocktail, CocktailIngredient
 
 
@@ -6,9 +7,6 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ['id', 'name', 'is_available', 'image']
-        extra_kwargs = {
-            'image': {'required': False, 'allow_null': True}
-        }
 
 
 class CocktailIngredientSerializer(serializers.ModelSerializer):
@@ -38,21 +36,13 @@ class CocktailSerializer(serializers.ModelSerializer):
             'is_available',
             'ingredients',
         ]
-        extra_kwargs = {
-            'image': {'required': False, 'allow_null': True}
-        }
 
     def get_is_available(self, obj):
-        """Метод для получения значения is_available"""
         return obj.is_available
 
 
 class CocktailCreateUpdateSerializer(serializers.ModelSerializer):
-    ingredients = serializers.ListField(
-        child=serializers.DictField(),
-        write_only=True,
-        required=False
-    )
+    ingredients = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Cocktail
@@ -64,7 +54,32 @@ class CocktailCreateUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def validate_ingredients(self, value):
-        for item in value:
-            if 'ingredient' not in item:
-                raise serializers.ValidationError("Каждый ингредиент должен содержать ID ингредиента")
-        return value
+        if not value:
+            return []
+        try:
+            ingredients = json.loads(value)
+            if not isinstance(ingredients, list):
+                raise serializers.ValidationError("Поле ingredients должно быть списком")
+            for item in ingredients:
+                if not isinstance(item, dict) or 'ingredient' not in item:
+                    raise serializers.ValidationError("Каждый ингредиент должен быть словарем и содержать поле 'ingredient'")
+                try:
+                    ingredient_id = int(item['ingredient'])
+                    Ingredient.objects.get(pk=ingredient_id)
+                    item['ingredient'] = ingredient_id
+                except (ValueError, TypeError):
+                    raise serializers.ValidationError(f"ID ингредиента '{item['ingredient']}' должен быть числом")
+                except Ingredient.DoesNotExist:
+                    raise serializers.ValidationError(f"Ингредиент с ID {item['ingredient']} не существует")
+                try:
+                    item['amount'] = int(item['amount'])
+                    if item['amount'] <= 0:
+                        raise serializers.ValidationError(f"Количество для ингредиента '{item['ingredient']}' должно быть положительным")
+                except (ValueError, TypeError):
+                    raise serializers.ValidationError(f"Количество для ингредиента '{item['ingredient']}' должно быть числом")
+                valid_units = [choice[0] for choice in CocktailIngredient.MEASUREMENT_UNITS]
+                if item.get('unit') and item['unit'] not in valid_units:
+                    raise serializers.ValidationError(f"Единица измерения '{item['unit']}' недопустима")
+            return ingredients
+        except json.JSONDecodeError:
+            raise serializers.ValidationError("Невалидный формат JSON в поле ingredients")

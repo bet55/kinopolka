@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+import os
 
 
 class Ingredient(models.Model):
@@ -16,6 +17,7 @@ class Ingredient(models.Model):
         upload_to='media/ingredients/',
         blank=True,
         null=True,
+        default='media/ingredients/default.png',
         verbose_name='Изображение'
     )
 
@@ -27,7 +29,16 @@ class Ingredient(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.image or self.image == '':
+            self.image = self._meta.get_field('image').get_default()
+        super().save(*args, **kwargs)
+
     def delete(self, *args, **kwargs):
+        # Delete associated image if it exists and is not the default image
+        if self.image and 'default.png' not in self.image.name:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
         if self.cocktail_ingredients.exists():
             raise ValidationError(
                 "Нельзя удалить ингредиент, который используется в коктейлях. "
@@ -49,12 +60,15 @@ class Cocktail(models.Model):
         verbose_name='Ингредиенты'
     )
     instructions = models.TextField(
-        verbose_name='Инструкция приготовления'
+        verbose_name='Инструкция приготовления',
+        blank=True,
+        default=''
     )
     image = models.ImageField(
         upload_to='media/cocktails/',
         blank=True,
         null=True,
+        default='media/cocktails/default.png',
         verbose_name='Изображение коктейля'
     )
 
@@ -65,6 +79,18 @@ class Cocktail(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.image or self.image == '':
+            self.image = self._meta.get_field('image').get_default()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Delete associated image if it exists and is not the default image
+        if self.image and 'default.png' not in self.image.name:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+        super().delete(*args, **kwargs)
 
     @property
     def is_available(self):
@@ -84,11 +110,9 @@ class Cocktail(models.Model):
 
 class CocktailIngredient(models.Model):
     MEASUREMENT_UNITS = [
-        ('ml', 'миллилитры'),
-        ('g', 'граммы'),
-        ('pcs', 'штуки'),
-        ('pinch', 'щепотка'),
-        ('slice', 'долька'),
+        ('ml', 'мл'),
+        ('g', 'гр'),
+        ('pcs', 'штк'),
     ]
 
     cocktail = models.ForeignKey(

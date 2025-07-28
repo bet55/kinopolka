@@ -5,7 +5,8 @@ from .views import (
     IngredientDetail,
     CocktailListCreate,
     CocktailDetail,
-    CocktailAvailability
+    CocktailAvailability,
+    IngredientTelegramRequest
 )
 
 urlpatterns = [
@@ -16,4 +17,6 @@ urlpatterns = [
     path('cocktails/', CocktailListCreate.as_view(), name='cocktail'),
     path('cocktails/<int:pk>/', CocktailDetail.as_view(), name='cocktail-detail'),
     path('cocktails/<int:pk>/availability/', CocktailAvailability.as_view(), name='cocktail-availability'),
+    path('ingredients/telegram/', IngredientTelegramRequest.as_view(), name='ingredients-tg-request'),
+
 ]

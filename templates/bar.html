@@ -1,0 +1,176 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/bar.css' %}">
+{% endblock %}
+
+{% block title %}Бар{% endblock %}
+
+
+{# коктейли #}
+{% block center-content %}
+    <div id="cocktails">
+        <h2>Коктейли</h2>
+        <button class="add">+ добавить</button>
+
+        <!-- Форма для добавления нового коктейля (изначально скрыта) -->
+        <div id="new-cocktail-form" class="hide">
+            <form id="cocktail-form" method="post" enctype="multipart/form-data">
+
+                <div class="form-header">
+                    <button type="button" class="close-btn">&times;</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="image-upload">
+                        <label for="cocktail-image" class="image-upload-label">
+                            <span>+</span>
+                            <img id="cocktail-image-preview" class="hide" alt="">
+                            <input type="file" id="cocktail-image" name="image" accept="image/*">
+                        </label>
+                    </div>
+                    <div class="form-group text-section">
+                        <label for="cocktail-name">
+                            <input type="text" id="cocktail-name" name="name" placeholder="название" required>
+                        </label>
+                        <textarea id="cocktail-instructions" name="instructions" placeholder="инструкция"></textarea>
+                    </div>
+
+                    <div class="ingredients-section">
+                        <div class="ingredient-selector">
+                            <div class="custom-select-wrapper">
+                                <select id="ingredient-select" class="original-select">
+                                    {% for i in ingredients %}
+                                        <option value="{{ i.id }}">{{ i.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="custom-select" id="custom-ingredient-select">Выберите ингредиент</div>
+                                <div class="custom-select-options" id="custom-ingredient-options">
+                                    {% for i in ingredients %}
+                                        <div class="custom-select-option" data-value="{{ i.id }}">{{ i.name }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <input type="text" id="ingredient-amount" maxlength="3"
+                                   oninput="this.value = this.value.replace(/[^0-9]/, '')">
+                            <select id="ingredient-unit">
+                                <option value="ml">мл</option>
+                                <option value="g">гр</option>
+                                <option value="pcs">штк</option>
+                            </select>
+                            <button type="button" class="add-ingredient-btn">+</button>
+                        </div>
+
+                        <ul id="selected-ingredients-list" class="selected-ingredients">
+                            <!-- Здесь будут отображаться выбранные ингредиенты -->
+                        </ul>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="save-btn">Сохранить</button>
+            </form>
+        </div>
+
+
+        <ul id="cocktails-list">
+            {% for c in cocktails %}
+                <li class="cocktail" data-available="{{ c.is_available }}" data-cocktail-id="{{ c.id }}">
+
+                    <img src="{{ c.image }}" alt="" class="cocktail-img">
+                    <div class="description">
+                        {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
+                        <h3>
+                            <img src="{% static 'img/bar/pencil.png' %}" class="update" data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-bs-title="Редактировать">
+                            <img src="{% static 'img/bar/telegram.png' %}" class="telegram" data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-bs-title="Запросить покупки">
+                            {{ c.name }}
+                            <span class="remove" data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  data-bs-title="Удалить">&times;</span>
+                        </h3>
+                        <ul class="cocktail-ingredients">
+                            {% for ci in c.ingredients %}
+                                <li data-ingredient-id="{{ ci.ingredient.id }}">
+                                    <span>{{ ci.ingredient.name }}</span>
+                                    <span><b>{{ ci.amount }}</b></span>
+                                    <span>{{ ci.unit_display }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <p class="instruction">
+                        {{ c.instructions }}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+
+
+    </div>
+
+{% endblock %}
+
+{# ингредиенты #}
+{% block right-content %}
+    <div id="ingredients">
+        <h2>Ингредиенты</h2>
+        <button class="add">+ добавить</button>
+
+        <!-- Форма для добавления нового ингредиента (изначально скрыта) -->
+        <div id="new-ingredient-form" class="hide">
+            <form id="ingredient-form" method="post" enctype="multipart/form-data">
+                <div class="form-header">
+                    <button type="button" class="close-btn">&times;</button>
+                </div>
+                <div class="form-row">
+                    <div class="image-upload">
+                        <label for="ingredient-image" class="image-upload-label">
+                            <span>+</span>
+                            <img id="image-preview" class="hide" alt="">
+                            <input type="file" id="ingredient-image" name="image" accept="image/*">
+                        </label>
+                    </div>
+                    <div class="fields-group">
+                        <div class="form-group">
+                            <input type="text" id="ingredient-name" name="name" placeholder="название" required>
+                            <label for="ingredient-name"></label>
+                        </div>
+                        <div class="form-group availability">
+                            <input type="checkbox" id="ingredient-available" name="is_available">
+                            <label for="ingredient-available">в наличии</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="save-btn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+
+        <ul id="ingredients-list">
+            {% for i in ingredients %}
+                <li class="ingredient" data-available="{{ i.is_available }}" data-ingredient-id="{{ i.id }}">
+                    <img src="{{ i.image }}" alt="">
+                    <h6>{{ i.name }}</h6>
+                    <button class="update"><img src="{% static 'img/bar/box.png' %}" alt=""></button>
+                    <button class="remove">&times;</button>
+                    {% include "elements/confirmation_tooltip.html" with title="Удалить ингредиент?" position="left" %}
+                </li>
+            {% endfor %}
+
+
+        </ul>
+    </div>
+{% endblock %}
+
+
+
+{# Подключаем js #}
+{% block script %}
+    <script type="module" src="{% static 'js/bar.js' %}"></script>
+{% endblock %}
