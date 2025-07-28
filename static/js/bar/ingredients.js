@@ -171,7 +171,7 @@ function createIngredientNode(ingredientData) {
         </li>
     `;
 
-    ingredientsList.appendChild(li);
+    ingredientsList.prepend(li);
     updateIngredient();
     removeIngredient();
 }

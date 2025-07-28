@@ -3,12 +3,13 @@ import {Request} from "../utils/request.js";
 import {confirmModalAction} from "../utils/confirm_modal_action.js";
 import {capitalise} from "../utils/capitalise.js";
 import {getCookie} from "../utils/cookie.js";
+import {getRandomItem} from "../utils/get_random_item.js";
 
 // Глобальные переменные для состояния формы
 let selectedIngredients = [];
 let currentCocktailId = null;
 let imageCorrect = true;
-const UNIT_MAP = {'мл': 'ml', 'гр': 'gr', 'pcs': 'штк'};
+const UNIT_MAP = {'мл': 'ml', 'гр': 'g', 'pcs': 'штк'};
 
 export function createCocktail() {
     setupFormToggle();
@@ -33,17 +34,33 @@ export function updateCocktail(cocktail) {
 export function telegramRequest(cocktail) {
     const cocktailsList = cocktail ? [cocktail] : document.querySelectorAll('.cocktail');
 
+    const createMessage = (userName, cockName, ingredients) => {
+        const STARS = ['💫', '⭐', '🌟', '🌠', '✨', '✴'];
+        const CHARS = ['👺', '🤯', '😎', '🤡', '👽', '🤖', '🧟', '🧞'];
+        const COCKS = ['🍸', '🍹', '💩', '🍺']
+
+        const star = getRandomItem(STARS);
+        const char = getRandomItem(CHARS);
+        const cock = getRandomItem(COCKS);
+
+        let text = `${star} Хэллоу ${star} 
+                            \n До меня дошли слухи, что <b>${userName}</b> ${char} хочет <b>${cockName}</b> ${cock}
+                            \nДобудьте мне:`;
+        text += '\n — ' + ingredients.join('\n — ');
+        return text;
+    }
+
     cocktailsList.forEach(cock => {
         const button = cock.querySelector('.telegram');
         button.addEventListener('click', async (e) => {
 
 
-            const cockName = cock.querySelector('h3').innerText.split(' ')[2];
+            const cockName = cock.querySelector('h3').innerText.replace('×', '').trim();
             const currentUser = getCookie('user');
             let userName = 'некто';
 
             if (cock.dataset.available === 'True') {
-                createToast(`Для коктейля ${cockName} уже всё есть`, 'info');
+                createToast(`Для коктейля «${cockName}» уже всё есть`, 'info');
                 return;
             }
 
@@ -67,9 +84,7 @@ export function telegramRequest(cocktail) {
             });
 
 
-            let text = `🌟 Хэллоу 🌟 \n До меня дошли слухи, что <b>${userName}</b> 🤡 хочет <b>${cockName}</b> 🍹\nДобудьте мне:`;
-            text += '\n — ' + unavailableIngredient.join('\n — ');
-
+            const text = createMessage(userName, cockName, unavailableIngredient);
             const response = await Request.post({url: `/bar/ingredients/telegram/`, body: {text: text}});
 
             if (response) {
@@ -283,10 +298,17 @@ async function submitCocktailForm() {
     const formData = new FormData(form);
     const isEditMode = !!currentCocktailId;
 
+    // Проверяем наличие ингредиентов
+    if (selectedIngredients.length < 3) {
+        createToast('Коктейль - это хотя бы 3 ингредиента!', 'error');
+        return;
+    }
+
+
+    // Проверяем, что такого названия коктейля больше нет`
     const nameInput = document.querySelector('#cocktail-name');
     nameInput.value = capitalise(nameInput.value);
 
-    // Проверяем, что такого названия коктейля больше нет`
     const existingCocktails = Array.from(document.querySelectorAll('.cocktail'))
         .filter(c => c.dataset.cocktailId !== currentCocktailId)
     const sameNameCocktails = existingCocktails.filter(c => capitalise(c.querySelector('h3').innerText) === nameInput.value);
@@ -303,6 +325,7 @@ async function submitCocktailForm() {
         unit: ing.unit
     }));
     formData.append('ingredients', JSON.stringify(ingredientsData));
+
 
     // Передаём картинку отдельно, при обновлении коктейля
     const previewImg = document.querySelector('#cocktail-image-preview').src;
@@ -322,15 +345,13 @@ async function submitCocktailForm() {
 
     }
 
-    console.log(formData)
-
     try {
         const response = await Request.send({
             method: isEditMode ? 'PUT' : 'POST',
             url: isEditMode ? `/bar/cocktails/${currentCocktailId}/` : '/bar/cocktails/',
             body: formData
         });
-        console.log(response)
+
 
         if (response) {
             refreshCocktailNode(response);
@@ -418,16 +439,17 @@ function resetForm() {
 }
 
 function refreshCocktailNode(cocktailData) {
+
     let cocktailNode = document.querySelector(`.cocktail[data-cocktail-id="${cocktailData.id}"]`);
-    const isCreating = !!cocktailNode;
+    const isCreating = !cocktailNode;
 
     if (isCreating) {
         cocktailNode = document.createElement('li');
         cocktailNode.className = 'cocktail';
-        cocktailNode.dataset.available = cocktailData.is_available ? 'True' : 'False';
         cocktailNode.dataset.cocktailId = cocktailData.id;
     }
 
+    cocktailNode.dataset.available = cocktailData.is_available ? 'True' : 'False';
 
     cocktailNode.innerHTML = `
         <img src="${cocktailData.image || '/static/img/bar/cocktail.png'}" alt="${cocktailData.name}">
@@ -439,6 +461,7 @@ function refreshCocktailNode(cocktailData) {
         </div>
             <h3>
                 <img src="/static/img/bar/pencil.png" class="update">
+                <img src="/static/img/bar/telegram.png" class="telegram">
                 ${capitalise(cocktailData.name)}
                 <span class="remove">×</span>
             </h3>
@@ -457,7 +480,7 @@ function refreshCocktailNode(cocktailData) {
 
     if (isCreating) {
         const cocktailsList = document.querySelector('#cocktails-list');
-        cocktailsList.appendChild(cocktailNode);
+        cocktailsList.prepend(cocktailNode);
     }
 
     telegramRequest(cocktailNode);

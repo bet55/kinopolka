@@ -84,10 +84,16 @@
                     <div class="description">
                         {% include "elements/confirmation_tooltip.html" with title="Удалить коктейль?" position="center" %}
                         <h3>
-                            <img src="{% static 'img/bar/pencil.png' %}" class="update">
-                            <img src="{% static 'img/bar/telegram.png' %}" class="telegram">
+                            <img src="{% static 'img/bar/pencil.png' %}" class="update" data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-bs-title="Редактировать">
+                            <img src="{% static 'img/bar/telegram.png' %}" class="telegram" data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 data-bs-title="Запросить покупки">
                             {{ c.name }}
-                            <span class="remove">&times;</span>
+                            <span class="remove" data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  data-bs-title="Удалить">&times;</span>
                         </h3>
                         <ul class="cocktail-ingredients">
                             {% for ci in c.ingredients %}
