@@ -34,6 +34,13 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
             logger.error("Failed to retrieve postcards: %s", postcards.message)
             return Response({'error': postcards.message}, status=postcards.status)
 
+        response_format = request.query_params.get("format")
+        if response_format == "json":
+            return Response(
+                postcards,
+                status=status.HTTP_200_OK
+            )
+
         context = await self.add_context_data(request, {"postcards": postcards})
         return render(request, "postcards_archive.html", context=context)
 

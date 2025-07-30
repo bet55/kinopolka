@@ -157,8 +157,14 @@
                 <li class="ingredient" data-available="{{ i.is_available }}" data-ingredient-id="{{ i.id }}">
                     <img src="{{ i.image }}" alt="">
                     <h6>{{ i.name }}</h6>
-                    <button class="update"><img src="{% static 'img/bar/box.png' %}" alt=""></button>
-                    <button class="remove">&times;</button>
+                    <button class="update"><img src="{% static 'img/bar/box.png' %}"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-title="Статус наличия"></button>
+                    <button class="remove" data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-title="Удалить">&times;
+                    </button>
                     {% include "elements/confirmation_tooltip.html" with title="Удалить ингредиент?" position="left" %}
                 </li>
             {% endfor %}

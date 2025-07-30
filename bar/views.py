@@ -39,6 +39,15 @@ class Bar(GlobalDataMixin, APIView):
             return Response({'error': '\n'.join(errors)}, status=status.HTTP_400_BAD_REQUEST)
 
         context = {'cocktails': cocktails, 'ingredients': ingredients}
+
+        response_format = request.query_params.get("format")
+        if response_format == "json":
+            return Response(
+                context,
+                status=status.HTTP_200_OK
+            )
+
+
         return render(request, "bar.html", context=await self.add_context_data(request, context))
 
 
