@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework.request import Request
 from classes import Statistic, MovieHandler
 from mixins import GlobalDataMixin
+from utils.response_handler import handle_response
 
 
 class Catalog(GlobalDataMixin, APIView):

@@ -1,12 +1,12 @@
 import logging
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from bar.models import Ingredient, Cocktail, CocktailIngredient
 from bar.serializers import CocktailSerializer, CocktailCreateUpdateSerializer, CocktailIngredientSerializer
-from .exception_handler import handle_exceptions
+from utils.exception_handler import handle_exceptions
 from asgiref.sync import sync_to_async
 import os
 
-logger = logging.getLogger('kinopolka')
+logger = logging.getLogger(__name__)
 
 
 class CocktailHandler:

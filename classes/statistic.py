@@ -1,3 +1,4 @@
+import logging
 from classes import NoteHandler, MovieHandler, MoviesStructure
 import pandas as pd
 import numpy as np
@@ -5,6 +6,9 @@ import plotly
 import plotly.express as px
 
 from icecream import ic
+
+logger = logging.getLogger(__name__)
+
 
 
 class Statistic:

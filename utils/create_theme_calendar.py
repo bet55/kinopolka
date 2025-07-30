@@ -39,7 +39,7 @@ res = create_theme_calendar()
 sorted_items = sorted(res.items(), key=lambda x: (x[1], x[0]))
 ordered_dict = OrderedDict(sorted_items)
 
-print(dict(ordered_dict))
+# print(dict(ordered_dict))
 
 
 

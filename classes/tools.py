@@ -10,7 +10,8 @@ from filmoclub.calendar.theme_calendar import CALENDAR
 from django.conf import settings
 import pendulum
 
-logger = logging.getLogger('kinopolka')
+logger = logging.getLogger(__name__)
+
 
 class Tools:
     """

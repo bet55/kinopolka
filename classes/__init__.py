@@ -11,7 +11,7 @@ __all__ = [
     "Invitation",
     "IngredientHandler",
     "CocktailHandler",
-    "Error",
+    "ErrorHandler",
     "Telegram"
 ]
 
@@ -26,5 +26,5 @@ from .postcard import PostcardHandler
 from .invitation import Invitation
 from .ingredient import IngredientHandler
 from .cocktail import CocktailHandler
-from .error import Error
+from .exceptions import ErrorHandler
 from .tg import Telegram

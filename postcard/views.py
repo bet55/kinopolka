@@ -4,22 +4,12 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from classes import Tools, PostcardHandler, Invitation, Error
+from classes import Tools, PostcardHandler, Invitation
 from mixins import GlobalDataMixin
+from utils.response_handler import handle_response
 
-logger = logging.getLogger('kinopolka')
+logger = logging.getLogger(__name__)
 
-
-def handle_response(data, success_status=status.HTTP_200_OK):
-    """
-    Унифицированная функция для обработки ответов API.
-    :param data: Данные ответа (dict, list, bool, или Error).
-    :param success_status: HTTP-статус для успешного ответа.
-    :return: Response объект.
-    """
-    if isinstance(data, Error):
-        return Response({'error': data.message}, status=data.status)
-    return Response(data, status=success_status)
 
 
 class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
@@ -30,9 +20,6 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
         Получение страницы архива всех открыток.
         """
         postcards = await PostcardHandler.get_all_postcards()
-        if isinstance(postcards, Error):
-            logger.error("Failed to retrieve postcards: %s", postcards.message)
-            return Response({'error': postcards.message}, status=postcards.status)
 
         response_format = request.query_params.get("format")
         if response_format == "json":
@@ -54,10 +41,6 @@ class InvitationViewSet(APIView):
         """
         invitation = await Invitation.create()
         result = await invitation.send_invitation()
-        if isinstance(result, dict) and any("Ошибка" in v for v in result.values()):
-            logger.error("Failed to send invitation: %s", result)
-            return Response({"error": result}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        logger.info("Invitation sent successfully")
         return handle_response(result)
 
 
@@ -70,10 +53,10 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         """
         theme = request.query_params.get("theme")
         random_images = Tools.get_random_images(theme)
-        # postcard_data = Error(message='lol')
+
         postcard_data = await PostcardHandler.get_postcard()
 
-        if isinstance(postcard_data, Error):
+        if isinstance(postcard_data, dict) and postcard_data.get('error'):
             postcard_url = random_images.get("postcard")
             is_active = False
         else:
@@ -93,16 +76,14 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         Создание новой открытки.
         """
         postcard_data = await PostcardHandler.create_postcard(request.data, request=request)
-        return handle_response(postcard_data, status.HTTP_201_CREATED)
+        return handle_response(postcard_data, status=status.HTTP_201_CREATED)
 
     async def put(self, request: Request):
         """
         Деактивация всех открыток.
         """
-        success = await PostcardHandler.deactivate_postcard()
-        if isinstance(success, Error):
-            return handle_response(success)
-        return handle_response({"message": "Postcards deactivated"})
+        result = await PostcardHandler.deactivate_postcard()
+        return handle_response(result, {"message": "Postcards deactivated"})
 
     async def delete(self, request: Request):
         """
@@ -110,5 +91,5 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         """
         postcard_id = request.data.get("id")
 
-        success = await PostcardHandler.delete_postcard(postcard_id)
-        return handle_response(success, status.HTTP_204_NO_CONTENT)
+        result = await PostcardHandler.delete_postcard(postcard_id)
+        return handle_response(result, status=status.HTTP_204_NO_CONTENT)

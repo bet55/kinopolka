@@ -3,27 +3,21 @@ from adrf.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from classes import CocktailHandler, IngredientHandler, Error, Telegram
+from classes import CocktailHandler, IngredientHandler, Telegram
 from mixins import GlobalDataMixin
-from asgiref.sync import sync_to_async
-
-
-def handle_response(data, success_status=status.HTTP_200_OK):
-    if isinstance(data, Error):
-        return Response({'error': data.message}, status=data.status)
-    return Response(data, status=success_status)
+from utils.response_handler import handle_response
 
 
 class IngredientTelegramRequest(APIView):
     async def post(self, request: Request):
         tg = Telegram()
         if not tg.is_init:
-            return Response({'error': 'Не подключились'}, status=400)
+            return Response({'error': 'Не подключились'}, status=status.HTTP_500)
 
         text = request.data.get('text', 'а где текст?')
 
         good_message = await tg.send_message(text)
-        return Response({'message': good_message}, status=200)
+        return handle_response(good_message, {'message': good_message}, status.HTTP_200_OK)
 
 
 class Bar(GlobalDataMixin, APIView):
@@ -34,9 +28,6 @@ class Bar(GlobalDataMixin, APIView):
         ingredients = await IngredientHandler.get_all_ingredients()
         cocktails = await CocktailHandler.get_all_cocktails()
 
-        errors = [e.message for e in [ingredients, cocktails] if isinstance(e, Error)]
-        if errors:
-            return Response({'error': '\n'.join(errors)}, status=status.HTTP_400_BAD_REQUEST)
 
         context = {'cocktails': cocktails, 'ingredients': ingredients}
 
@@ -71,7 +62,7 @@ class IngredientDetail(APIView):
         Удаление ингредиента по ID
         """
         response_id = await IngredientHandler.delete_ingredient(pk)
-        return handle_response(response_id, status.HTTP_204_NO_CONTENT)
+        return handle_response(response_id, status=status.HTTP_204_NO_CONTENT)
 
 
 class IngredientListCreate(APIView):
@@ -87,7 +78,7 @@ class IngredientListCreate(APIView):
         Создание нового ингредиента
         """
         ingredient = await IngredientHandler.create_ingredient(request.data, request)
-        return handle_response(ingredient, status.HTTP_201_CREATED)
+        return handle_response(ingredient, status=status.HTTP_201_CREATED)
 
 
 class CocktailDetail(APIView):
@@ -110,7 +101,7 @@ class CocktailDetail(APIView):
         Удаление коктейля по ID
         """
         response_id = await CocktailHandler.delete_cocktail(pk)
-        return handle_response(response_id, status.HTTP_204_NO_CONTENT)
+        return handle_response(response_id, status=status.HTTP_204_NO_CONTENT)
 
 
 class CocktailListCreate(APIView):

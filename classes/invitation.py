@@ -8,13 +8,11 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from email.mime.image import MIMEImage
 
-from telegram import Bot
-from telegram.error import TelegramError
 
 from .postcard import PostcardHandler
 from .user import UserHandler
 from postcard.models import Postcard
-from .error import Error
+from .exceptions import ErrorHandler
 from .tg import Telegram
 
 
@@ -47,7 +45,7 @@ class Invitation:
             An initialized Invitation instance with the active postcard.
         """
         postcard_data = await PostcardHandler.get_postcard()
-        if isinstance(postcard_data, Error):
+        if isinstance(postcard_data, ErrorHandler):
             logger.warning("No active postcard found for Invitation: %s", postcard_data.message)
             return cls(postcard=None, is_active=False)
 
