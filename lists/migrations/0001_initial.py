@@ -3,9 +3,10 @@
 import django.contrib.auth.models
 import django.db.models.deletion
 import django.db.models.manager
-import lists.validators
 from django.conf import settings
 from django.db import migrations, models
+
+import lists.validators
 
 
 class Migration(migrations.Migration):

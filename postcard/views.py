@@ -1,19 +1,20 @@
 import logging
+
 from adrf.views import APIView
 from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.request import Request
 from rest_framework import status
-from classes import Tools, PostcardHandler, Invitation
+from rest_framework.request import Request
+from rest_framework.response import Response
+
+from classes import Invitation, PostcardHandler, Tools
 from mixins import GlobalDataMixin
 from utils.response_handler import handle_response
 
 logger = logging.getLogger(__name__)
 
 
-
 class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
-    http_method_names = ['get']
+    http_method_names = ["get"]
 
     async def get(self, request: Request):
         """
@@ -23,17 +24,14 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
 
         response_format = request.query_params.get("format")
         if response_format == "json":
-            return Response(
-                postcards,
-                status=status.HTTP_200_OK
-            )
+            return Response(postcards, status=status.HTTP_200_OK)
 
         context = await self.add_context_data(request, {"postcards": postcards})
         return render(request, "postcards_archive.html", context=context)
 
 
 class InvitationViewSet(APIView):
-    http_method_names = ['post']
+    http_method_names = ["post"]
 
     async def post(self, request: Request):
         """
@@ -45,23 +43,26 @@ class InvitationViewSet(APIView):
 
 
 class PostcardViewSet(GlobalDataMixin, APIView):
-    http_method_names = ['get', 'post', 'put', 'delete']
+    http_method_names = ["get", "post", "put", "delete"]
 
     async def get(self, request: Request):
         """
         Получение страницы с текущей активной открыткой.
+        Если активной открытки нет отображаем шаблон для заполнения.
         """
         theme = request.query_params.get("theme")
         random_images = Tools.get_random_images(theme)
 
+        postcard_url = random_images.get("postcard")
+        is_active = False
+
         postcard_data = await PostcardHandler.get_postcard()
 
-        if isinstance(postcard_data, dict) and postcard_data.get('error'):
-            postcard_url = random_images.get("postcard")
-            is_active = False
-        else:
-            postcard_url = postcard_data.get('screenshot') or random_images.get("postcard")
-            is_active = postcard_data.get('is_active', False)
+        if not postcard_data.get("error"):
+            postcard_url = postcard_data.get("screenshot") or random_images.get(
+                "postcard"
+            )
+            is_active = postcard_data.get("is_active", False)
 
         context = {
             "postcard": postcard_url,
@@ -75,7 +76,9 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         """
         Создание новой открытки.
         """
-        postcard_data = await PostcardHandler.create_postcard(request.data, request=request)
+        postcard_data = await PostcardHandler.create_postcard(
+            request.data, request=request
+        )
         return handle_response(postcard_data, status=status.HTTP_201_CREATED)
 
     async def put(self, request: Request):

@@ -24,17 +24,13 @@ class ErrorHandler:
     :param status: int статус код
 
     """
+
     def __init__(self, message: str, status: int = 400):
         self.message = message
         self.status = status
 
     def to_dict(self):
-        return {
-            "error": {
-                "message": self.message,
-                "status": self.status
-            }
-        }
+        return {"error": {"message": self.message, "status": self.status}}
 
     def __dict__(self):
         return self.to_dict()

@@ -1,10 +1,12 @@
-from rest_framework.decorators import api_view
+import asyncio
+import json
+
 from adrf.decorators import api_view as asapi_view
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
 from classes import MovieHandler, NoteHandler, Tools
 from lists.models import User
-import json
-import asyncio
 from tools.serializers import UserSerializer
 
 

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from lists.views import MoviesViewSet, MovieRatingViewSet, MovieAddingViewSet
+from lists.views import MovieAddingViewSet, MovieRatingViewSet, MoviesViewSet
 
 urlpatterns = [
     path("", MoviesViewSet.as_view(), name="view_movies"),

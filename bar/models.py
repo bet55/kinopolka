@@ -1,42 +1,38 @@
-from django.db import models
-from django.core.exceptions import ValidationError
 import os
+
+from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=100,
-        unique=True,
-        verbose_name='Название ингредиента'
+        max_length=100, unique=True, verbose_name="Название ингредиента"
     )
-    is_available = models.BooleanField(
-        default=False,
-        verbose_name='Наличие'
-    )
+    is_available = models.BooleanField(default=False, verbose_name="Наличие")
     image = models.ImageField(
-        upload_to='media/ingredients/',
+        upload_to="media/ingredients/",
         blank=True,
         null=True,
-        default='media/ingredients/default.png',
-        verbose_name='Изображение'
+        default="media/ingredients/default.png",
+        verbose_name="Изображение",
     )
 
     class Meta:
-        verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Ингредиенты'
-        ordering = ['name']
+        verbose_name = "Ингредиент"
+        verbose_name_plural = "Ингредиенты"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.image or self.image == '':
-            self.image = self._meta.get_field('image').get_default()
+        if not self.image or self.image == "":
+            self.image = self._meta.get_field("image").get_default()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # Delete associated image if it exists and is not the default image
-        if self.image and 'default.png' not in self.image.name:
+        if self.image and "default.png" not in self.image.name:
             if os.path.isfile(self.image.path):
                 os.remove(self.image.path)
         if self.cocktail_ingredients.exists():
@@ -49,45 +45,41 @@ class Ingredient(models.Model):
 
 class Cocktail(models.Model):
     name = models.CharField(
-        max_length=100,
-        unique=True,
-        verbose_name='Название коктейля'
+        max_length=100, unique=True, verbose_name="Название коктейля"
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='CocktailIngredient',
-        related_name='cocktails',
-        verbose_name='Ингредиенты'
+        through="CocktailIngredient",
+        related_name="cocktails",
+        verbose_name="Ингредиенты",
     )
     instructions = models.TextField(
-        verbose_name='Инструкция приготовления',
-        blank=True,
-        default=''
+        verbose_name="Инструкция приготовления", blank=True, default=""
     )
     image = models.ImageField(
-        upload_to='media/cocktails/',
+        upload_to="media/cocktails/",
         blank=True,
         null=True,
-        default='media/cocktails/default.png',
-        verbose_name='Изображение коктейля'
+        default="media/cocktails/default.png",
+        verbose_name="Изображение коктейля",
     )
 
     class Meta:
-        verbose_name = 'Коктейль'
-        verbose_name_plural = 'Коктейли'
-        ordering = ['name']
+        verbose_name = "Коктейль"
+        verbose_name_plural = "Коктейли"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.image or self.image == '':
-            self.image = self._meta.get_field('image').get_default()
+        if not self.image or self.image == "":
+            self.image = self._meta.get_field("image").get_default()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # Delete associated image if it exists and is not the default image
-        if self.image and 'default.png' not in self.image.name:
+        if self.image and "default.png" not in self.image.name:
             if os.path.isfile(self.image.path):
                 os.remove(self.image.path)
         super().delete(*args, **kwargs)
@@ -98,10 +90,7 @@ class Cocktail(models.Model):
         if not self.ingredients.exists():
             return False
 
-        return all(
-            ci.ingredient.is_available
-            for ci in self.ingredient_amounts.all()
-        )
+        return all(ci.ingredient.is_available for ci in self.ingredient_amounts.all())
 
     def get_availability_display(self):
         """Возвращает текстовое представление доступности"""
@@ -110,38 +99,35 @@ class Cocktail(models.Model):
 
 class CocktailIngredient(models.Model):
     MEASUREMENT_UNITS = [
-        ('ml', 'мл'),
-        ('g', 'гр'),
-        ('pcs', 'штк'),
+        ("ml", "мл"),
+        ("g", "гр"),
+        ("pcs", "штк"),
     ]
 
     cocktail = models.ForeignKey(
-        'Cocktail',
+        "Cocktail",
         on_delete=models.CASCADE,
-        related_name='ingredient_amounts',
-        verbose_name='Коктейль'
+        related_name="ingredient_amounts",
+        verbose_name="Коктейль",
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.PROTECT,
-        related_name='cocktail_ingredients',
-        verbose_name='Ингредиент'
+        related_name="cocktail_ingredients",
+        verbose_name="Ингредиент",
     )
-    amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество',
-        default=1
-    )
+    amount = models.PositiveSmallIntegerField(verbose_name="Количество", default=1)
     unit = models.CharField(
         max_length=10,
         choices=MEASUREMENT_UNITS,
-        default='ml',
-        verbose_name='Единица измерения'
+        default="ml",
+        verbose_name="Единица измерения",
     )
 
     class Meta:
-        verbose_name = 'Ингредиент коктейля'
-        verbose_name_plural = 'Ингредиенты коктейлей'
-        unique_together = [['cocktail', 'ingredient']]
+        verbose_name = "Ингредиент коктейля"
+        verbose_name_plural = "Ингредиенты коктейлей"
+        unique_together = [["cocktail", "ingredient"]]
 
     def __str__(self):
         return f"{self.amount} {self.get_unit_display()} {self.ingredient.name}"

@@ -1,14 +1,14 @@
 import logging
-from classes import NoteHandler, MovieHandler, MoviesStructure
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 import plotly
 import plotly.express as px
-
 from icecream import ic
 
-logger = logging.getLogger(__name__)
+from classes import MovieHandler, MoviesStructure, NoteHandler
 
+logger = logging.getLogger(__name__)
 
 
 class Statistic:
@@ -25,13 +25,15 @@ class Statistic:
         df = pd.DataFrame(film_model.values())
 
         # почему-то слетают типы нужно проверить сериалайзер
-        df.loc[:, ['duration', 'rating_kp', 'rating_imdb']] = (
-            df.loc[:, ['duration', 'rating_kp', 'rating_imdb']].astype(np.float16))
-
+        df.loc[:, ["duration", "rating_kp", "rating_imdb"]] = df.loc[
+            :, ["duration", "rating_kp", "rating_imdb"]
+        ].astype(np.float16)
 
         notes = await NoteHandler.get_all_notes("list")
         notes = pd.DataFrame(notes)
-        users_mean_rating = notes.groupby(['movie']).agg({'rating': 'mean'}).rating.mean().round(2)
+        users_mean_rating = (
+            notes.groupby(["movie"]).agg({"rating": "mean"}).rating.mean().round(2)
+        )
 
         stats = {
             "total_duration": df["duration"].sum(),
@@ -50,7 +52,9 @@ class Statistic:
     @classmethod
     async def most_rated_imdb_movies(cls):
 
-        all_movies = await MovieHandler.get_all_movies(MoviesStructure.rating.value, True)
+        all_movies = await MovieHandler.get_all_movies(
+            MoviesStructure.rating.value, True
+        )
 
         df = pd.DataFrame(all_movies)
         df["rating_imdb"] = df["rating_imdb"].astype(float)
@@ -94,7 +98,7 @@ class Statistic:
 
     @classmethod
     async def draw(cls):
-        film_model =  await MovieHandler.get_all_movies(is_archive=True)
+        film_model = await MovieHandler.get_all_movies(is_archive=True)
         film_model = film_model.values()
 
         df = pd.DataFrame(film_model)

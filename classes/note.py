@@ -1,11 +1,13 @@
 import logging
-from typing import Dict, List, Union
 from collections import defaultdict
+from typing import Dict, List, Union
+
+from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
-from lists.models import Note, User, Movie
+
+from lists.models import Movie, Note, User
 from lists.serializers import NoteSerializer
 from pydantic_models import RateMovieRequestModel
-from asgiref.sync import sync_to_async
 from utils.exception_handler import handle_exceptions
 
 # Configure logger
@@ -20,7 +22,9 @@ class NoteHandler:
     @classmethod
     @handle_exceptions("Заметки")
     @sync_to_async
-    def get_all_notes(cls, result_format: str = "dict") -> Union[Dict[int, List[Dict]], List[Dict]]:
+    def get_all_notes(
+        cls, result_format: str = "dict"
+    ) -> Union[Dict[int, List[Dict]], List[Dict]]:
         """
         Получение всех заметок с оценками фильмов.
         :param result_format: Формат возвращаемых данных ('dict' для группировки по movie_id, иначе 'list').
@@ -53,9 +57,10 @@ class NoteHandler:
         if not isinstance(note_body, dict):
             raise ValidationError("Некорректный тип данных note_body")
 
-        if not isinstance(note_body, dict) or not all(key in note_body for key in ["user", "movie", "rating"]):
+        if not isinstance(note_body, dict) or not all(
+            key in note_body for key in ["user", "movie", "rating"]
+        ):
             raise ValidationError("Некорректные данные заметки")
-
 
         try:
             modeling = RateMovieRequestModel(**note_body)
@@ -83,7 +88,11 @@ class NoteHandler:
             update_fields=["rating", "text"],
             unique_fields=["movie", "user"],
         )
-        logger.info("Создана/обновлена заметка для пользователя %s, фильма %s", user.id, film.kp_id)
+        logger.info(
+            "Создана/обновлена заметка для пользователя %s, фильма %s",
+            user.id,
+            film.kp_id,
+        )
         note_id = note.id
         return note_id
 
@@ -104,5 +113,7 @@ class NoteHandler:
         note = await Note.mgr.aget(user__id=user_id, movie__kp_id=movie_kp_id)
         note_id = note.id
         await note.adelete()
-        logger.info("Удалена заметка для пользователя %s, фильма %s", user_id, movie_kp_id)
+        logger.info(
+            "Удалена заметка для пользователя %s, фильма %s", user_id, movie_kp_id
+        )
         return note_id

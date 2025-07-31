@@ -18,3 +18,9 @@ media/posters/*
 
 media/postcards/*
 !media/postcards/screenshot.png
+
+media/cocktails/*
+!media/cocktails/default.png
+
+media/ingredients/*
+!media/ingredients/default.png

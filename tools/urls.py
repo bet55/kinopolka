@@ -1,6 +1,6 @@
 from django.urls import path
 
-from tools.views import view_users, view_notes, init_project, import_films, create_users
+from tools.views import create_users, import_films, init_project, view_notes, view_users
 
 urlpatterns = [
     path("init_project/", init_project),

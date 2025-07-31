@@ -4,6 +4,7 @@ from functools import wraps
 from django.conf import settings
 from telegram import Bot
 from telegram.error import TelegramError
+
 from .exceptions import ErrorHandler
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,9 @@ def handle_exceptions(func):
             return ErrorHandler(message=str(e), status=404)
         except Exception as e:
             logger.error(f"Ошибка отправки telegram сообщения : {str(e)}")
-            return ErrorHandler(message=f"Ошибка отправки telegram сообщения : {str(e)}")
+            return ErrorHandler(
+                message=f"Ошибка отправки telegram сообщения : {str(e)}"
+            )
 
     return wrapper
 
@@ -49,12 +52,18 @@ class Telegram:
         with open(file_path, "rb") as img:
             await self.bot.send_photo(chat_id=self.group_id, photo=img)
 
-        logger.info("Telegram image sent to group", )
+        logger.info(
+            "Telegram image sent to group",
+        )
         return "Открытка отправлена в телеграм!"
 
     @handle_exceptions
     async def send_message(self, message: str) -> str:
-        await self.bot.send_message(chat_id=self.group_id, text=message, parse_mode='HTML')
+        await self.bot.send_message(
+            chat_id=self.group_id, text=message, parse_mode="HTML"
+        )
 
-        logger.info("Telegram message sent to group", )
+        logger.info(
+            "Telegram message sent to group",
+        )
         return "Открытка отправлена в телеграм!"

@@ -1,8 +1,10 @@
 import logging
 from dataclasses import dataclass
-from typing import ClassVar, Optional, Dict, Any, Union
+from typing import Any, ClassVar, Dict, Optional, Union
+
 import httpx
 from django.conf import settings
+
 from classes.caching import Caching
 
 # Configure logger
@@ -15,7 +17,7 @@ class KP:
     Класс для работы с неофициальным api кинопоиска https://kinopoisk.dev
     """
 
-    CACHE_DIRECTORY: str = 'app_cache'
+    CACHE_DIRECTORY: str = "app_cache"
     CACHE_DURATION: int = 60 * 2  # 2 minutes
     cache: Caching = Caching(CACHE_DIRECTORY, CACHE_DURATION)
 
@@ -32,7 +34,9 @@ class KP:
             self.headers = {}
             self.error = "Missing KP_API_TOKEN in settings"
 
-    def _make_request(self, url: str, params: Optional[Dict[str, Any]] = None) -> Optional[Dict]:
+    def _make_request(
+        self, url: str, params: Optional[Dict[str, Any]] = None
+    ) -> Optional[Dict]:
         """
         Make an HTTP request to the Kinopoisk API with caching.
 
@@ -108,7 +112,11 @@ class KP_Movie(KP):
 
         :return: Словарь с информацией о фильме или None в случаи ошибки.
         """
-        if not movie_id or not isinstance(movie_id, (str, int)) or (isinstance(movie_id, int) and movie_id <= 0):
+        if (
+            not movie_id
+            or not isinstance(movie_id, (str, int))
+            or (isinstance(movie_id, int) and movie_id <= 0)
+        ):
             logger.error("Invalid movie_id: %s", movie_id)
             self.error = "Invalid movie_id provided"
             return None

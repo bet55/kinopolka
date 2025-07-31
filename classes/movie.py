@@ -1,17 +1,23 @@
 import logging
-from typing import Dict, List, Optional, Tuple, Union, NamedTuple
-from rest_framework.exceptions import ValidationError
-from django.core.files.base import ContentFile
+from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+
 import httpx
-from lists.models import Movie, Actor, Director, Writer, Genre
-from lists.serializers import MovieDictSerializer, MoviePosterSerializer, MovieRatingSerializer
-from pydantic_models import KPFilmModel, KpFilmPersonModel, KpFilmGenresModel
-from classes.kp import KP_Movie
 from asgiref.sync import sync_to_async
+from django.core.files.base import ContentFile
+from rest_framework.exceptions import ValidationError
+
+from classes.kp import KP_Movie
+from lists.models import Actor, Director, Genre, Movie, Writer
+from lists.serializers import (
+    MovieDictSerializer,
+    MoviePosterSerializer,
+    MovieRatingSerializer,
+)
+from pydantic_models import KpFilmGenresModel, KPFilmModel, KpFilmPersonModel
 from utils.exception_handler import handle_exceptions
 
 # Configure logger
-logger = logging.getLogger('kinopolka')
+logger = logging.getLogger("kinopolka")
 
 
 class MoviesStructure:
@@ -39,7 +45,11 @@ class MovieHandler:
         :param kp_id: Kinopoisk ID фильма (целое число или строка).
         :return: Сериализованные данные фильма.
         """
-        if not kp_id or not isinstance(kp_id, (int, str)) or (isinstance(kp_id, int) and kp_id <= 0):
+        if (
+            not kp_id
+            or not isinstance(kp_id, (int, str))
+            or (isinstance(kp_id, int) and kp_id <= 0)
+        ):
             raise ValidationError("Некорректный kp_id", 400)
 
         film_model = Movie.mgr.get(kp_id=kp_id)
@@ -48,7 +58,9 @@ class MovieHandler:
     @classmethod
     @handle_exceptions("Фильмы")
     @sync_to_async
-    def get_all_movies(cls, info_type: Optional[str] = None, is_archive: bool = False) -> List[dict]:
+    def get_all_movies(
+        cls, info_type: Optional[str] = None, is_archive: bool = False
+    ) -> List[dict]:
         """
         Получение всех фильмов с фильтрацией по статусу архива и типом сериализации.
         :param info_type: Тип сериализации (posters, rating или None для полных данных).
@@ -64,19 +76,30 @@ class MovieHandler:
         else:
             serializer = MovieDictSerializer(raw_films, many=True)
 
-        logger.info("Получено %d фильмов (is_archive=%s, info_type=%s)", raw_films.count(), is_archive, info_type)
+        logger.info(
+            "Получено %d фильмов (is_archive=%s, info_type=%s)",
+            raw_films.count(),
+            is_archive,
+            info_type,
+        )
         return serializer.data
 
     @classmethod
     @handle_exceptions("Фильм")
-    async def change_movie_status(cls, kp_id: Union[int, str], is_archive: bool) -> bool:
+    async def change_movie_status(
+        cls, kp_id: Union[int, str], is_archive: bool
+    ) -> bool:
         """
         Обновление статуса архива фильма.
         :param kp_id: Kinopoisk ID фильма.
         :param is_archive: Новый статус архива (True для архива, False для активного).
         :return: True если обновление успешно.
         """
-        if not kp_id or not isinstance(kp_id, (int, str)) or (isinstance(kp_id, int) and kp_id <= 0):
+        if (
+            not kp_id
+            or not isinstance(kp_id, (int, str))
+            or (isinstance(kp_id, int) and kp_id <= 0)
+        ):
             raise ValidationError("Некорректный kp_id", 400)
         if not isinstance(is_archive, bool):
             raise ValidationError("Некорректное значение is_archive", 400)
@@ -95,7 +118,11 @@ class MovieHandler:
         :param kp_id: Kinopoisk ID фильма.
         :return: True если удаление успешно.
         """
-        if not kp_id or not isinstance(kp_id, (int, str)) or (isinstance(kp_id, int) and kp_id <= 0):
+        if (
+            not kp_id
+            or not isinstance(kp_id, (int, str))
+            or (isinstance(kp_id, int) and kp_id <= 0)
+        ):
             raise ValidationError("Некорректный kp_id", 400)
 
         film_model = await Movie.mgr.aget(kp_id=kp_id)
@@ -105,14 +132,20 @@ class MovieHandler:
 
     @classmethod
     @handle_exceptions("Фильм")
-    async def a_download(cls, kp_id: Union[int, str], kp_scheme: Optional[Dict] = None) -> int:
+    async def a_download(
+        cls, kp_id: Union[int, str], kp_scheme: Optional[Dict] = None
+    ) -> int:
         """
         Асинхронная загрузка данных фильма из Kinopoisk API и сохранение в базу данных.
         :param kp_id: Kinopoisk ID фильма.
         :param kp_scheme: Опциональный ответ API. Если None, данные запрашиваются из API.
         :return: Кортеж (movie_id, успех).
         """
-        if not kp_id or not isinstance(kp_id, (int, str)) or (isinstance(kp_id, int) and kp_id <= 0):
+        if (
+            not kp_id
+            or not isinstance(kp_id, (int, str))
+            or (isinstance(kp_id, int) and kp_id <= 0)
+        ):
             raise ValidationError("Некорректный kp_id", 400)
 
         movie = await cls.get_movie(kp_id=kp_id)
@@ -120,12 +153,10 @@ class MovieHandler:
         if movie:
             raise ValidationError("Фильм уже существует", 400)
 
-
         kp_client = KP_Movie()
         api_response = kp_scheme if kp_scheme else kp_client.get_movie_by_id(kp_id)
         if not api_response:
             raise ValidationError("Данные не получены из Kinopoisk API", 500)
-
 
         movie_info = cls._response_preprocess(api_response)
         movie_model, success = await cls._a_save_movie_to_db(movie_info)
@@ -133,13 +164,19 @@ class MovieHandler:
             raise ValidationError("Не удалось сохранить фильм в базу данных", 520)
 
         if api_response.get("poster", {}).get("url"):
-            await cls._download_and_save_poster(movie_model, api_response["poster"]["url"], kp_id)
+            await cls._download_and_save_poster(
+                movie_model, api_response["poster"]["url"], kp_id
+            )
 
-        logger.info("Асинхронно загружен и сохранен фильм %s: success=%s", kp_id, success)
+        logger.info(
+            "Асинхронно загружен и сохранен фильм %s: success=%s", kp_id, success
+        )
         return api_response.get("id", -1)
 
     @classmethod
-    async def _download_and_save_poster(cls, movie_model: Movie, poster_url: str, kp_id: str) -> bool:
+    async def _download_and_save_poster(
+        cls, movie_model: Movie, poster_url: str, kp_id: str
+    ) -> bool:
         """
         Асинхронная загрузка и сохранение постера фильма.
         """
@@ -151,7 +188,9 @@ class MovieHandler:
                 file_name = f"poster_{kp_id}.jpg"
                 content_file = ContentFile(response.content)
 
-                save_file = sync_to_async(movie_model.poster_local.save, thread_sensitive=True)
+                save_file = sync_to_async(
+                    movie_model.poster_local.save, thread_sensitive=True
+                )
                 await save_file(file_name, content_file, save=True)
 
                 logger.info("Загружен и сохранен постер для фильма %s", kp_id)
@@ -163,7 +202,9 @@ class MovieHandler:
             return False
 
     @classmethod
-    async def _a_save_movie_to_db(cls, movie_info: KPEntities) -> Tuple[Optional[Movie], bool]:
+    async def _a_save_movie_to_db(
+        cls, movie_info: KPEntities
+    ) -> Tuple[Optional[Movie], bool]:
         """
         Асинхронное сохранение данных фильма в базу данных.
         """
@@ -171,18 +212,32 @@ class MovieHandler:
             movie, persons, genres = movie_info
             movie_model, _ = await Movie.mgr.aupdate_or_create(**movie)
 
-            actors, directors, writers, genres = cls._create_models_constructor_list(persons, genres)
+            actors, directors, writers, genres = cls._create_models_constructor_list(
+                persons, genres
+            )
             await Actor.mgr.abulk_create(
-                actors, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+                actors,
+                update_conflicts=True,
+                update_fields=["photo"],
+                unique_fields=["kp_id"],
             )
             await Director.mgr.abulk_create(
-                directors, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+                directors,
+                update_conflicts=True,
+                update_fields=["photo"],
+                unique_fields=["kp_id"],
             )
             await Writer.mgr.abulk_create(
-                writers, update_conflicts=True, update_fields=["photo"], unique_fields=["kp_id"]
+                writers,
+                update_conflicts=True,
+                update_fields=["photo"],
+                unique_fields=["kp_id"],
             )
             await Genre.mgr.abulk_create(
-                genres, update_conflicts=True, update_fields=["watch_counter"], unique_fields=["name"]
+                genres,
+                update_conflicts=True,
+                update_fields=["watch_counter"],
+                unique_fields=["name"],
             )
 
             await movie_model.actors.aset(actors)
@@ -198,7 +253,7 @@ class MovieHandler:
 
     @classmethod
     def _create_models_constructor_list(
-            cls, persons: Dict[str, List[Dict]], genres: List[Dict]
+        cls, persons: Dict[str, List[Dict]], genres: List[Dict]
     ) -> Tuple[List[Actor], List[Director], List[Writer], List[Genre]]:
         """
         Создание экземпляров моделей для актеров, режиссеров, сценаристов и жанров.
@@ -208,8 +263,13 @@ class MovieHandler:
             directors = [Director(**pers) for pers in persons.get("director", [])]
             writers = [Writer(**pers) for pers in persons.get("writer", [])]
             genres = [Genre(**gen) for gen in genres]
-            logger.debug("Создано %d актеров, %d режиссеров, %d сценаристов, %d жанров",
-                         len(actors), len(directors), len(writers), len(genres))
+            logger.debug(
+                "Создано %d актеров, %d режиссеров, %d сценаристов, %d жанров",
+                len(actors),
+                len(directors),
+                len(writers),
+                len(genres),
+            )
             return actors, directors, writers, genres
         except Exception as e:
             logger.error("Не удалось создать экземпляры моделей: %s", str(e))
@@ -236,7 +296,9 @@ class MovieHandler:
             formatted_movie = modeling.model_dump(
                 exclude_none=True, exclude_defaults=True, exclude_unset=True
             )
-            logger.debug("Предобработаны данные фильма: kp_id=%s", formatted_movie.get("kp_id"))
+            logger.debug(
+                "Предобработаны данные фильма: kp_id=%s", formatted_movie.get("kp_id")
+            )
             return formatted_movie
         except KPFilmModel.ValidationError as e:
             logger.warning("Некорректные данные фильма: %s", str(e))
@@ -255,7 +317,9 @@ class MovieHandler:
             persons = {"actor": [], "director": [], "writer": []}
             for person in movie_info.get("persons", []):
                 if not all([person.get("id"), person.get("name")]):
-                    logger.debug("Пропущена персона с отсутствующим id или именем: %s", person)
+                    logger.debug(
+                        "Пропущена персона с отсутствующим id или именем: %s", person
+                    )
                     continue
                 try:
                     persons[person["enProfession"]].append(
@@ -266,8 +330,12 @@ class MovieHandler:
                 except (KeyError, KpFilmPersonModel.ValidationError):
                     logger.debug("Пропущена некорректная персона: %s", person)
                     continue
-            logger.debug("Предобработано %d актеров, %d режиссеров, %d сценаристов",
-                         len(persons["actor"]), len(persons["director"]), len(persons["writer"]))
+            logger.debug(
+                "Предобработано %d актеров, %d режиссеров, %d сценаристов",
+                len(persons["actor"]),
+                len(persons["director"]),
+                len(persons["writer"]),
+            )
             return persons
         except Exception as e:
             logger.error("Не удалось предобработать персон: %s", str(e))
@@ -299,5 +367,5 @@ class MovieHandler:
         """
         genres = []
         for movie in movies:
-            genres += movie.get('genres', [])
+            genres += movie.get("genres", [])
         return list(set(genres))

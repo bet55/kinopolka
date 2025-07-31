@@ -1,7 +1,9 @@
 # tests.py
 from django.test import TestCase
-from classes import IngredientHandler, Error
+
 from bar.models import Ingredient
+from classes import Error, IngredientHandler
+
 
 class IngredientHandlerTests(TestCase):
     def test_get_ingredient_by_id_not_found(self):

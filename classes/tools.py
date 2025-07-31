@@ -1,14 +1,16 @@
-import logging
-from classes import MovieHandler
-from lists.models import User
-import json
 import asyncio
+import json
+import logging
 import os
 import random
-from filmoclub.calendar.theme_settings import ImageFolders, Themes, IMAGES_PATH
-from filmoclub.calendar.theme_calendar import CALENDAR
-from django.conf import settings
+
 import pendulum
+from django.conf import settings
+
+from classes import MovieHandler
+from filmoclub.calendar.theme_calendar import CALENDAR
+from filmoclub.calendar.theme_settings import IMAGES_PATH, ImageFolders, Themes
+from lists.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +30,9 @@ class Tools:
         try:
             current_date = pendulum.now(tz=settings.TIME_ZONE).format("DD.MM")
             theme = CALENDAR.get(current_date, Themes.default.value)
-            logger.debug("Determined current theme: %s for date %s", theme, current_date)
+            logger.debug(
+                "Determined current theme: %s for date %s", theme, current_date
+            )
             return theme
         except Exception as e:
             logger.error("Failed to determine current theme: %s", str(e))
@@ -47,7 +51,9 @@ class Tools:
 
         return {
             "poster": cls._choose_random_image(theme, ImageFolders.poster.value),
-            "navigation": cls._choose_random_image(theme, ImageFolders.navigation.value),
+            "navigation": cls._choose_random_image(
+                theme, ImageFolders.navigation.value
+            ),
             "header": cls._choose_random_image(theme, ImageFolders.header.value),
             "postcard": cls._choose_random_image(theme, ImageFolders.postcard.value),
         }
