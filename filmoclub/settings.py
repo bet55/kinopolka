@@ -10,10 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
-import logging
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -121,12 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
-
+LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Asia/Yekaterinburg"
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Хранение изображений(открытки) из бд
@@ -145,9 +141,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "classes.exception_handler.custom_exception_handler",
-}
+REST_FRAMEWORK = {}
 
 # email для отправки приглашений
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -172,6 +166,7 @@ KP_API_TOKEN = os.getenv("KP_API_TOKEN")
 
 # настройки логгера
 from logging.config import dictConfig
+
 import logging_loki  # pass
 
 
@@ -180,70 +175,64 @@ class LogFilter(logging.Filter):
         """Добавляем в логи данные для фильтрации. Формат: tags: {'thread': 11}"""
         # print(record.__dict__) если нужно посмотреть, что передается в log
 
-        if not hasattr(record, 'tags'):
+        if not hasattr(record, "tags"):
             record.tags = {}
 
-        record.tags['function'] = getattr(record, 'funcName', 'unknown')
-        record.tags['line'] = getattr(record, 'lineno', 'unknown')
-        record.tags['file'] = getattr(record, 'filename', 'unknown')
-        record.tags['message'] = getattr(record, 'message', 'unknown')
+        record.tags["function"] = getattr(record, "funcName", "unknown")
+        record.tags["line"] = getattr(record, "lineno", "unknown")
+        record.tags["file"] = getattr(record, "filename", "unknown")
+        record.tags["message"] = getattr(record, "message", "unknown")
         return True
 
 
-loki_url = os.getenv('LOKI_URL', '') + '/loki/api/v1/push'
-application = os.getenv('APP_NAME')
-service = os.getenv('SERVICE_NAME')
+loki_url = os.getenv("LOKI_URL", "") + "/loki/api/v1/push"
+application = os.getenv("APP_NAME")
+service = os.getenv("SERVICE_NAME")
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console_msg': {
-            'format': '{levelname} {message} {filename} {funcName} {lineno}',
-            'style': '{'
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console_msg": {
+            "format": "{levelname} {message} {filename} {funcName} {lineno}",
+            "style": "{",
         }
     },
-    'filters': {
-        'loki_tags': {
-            '()': LogFilter
-        }
+    "filters": {"loki_tags": {"()": LogFilter}},
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "console_msg",
+        },
+        "loki": {
+            "class": "logging_loki.LokiHandler",
+            "level": "INFO",
+            "formatter": "console_msg",
+            "url": loki_url,
+            "tags": {"application": application, "service": service},
+            "version": "2",
+            "filters": ["loki_tags"],
+        },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
-            'formatter': 'console_msg'
+    "loggers": {
+        "kinopolka": {
+            "level": "INFO",
+            "handlers": ["console", "loki"],
         },
-        'loki': {
-            'class': 'logging_loki.LokiHandler',
-            'level': 'INFO',
-            'formatter': 'console_msg',
-            'url': loki_url,
-            'tags': {'application': application, 'service': service},
-            'version': '2',
-            'filters': ['loki_tags']
-        }
-    },
-
-    'loggers': {
-        'kinopolka': {
-            'level': 'INFO',
-            'handlers': ['console', 'loki'],
+        "django": {
+            "level": "WARNING",
+            "handlers": ["console", "loki"],
+            "propagate": False,
         },
-
-        'django': {
-            'level': 'WARNING',
-            'handlers': ['console', 'loki'],
-            'propagate': False,
-        },
-        'django.request': {
-            'level': 'ERROR',
-            'handlers': ['console', 'loki'],
-            'propagate': False,
+        "django.request": {
+            "level": "ERROR",
+            "handlers": ["console", "loki"],
+            "propagate": False,
         },
         # '': {  # Root logger
         #     'level': 'INFO',
         #     'handlers': ['console'],
         # }
-    }
+    },
 }

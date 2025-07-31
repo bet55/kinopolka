@@ -1,6 +1,6 @@
 from django.urls import path
 
-from postcard.views import PostcardViewSet, PostcardsArchiveViewSet, InvitationViewSet
+from postcard.views import InvitationViewSet, PostcardsArchiveViewSet, PostcardViewSet
 
 urlpatterns = [
     path("", PostcardViewSet.as_view(), name="postcard_views"),

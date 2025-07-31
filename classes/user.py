@@ -1,58 +1,48 @@
 import logging
-from typing import Dict, List, Optional
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from typing import List, Union
+
+from asgiref.sync import sync_to_async
+from rest_framework.exceptions import ValidationError
+
 from lists.models import User
 from lists.serializers import UserSerializer
-from asgiref.sync import sync_to_async
+from utils.exception_handler import handle_exceptions
 
 # Configure logger
-logger = logging.getLogger('kinopolka')
+logger = logging.getLogger(__name__)
+
 
 class UserHandler:
     """
-    Класс для работы с пользователями в базе данных
+    Класс для работы с пользователями в базе данных.
     """
 
     @classmethod
-    async def get_user(cls, user_id: int | str) -> Optional[Dict]:
+    @handle_exceptions("Пользователь")
+    async def get_user(cls, user_id: Union[int, str]) -> dict:
         """
-        Retrieve a user by their ID.
-
-        :param user_id: Id нужного пользователя.
-
-        :return: Информация о пользователе или None в случаи ошибки.
+        Получение пользователя по ID.
+        :param user_id: ID пользователя (целое число или строка).
+        :return: Сериализованные данные пользователя.
         """
-        if not user_id or not isinstance(user_id, (int, str)) or (isinstance(user_id, int) and user_id <= 0):
-            logger.error("Invalid user_id: %s", user_id)
-            return None
+        if (
+            not user_id
+            or not isinstance(user_id, (int, str))
+            or (isinstance(user_id, int) and user_id <= 0)
+        ):
+            raise ValidationError("Некорректный user_id")
 
-        try:
-            app_user = await User.objects.aget(pk=user_id)
-            serialized_user = UserSerializer(app_user)
-            logger.info("Retrieved user with id: %s", user_id)
-            return serialized_user.data
-
-        except (ObjectDoesNotExist, MultipleObjectsReturned) as e:
-            logger.warning("Failed to retrieve user %s: %s", user_id, str(e))
-            return None
-        except Exception as e:
-            logger.error("Unexpected error retrieving user %s: %s", user_id, str(e))
-            return None
+        app_user = await User.objects.aget(pk=user_id)
+        return UserSerializer(app_user).data
 
     @classmethod
+    @handle_exceptions("Пользователи")
     @sync_to_async
-    def get_all_users(cls) -> List[Dict]:
+    def get_all_users(cls) -> List[dict]:
         """
         Получение всех пользователей.
-
-        :return: Информация о пользователях или пустой список.
+        :return: Список сериализованных пользователей.
         """
-        try:
-            all_app_users = User.objects.all()
-            serialized_all_app_users = UserSerializer(all_app_users, many=True)
-            logger.info("Retrieved %d users", all_app_users.count())
-            return serialized_all_app_users.data
-
-        except Exception as e:
-            logger.error("Failed to retrieve all users: %s", str(e))
-            return []
+        all_app_users = User.objects.all()
+        logger.info("Получено %d пользователей", all_app_users.count())
+        return UserSerializer(all_app_users, many=True).data

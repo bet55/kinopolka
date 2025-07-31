@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 IMAGES_PATH = "static/img"
 
 
@@ -42,12 +41,10 @@ THEMES_RANGES = {
     "01.03-08.03": Themes.spring.value,
     "02.06-08.06": Themes.summer.value,
     "01.09-08.09": Themes.fall.value,
-
     "21.03-21.03": Themes.Nikita.value,
     "01.06-01.06": Themes.Lexa.value,
     "19.06-19.06": Themes.Sanya.value,
     "18.12-18.12": Themes.Danya.value,
-
     "29.12-11.01": Themes.new_year.value,
     "31.10-31.10": Themes.halloween.value,
 }

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User as UserModel
-from django.db.models import Model
 from django.db import models
+from django.db.models import Model
 
 from lists import validators
 
@@ -76,7 +76,9 @@ class Movie(Model):
     short_description = models.TextField(default="...")
     slogan = models.TextField(default="...")
     duration = models.IntegerField(default=0)
-    poster_local = models.ImageField(upload_to="media/posters/", default='media/posters/default.png')
+    poster_local = models.ImageField(
+        upload_to="media/posters/", default="media/posters/default.png"
+    )
     poster = models.URLField(default=QUESTION_MARK_URL)
     rating_kp = models.DecimalField(default=0.0, decimal_places=3, max_digits=4)
     rating_imdb = models.DecimalField(default=0.0, decimal_places=3, max_digits=4)

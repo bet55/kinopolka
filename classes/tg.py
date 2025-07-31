@@ -4,9 +4,10 @@ from functools import wraps
 from django.conf import settings
 from telegram import Bot
 from telegram.error import TelegramError
-from .error import Error
 
-logger = logging.getLogger('kinopolka')
+from .exceptions import ErrorHandler
+
+logger = logging.getLogger(__name__)
 
 
 def handle_exceptions(func):
@@ -18,10 +19,12 @@ def handle_exceptions(func):
             return await func(*args, **kwargs)
         except FileNotFoundError as e:
             logger.error(f"Файл для отправки не найден: {str(e)}")
-            return Error(message=str(e), status=404)
+            return ErrorHandler(message=str(e), status=404)
         except Exception as e:
             logger.error(f"Ошибка отправки telegram сообщения : {str(e)}")
-            return Error(message=f"Ошибка отправки telegram сообщения : {str(e)}")
+            return ErrorHandler(
+                message=f"Ошибка отправки telegram сообщения : {str(e)}"
+            )
 
     return wrapper
 
@@ -38,7 +41,7 @@ class Telegram:
 
         if not self.bot_token or not self.group_id:
             logger.error("Missing Telegram configuration")
-            return Error(message="Ошибка: отсутствуют настройки Telegram")
+            return ErrorHandler(message="Ошибка: отсутствуют настройки Telegram")
 
         self.bot = Bot(token=self.bot_token)
         self.is_init = True
@@ -49,12 +52,18 @@ class Telegram:
         with open(file_path, "rb") as img:
             await self.bot.send_photo(chat_id=self.group_id, photo=img)
 
-        logger.info("Telegram image sent to group", )
+        logger.info(
+            "Telegram image sent to group",
+        )
         return "Открытка отправлена в телеграм!"
 
     @handle_exceptions
-    async def send_message(self, message: str):
-        await self.bot.send_message(chat_id=self.group_id, text=message, parse_mode='HTML')
+    async def send_message(self, message: str) -> str:
+        await self.bot.send_message(
+            chat_id=self.group_id, text=message, parse_mode="HTML"
+        )
 
-        logger.info("Telegram message sent to group", )
+        logger.info(
+            "Telegram message sent to group",
+        )
         return "Открытка отправлена в телеграм!"

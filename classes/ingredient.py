@@ -1,12 +1,13 @@
 import logging
-from django.core.exceptions import ValidationError
+
+from asgiref.sync import sync_to_async
+from rest_framework.exceptions import ValidationError
+
 from bar.models import Ingredient
 from bar.serializers import IngredientSerializer
-from .exception_handler import handle_exceptions
-from asgiref.sync import sync_to_async
+from utils.exception_handler import handle_exceptions
 
-logger = logging.getLogger('kinopolka')
-
+logger = logging.getLogger(__name__)
 
 
 class IngredientHandler:
@@ -21,10 +22,10 @@ class IngredientHandler:
         :param request: HTTP-запрос для контекста сериализатора
         :return: сериализованные данные ингредиента
         """
-        if not data.get('name'):
+        if not data.get("name"):
             raise ValidationError("Поле 'name' обязательно")
 
-        serializer = IngredientSerializer(data=data, context={'request': request})
+        serializer = IngredientSerializer(data=data, context={"request": request})
         if not serializer.is_valid():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
 
@@ -65,7 +66,9 @@ class IngredientHandler:
         """
         ingredient = await Ingredient.objects.aget(pk=ingredient_id)
         old_image = ingredient.image.name if ingredient.image else None
-        serializer = IngredientSerializer(ingredient, data=data, partial=True, context={'request': request})
+        serializer = IngredientSerializer(
+            ingredient, data=data, partial=True, context={"request": request}
+        )
 
         if not await sync_to_async(serializer.is_valid)():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
@@ -76,8 +79,13 @@ class IngredientHandler:
 
         await ingredient.asave()
 
-        if old_image and old_image != ingredient.image.name and 'default.png' not in old_image:
+        if (
+            old_image
+            and old_image != ingredient.image.name
+            and "default.png" not in old_image
+        ):
             import os
+
             if os.path.isfile(old_image):
                 os.remove(old_image)
 

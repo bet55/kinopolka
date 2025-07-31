@@ -1,10 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "based_layout.html" %}
 
-</body>
-</html>
+{% load static %}
+
+{% block style %}
+    <style>
+        .mb {
+            border: 3px solid black;
+            max-height: 75%;
+            object-fit: contain;
+            margin: 20px 0;
+        }
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #6c757d;
+            margin-top: 20px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block center-content %}
+    <div class="error-container">
+        <h1>401</h1>
+        <img class="mb" id="random-image" src="{% static 'img/ovsya.webp' %}" alt="Потеряли девочку">
+        <h3>Я хз</h3>
+    </div>
+{% endblock %}

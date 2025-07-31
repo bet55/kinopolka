@@ -15,13 +15,31 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.static import static
 from django.conf import settings
-from drf_yasg.views import get_schema_view
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 
+from .view import (
+    handler400,
+    handler403,
+    handler404,
+    handler500,
+    test_400,
+    test_403,
+    test_404,
+    test_500,
+)
+
+# Обрабатываем ошибки всего проекта
+handler400 = handler400
+handler403 = handler403
+handler404 = handler404
+handler500 = handler500
+
+# Пробуем в документацию приложения
 schema_view = get_schema_view(
     openapi.Info(
         title="Filmoclub API",
@@ -35,12 +53,15 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    # path('test/400/', test_400),
+    # path('test/403/', test_403),
+    # path('test/404/', test_404),
+    # path('test/500/', test_500),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("movies/", include("lists.urls")),
     path("", include("postcard.urls")),
     path("tools/", include("tools.urls")),
-
     path("features/", include("features.urls")),
     path("bar/", include("bar.urls")),
     # API Documentation Endpoints
@@ -55,6 +76,8 @@ urlpatterns = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="redoc",
     ),
-
 ]
+
+# Когда-то пришлось добавить, чтобы локально грузилась статика. Работает только в дебаг моде
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,20 +11,20 @@ __all__ = [
     "Invitation",
     "IngredientHandler",
     "CocktailHandler",
-    "Error",
-    "Telegram"
+    "ErrorHandler",
+    "Telegram",
 ]
 
-from .user import UserHandler
-from .kp import KP_Movie
 from .caching import Caching
+from .cocktail import CocktailHandler
+from .exceptions import ErrorHandler
+from .ingredient import IngredientHandler
+from .invitation import Invitation
+from .kp import KP_Movie
 from .movie import MovieHandler, MoviesStructure
 from .note import NoteHandler
-from .statistic import Statistic
-from .tools import Tools
 from .postcard import PostcardHandler
-from .invitation import Invitation
-from .ingredient import IngredientHandler
-from .cocktail import CocktailHandler
-from .error import Error
+from .statistic import Statistic
 from .tg import Telegram
+from .tools import Tools
+from .user import UserHandler

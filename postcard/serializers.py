@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from asgiref.sync import sync_to_async
+from rest_framework import serializers
+
 from lists.serializers import MovieDictSerializer
 from postcard.models import Postcard
 
@@ -45,6 +46,7 @@ from postcard.models import Postcard
 #             await sync_to_async(lambda: instance.movies.set(movies))()
 #         return instance
 
+
 class PostcardSerializer(serializers.ModelSerializer):
     movies = MovieDictSerializer
     created_at = serializers.DateTimeField(format="%d.%m.%Y", read_only=True)
@@ -52,11 +54,19 @@ class PostcardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Postcard
-        fields = ["id", "meeting_date", "movies", "is_active", "screenshot", "title", "created_at"]
+        fields = [
+            "id",
+            "meeting_date",
+            "movies",
+            "is_active",
+            "screenshot",
+            "title",
+            "created_at",
+        ]
 
     def create(self, validated_data):
         postcard = Postcard(
-            title=validated_data['title'],
+            title=validated_data["title"],
             meeting_date=validated_data["meeting_date"],
             screenshot=validated_data["screenshot"],
         )

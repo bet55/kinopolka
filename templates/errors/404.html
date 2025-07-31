@@ -1,10 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "based_layout.html" %}
 
-</body>
-</html>
+{% load static %}
+
+{% block style %}
+    <style>
+        .mb {
+            border: 3px solid black;
+            max-height: 75%;
+            object-fit: contain;
+            margin: 20px 0;
+        }
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #6c757d;
+            margin-top: 20px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block center-content %}
+    <div class="error-container">
+        <h1>Не туда</h1>
+        <img class="mb" id="random-image" src="" alt="Потеряли девочку">
+        <h3>Прикоснись ко мне ...</h3>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Установка случайного изображения
+            const jpgOrGif = Math.floor(Math.random() * 2) + 1;
+
+            let randomNum = Math.floor(Math.random() * 10) + 1;
+            let imagePath = `/static/img/mb/mb${randomNum}.jpg`;
+
+            if (jpgOrGif === 1) {
+                randomNum = Math.floor(Math.random() * 4) + 1;
+                imagePath = `/static/img/mb/mbg${randomNum}.gif`;
+            }
+
+            document.getElementById('random-image').src = imagePath;
+
+            // Инициализация звука
+            const sound = new Audio("/static/sound/maybe.mp3");
+
+
+            // Попытка автоматического воспроизведения после взаимодействия
+            let interactionOccurred = false;
+
+            const tryAutoPlay = () => {
+                if (!interactionOccurred) return;
+
+                sound.play()
+                    .then(() => console.log("Звук воспроизводится автоматически"))
+                    .catch(e => console.log("Автовоспроизведение звука заблокировано"));
+            };
+
+            // Отслеживаем любое взаимодействие пользователя
+            document.addEventListener('click', () => {
+                interactionOccurred = true;
+                tryAutoPlay();
+            }, {once: true});
+        });
+    </script>
+{% endblock %}

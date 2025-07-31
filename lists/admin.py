@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from lists.models import User, Actor, Director, Writer, Genre, Movie, Note
+from lists.models import Actor, Director, Genre, Movie, Note, User, Writer
 
 # Register your models here.
 admin.site.register(User)

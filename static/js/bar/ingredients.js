@@ -120,10 +120,11 @@ function setupFormSubmission() {
 
 async function submitIngredientForm() {
     const form = document.querySelector('#ingredient-form');
-    const formData = new FormData(form);
     const nameInput = document.querySelector('#ingredient-name');
     const ingredientName = capitalise(nameInput.value);
     nameInput.value = ingredientName;
+
+    const formData = new FormData(form);
 
     // Проверка на существующий ингредиент
     const existingIngredients = Array.from(document.querySelectorAll('#ingredients-list h6'))

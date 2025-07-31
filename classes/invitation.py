@@ -1,24 +1,22 @@
 import logging
-from typing import Dict, List, Optional
 from datetime import datetime
+from email.mime.image import MIMEImage
+from typing import Dict, List, Optional
 
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.conf import settings
-from email.mime.image import MIMEImage
 
-from telegram import Bot
-from telegram.error import TelegramError
-
-from .postcard import PostcardHandler
-from .user import UserHandler
 from postcard.models import Postcard
-from .error import Error
+
+from .exceptions import ErrorHandler
+from .postcard import PostcardHandler
 from .tg import Telegram
+from .user import UserHandler
 
+logger = logging.getLogger("kinopolka")
 
-logger = logging.getLogger('kinopolka')
 
 class Invitation:
     """
@@ -35,11 +33,14 @@ class Invitation:
         """
         self.postcard: Optional[Postcard] = postcard
         self.is_active: bool = is_active
-        logger.debug("Initialized Invitation with postcard=%s, is_active=%s",
-                    postcard.id if postcard else None, is_active)
+        logger.debug(
+            "Initialized Invitation with postcard=%s, is_active=%s",
+            postcard.id if postcard else None,
+            is_active,
+        )
 
     @classmethod
-    async def create(cls) -> 'Invitation':
+    async def create(cls) -> "Invitation":
         """
         Asynchronously create an Invitation instance by fetching the active postcard.
 
@@ -47,21 +48,23 @@ class Invitation:
             An initialized Invitation instance with the active postcard.
         """
         postcard_data = await PostcardHandler.get_postcard()
-        if isinstance(postcard_data, Error):
-            logger.warning("No active postcard found for Invitation: %s", postcard_data.message)
+        if isinstance(postcard_data, ErrorHandler):
+            logger.warning(
+                "No active postcard found for Invitation: %s", postcard_data.message
+            )
             return cls(postcard=None, is_active=False)
 
         try:
             # Получаем объект Postcard по ID из сериализованных данных
-            postcard = await Postcard.objects.aget(id=postcard_data['id'])
-            is_active = postcard_data.get('is_active', False)
-            logger.info("Fetched active postcard with id=%s for Invitation", postcard.id)
+            postcard = await Postcard.objects.aget(id=postcard_data["id"])
+            is_active = postcard_data.get("is_active", False)
+            logger.info(
+                "Fetched active postcard with id=%s for Invitation", postcard.id
+            )
             return cls(postcard=postcard, is_active=is_active)
         except Postcard.DoesNotExist:
             logger.warning("Postcard with id=%s not found", postcard_data.id)
             return cls(postcard=None, is_active=False)
-
-
 
     async def send_invitation(self) -> Dict[str, str]:
         """
@@ -73,7 +76,7 @@ class Invitation:
             logger.warning("No active postcard available for invitation")
             return {
                 "telegram": "Ошибка: активная открытка не найдена",
-                "email": "Ошибка: активная открытка не найдена"
+                "email": "Ошибка: активная открытка не найдена",
             }
 
         try:
@@ -81,10 +84,12 @@ class Invitation:
             meeting_date = self.postcard.meeting_date
 
             if not screenshot or not meeting_date:
-                logger.error("Invalid postcard data: screenshot or meeting_date missing")
+                logger.error(
+                    "Invalid postcard data: screenshot or meeting_date missing"
+                )
                 return {
                     "telegram": "Ошибка: данные открытки некорректны",
-                    "email": "Ошибка: данные открытки некорректны"
+                    "email": "Ошибка: данные открытки некорректны",
                 }
 
             users = await UserHandler.get_all_users()
@@ -95,17 +100,18 @@ class Invitation:
                 logger.warning("No valid email addresses found for invitation")
 
             telegram_result = await self.send_telegram(screenshot)
-            email_result = self.send_email(screenshot, meeting_date, emails) if emails else 'ok'
+            email_result = (
+                self.send_email(screenshot, meeting_date, emails) if emails else "ok"
+            )
 
-            logger.info("Invitation sent: telegram=%s, email=%s", telegram_result, email_result)
+            logger.info(
+                "Invitation sent: telegram=%s, email=%s", telegram_result, email_result
+            )
             return {"telegram": telegram_result, "email": email_result}
 
         except Exception as e:
             logger.error("Failed to send invitations: %s", str(e))
-            return {
-                "telegram": f"Ошибка: {str(e)}",
-                "email": f"Ошибка: {str(e)}"
-            }
+            return {"telegram": f"Ошибка: {str(e)}", "email": f"Ошибка: {str(e)}"}
 
     @classmethod
     def send_email(
@@ -136,7 +142,8 @@ class Invitation:
 
         try:
             html_content = render_to_string(
-                "elements/email.html", {"postcard": screenshot.url, "date": meeting_date}
+                "elements/email.html",
+                {"postcard": screenshot.url, "date": meeting_date},
             )
             text_content = strip_tags(html_content)
 

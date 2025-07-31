@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, field_serializer, AliasPath, AliasChoices
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
+
+from pydantic import AliasChoices, AliasPath, BaseModel, Field, field_serializer
 
 n_url = "https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
 
