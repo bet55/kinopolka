@@ -17,7 +17,7 @@ from pydantic_models import KpFilmGenresModel, KPFilmModel, KpFilmPersonModel
 from utils.exception_handler import handle_exceptions
 
 # Configure logger
-logger = logging.getLogger("kinopolka")
+logger = logging.getLogger(__name__)
 
 
 class MoviesStructure:
@@ -150,7 +150,8 @@ class MovieHandler:
 
         movie = await cls.get_movie(kp_id=kp_id)
 
-        if movie:
+
+        if not movie.get('error'):
             raise ValidationError("Фильм уже существует", 400)
 
         kp_client = KP_Movie()
@@ -312,7 +313,7 @@ class MovieHandler:
         """
         Предобработка данных персон из ответа API.
         """
-        print(movie_info)
+
         try:
             persons = {"actor": [], "director": [], "writer": []}
             for person in movie_info.get("persons", []):
@@ -322,7 +323,14 @@ class MovieHandler:
                     )
                     continue
                 try:
-                    persons[person["enProfession"]].append(
+                    # Get profession and normalize it
+                    profession = person.get("enProfession", "").lower()
+
+                    # Skip if not one of our target professions
+                    if profession not in persons:
+                        continue
+
+                    persons[profession].append(
                         KpFilmPersonModel(**person).model_dump(
                             exclude_none=True, exclude_defaults=True, exclude_unset=True
                         )

@@ -23,7 +23,7 @@ def handle_exceptions(resource_name: str) -> Callable:
             except ValidationError as e:
                 logger.error(f"Ошибка валидации в {resource_name}: {str(e)}")
                 status_code = getattr(e, "status_code", 400)
-                error = ErrorHandler(str(e), status=status_code)
+                error = ErrorHandler(e.args[0], status=status_code)
                 return error.to_dict()
             except ObjectDoesNotExist as e:
                 logger.error(f"Объект не найден в {resource_name}: {str(e)}")
