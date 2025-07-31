@@ -64,7 +64,7 @@ class Request {
                 responseData = await response.json();
                 responseEmpty = false;
             } catch (e) {
-                console.error('Не распарсился отверт: ', e);
+                console.warn('Не распарсился отверт: ', e);
             }
 
 
@@ -77,8 +77,9 @@ class Request {
                 try {
                     errorText = await response.text();
                 } catch (e) {
-                    console.error('Не распарсили ошибку: ', e)
+                    console.warn('Не распарсили ошибку: ', e)
                 }
+
 
                 if (responseEmpty) {
                     toastText = `Ошибка сервера: ${status} ${errorText}`;
