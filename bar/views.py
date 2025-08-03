@@ -119,7 +119,7 @@ class CocktailListCreate(APIView):
         Создание нового коктейля
         """
         cocktail = await CocktailHandler.create_cocktail(request.data, request)
-        return handle_response(cocktail, status.HTTP_201_CREATED)
+        return handle_response(cocktail, status=status.HTTP_201_CREATED)
 
 
 class CocktailAvailability(APIView):

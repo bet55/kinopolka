@@ -58,26 +58,14 @@
 
             document.getElementById('random-image').src = imagePath;
 
-            // Инициализация звука
-            const sound = new Audio("/static/sound/maybe.mp3");
 
-
-            // Попытка автоматического воспроизведения после взаимодействия
-            let interactionOccurred = false;
-
-            const tryAutoPlay = () => {
-                if (!interactionOccurred) return;
-
+            // Нейро голосок
+            document.querySelector('.mb').addEventListener('click', () => {
+                const sound = new Audio("/static/sound/maybe.mp3");
                 sound.play()
                     .then(() => console.log("Звук воспроизводится автоматически"))
                     .catch(e => console.log("Автовоспроизведение звука заблокировано"));
-            };
-
-            // Отслеживаем любое взаимодействие пользователя
-            document.addEventListener('click', () => {
-                interactionOccurred = true;
-                tryAutoPlay();
-            }, {once: true});
+            });
         });
     </script>
 {% endblock %}

@@ -189,5 +189,5 @@ class Invitation:
             logger.error("Invalid Telegram connection")
             return "Ошибка: не подключились к телеграму"
 
-        send = tg.send_image(screenshot.path)
+        send = await tg.send_image(screenshot.path)
         return send
