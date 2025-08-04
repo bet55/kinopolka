@@ -27,20 +27,15 @@ class MoviesStatistic(GlobalDataMixin, APIView):
         common_stats = await statistic.statistic()
 
         movies = await statistic.outstanding_movies()
+        genres = await statistic.outstanding_genres()
         # actors = await statistic.outstanding_actors()
 
-        # best director
-        # worse director
-
-        # best writer
-        # worse writer
-
-        # ic(rated_movies)
 
         context = {
             # "graph_div": fig,
             "statistic": common_stats,
             "movies_rating": movies,
+            "genres_table": genres,
         }
 
         return render(

@@ -1,4 +1,19 @@
 import cowsay
+from colorama import init, Fore, Style
+
+# Initialize colorama for cross-platform color support
+init()
+
+
+
+# Function to color nipples red
+def color_nipples(text):
+    nipples = ['⣜⣁⣾', '⡤⣥⣙']
+    for n in nipples:
+        text = text.replace(n, f'{Fore.RED}{n}{Style.RESET_ALL}')
+    return text
+
+
 
 booba = r"""
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠟⠛⠛⠉⠙⠛⠛⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -59,5 +74,10 @@ booba = r"""
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠛⢓⣪⣭⣽⠿⢻⢝⡯⠇⡇⣘⠘⠉⠛⡿⢐⢿⠿⠻⠊⠉⠉⠙⠉⠉⠉⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 """
+# Color the message in cyan (you can change Fore.CYAN to another color like Fore.RED, Fore.GREEN, etc.)
+colored_message = f"{Fore.CYAN}you look lonely{Style.RESET_ALL}"
 
-cowsay.draw("you look lonely", booba)
+booba = color_nipples(booba)
+
+# Draw the cowsay with the colored message and modified ASCII art
+cowsay.draw(colored_message, booba)

@@ -1,4 +1,3 @@
-
 // Конфигурация
 const TAROT_CONFIG = {
     cardNames: [
@@ -146,10 +145,21 @@ function initStars() {
     }
 }
 
+// Функция для перемешивания массива (Fisher-Yates shuffle)
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
 // ==================== КАРТЫ ====================
 class TarotDeck {
     constructor() {
-        this.drawnCards = new Set();
+        this.shuffledDeck = shuffleArray(TAROT_CONFIG.cardNames);
+        this.currentCardIndex = 0;
         this.deckElement = document.querySelector('.deck-card');
         this.readingArea = document.getElementById('readingArea');
         this.openCardsList = document.querySelector('#open-cards-list');
@@ -162,19 +172,16 @@ class TarotDeck {
     }
 
     drawCard() {
-        if (this.drawnCards.size >= TAROT_CONFIG.cardNames.length) {
+        if (this.currentCardIndex >= this.shuffledDeck.length) {
             alert('Все карты уже вытянуты!');
             return;
         }
 
-        const availableCards = TAROT_CONFIG.cardNames.filter(card => !this.drawnCards.has(card));
-        const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
-        this.drawnCards.add(randomCard);
-
-
+        const cardName = this.shuffledDeck[this.currentCardIndex];
         const isReversed = Math.random() <= TAROT_CONFIG.reversedChance;
-        this.createCardElement(randomCard, isReversed);
-        this.addCardToList(randomCard, isReversed);
+        this.createCardElement(cardName, isReversed);
+        this.addCardToList(cardName, isReversed);
+        this.currentCardIndex++;
     }
 
     createCardElement(cardName, isReversed) {
@@ -252,8 +259,8 @@ class ModalController {
 }
 
 // ==================== ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЙ ====================
-function preloadImages() {
-    TAROT_CONFIG.cardNames.forEach(card => {
+function preloadImages(deck) {
+    deck.forEach(card => {
         const img = new Image();
         img.src = `/static/img/tarots/${card}.png`;
     });
@@ -261,7 +268,7 @@ function preloadImages() {
 
 // ==================== ЗАПУСК ПРИЛОЖЕНИЯ ====================
 document.addEventListener('DOMContentLoaded', () => {
-    preloadImages();
+    const deck = new TarotDeck();
+    preloadImages(deck.shuffledDeck);
     initStars();
-    new TarotDeck();
 });

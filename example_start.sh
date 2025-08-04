@@ -23,4 +23,6 @@ export SERVICE_NAME='django'
 
 # start
 uv run utils/top_secret.py
-uv run manage.py runserver 0.0.0.0:8000
+#uv run manage.py runserver --insecure 0.0.0.0:8000 # если нужно тестить debug mod
+#uv run manage.py runserver 0.0.0.0:8000 # prod
+uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port 8000 # uvicorn

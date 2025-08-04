@@ -7,40 +7,20 @@ from rest_framework.serializers import (
     ReturnDict,
 )
 
-from lists.models import Genre, Movie, Note, User, Actor, Director, Writer
+from lists.models import Movie, Note, User
+from features.serializers import GenreSerializer
+
 
 DEFAULT_POSTER = "/media/posters/default.png"
 
 
 class NoteSerializer(ModelSerializer):
+    """
+    Сериализатор для оценок пользователей
+    """
     class Meta:
         model = Note
         fields = "__all__"
-
-
-class ActorsSerializer(ModelSerializer):
-    class Meta:
-        model = Actor
-        fields = "__all__"
-
-
-class DirectorSerializer(ModelSerializer):
-    class Meta:
-        model = Director
-        fields = "__all__"
-
-
-class WriterSerializer(ModelSerializer):
-    class Meta:
-        model = Writer
-        fields = "__all__"
-
-
-class GenreSerializer(ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = "__all__"
-
 
 
 class MovieListSerializer(ListSerializer):
@@ -104,48 +84,6 @@ class MovieDictSerializer(ModelSerializer):
         return representation
 
 
-class MovieRatingSerializer(ModelSerializer):
-    """
-    Сериализатор для отображения статистик.
-    Поэтому прикрепляем сюда актёров, жанры и т.д.
-    """
-    genres = GenreSerializer(many=True)
-    actors = ActorsSerializer(many=True)
-    writers = WriterSerializer(many=True)
-    directors = DirectorSerializer(many=True)
-
-    class Meta:
-        model = Movie
-        fields = [
-            "kp_id",
-            "name",
-            "rating_imdb",
-            "rating_kp",
-            "votes_kp",
-            "votes_imdb",
-            "poster_local",
-            "duration",
-            "budget",
-            "fees",
-            "premiere",
-            "genres",
-            "actors",
-            "writers",
-            "directors"
-        ]
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        poster_local = instance.poster_local
-        representation["poster_local"] = poster_local.url if poster_local else DEFAULT_POSTER
-        representation["genres"] = [genre["name"] for genre in representation["genres"]]
-        representation["actors"] = [actor["kp_id"] for actor in representation["actors"]]
-        representation["writers"] = [writer["kp_id"] for writer in representation["writers"]]
-        representation["directors"] = [director["kp_id"] for director in representation["directors"]]
-
-        return representation
-
-
 class MoviePosterSerializer(ModelSerializer):
     """
     Сериализтаор для отрисовки постеров в html.
@@ -184,5 +122,3 @@ class UserSerializer(ModelSerializer):
             "last_name",
             "email",
         ]
-
-

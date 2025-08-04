@@ -28,6 +28,7 @@ dependencies = [
     "python-logging-loki-v2>=0.4.4",
     "drf-yasg>=1.21.10",
     "uvicorn>=0.35.0",
+    "colorama>=0.4.6",
 ]
 
 [build-system]

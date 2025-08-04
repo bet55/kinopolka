@@ -10,9 +10,9 @@ from classes.kp import KP_Movie
 from lists.models import Actor, Director, Genre, Movie, Writer
 from lists.serializers import (
     MovieDictSerializer,
-    MoviePosterSerializer,
-    MovieRatingSerializer,
+    MoviePosterSerializer
 )
+from features.serializers import MovieRatingSerializer
 from pydantic_models import KpFilmGenresModel, KPFilmModel, KpFilmPersonModel
 from utils.exception_handler import handle_exceptions
 
