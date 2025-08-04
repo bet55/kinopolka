@@ -295,8 +295,13 @@ async function submitCocktailForm() {
     // Заполняем форму и отправляем
 
     const form = document.querySelector('#cocktail-form');
-    const formData = new FormData(form);
+    const nameInput = document.querySelector('#cocktail-name');
     const isEditMode = !!currentCocktailId;
+
+    const cocktailName = capitalise(nameInput.value);
+    nameInput.value = cocktailName;
+    const formData = new FormData(form);
+
 
     // Проверяем наличие ингредиентов
     if (selectedIngredients.length < 3) {
@@ -306,12 +311,9 @@ async function submitCocktailForm() {
 
 
     // Проверяем, что такого названия коктейля больше нет`
-    const nameInput = document.querySelector('#cocktail-name');
-    nameInput.value = capitalise(nameInput.value);
-
     const existingCocktails = Array.from(document.querySelectorAll('.cocktail'))
         .filter(c => c.dataset.cocktailId !== currentCocktailId)
-    const sameNameCocktails = existingCocktails.filter(c => capitalise(c.querySelector('h3').innerText) === nameInput.value);
+    const sameNameCocktails = existingCocktails.filter(c => capitalise(c.querySelector('h3').innerText) === cocktailName);
 
     if (sameNameCocktails.length > 0) {
         createToast('Коктейль уже существует!', 'error');
@@ -442,6 +444,7 @@ function refreshCocktailNode(cocktailData) {
 
     let cocktailNode = document.querySelector(`.cocktail[data-cocktail-id="${cocktailData.id}"]`);
     const isCreating = !cocktailNode;
+
 
     if (isCreating) {
         cocktailNode = document.createElement('li');

@@ -16,14 +16,14 @@ http://185.80.91.29:8000/
 6. Архив открыток с сеансами
 7. Теги для фильтрации фильмов
 8. Сортировка фильмов
+9. Текущее состояние бара
 
 Может быть:
 1. Игровой выбор фильмов (турнир, квиз по фильмам)
 2. Добавить рубрику "Угадай кино"
 3. Список выпитого чая/коктейлей
 4. Голосование за фильмы
-5. Текущее состояние бара
-6. Фильтры для статистики
+
 
 Логи приложения:  
 http://185.80.91.29:3000/
@@ -34,11 +34,11 @@ http://185.80.91.29:3000/
 __копировать базу данных из сервера__  
 scp root@185.80.91.29:/var/www/kinopolka/db.sqlite3 /home/stephan/projects/vps_db
 
-__копировать открытки из сервера__  
+__копировать media папку из сервера__  
 scp root@185.80.91.29:/var/www/kinopolka/media/postcards/* /home/stephan/projects/kinopolka/media/postcards/
 
-__копировать постеры из сервера__  
-scp root@185.80.91.29:/var/www/kinopolka/media/posters/* /home/stephan/projects/kinopolka/media/posters/
+__копировать все media файлы из сервера__  
+scp -r root@185.80.91.29:/var/www/kinopolka/media/{postcards,posters,cocktails,ingredients} /home/stephan/projects/kinopolka/media
 
 __копировать start.sh файл из сервера__  
 scp root@185.80.91.29:/var/www/kinopolka/start.sh /home/stephan/projects/kinopolka/start.sh
@@ -49,14 +49,7 @@ scp root@185.80.91.29:/var/www/kinopolka/start.sh /home/stephan/projects/kinopol
 - Запустить докер контейнер django либо файл _start.sh_
 
 # Разрешение ошибок
-1. Сохранение открытки создает картинку с пустыми рамками, вместо постеров.
-   - Это проблема на стороне библиотеке. В автоматическом режиме пока что не получается её обнаружить.
-   - Просто, удалите получившуюся открытку и попытайтесь снова.  
-2. Отсутствие постеров фильмов.
-   - Нестабильное api по возвращению картинок. Из-за этого в базе может не сохраниться изображение. 
-   - Для решения. Запустите скрипт ` uv run manage.py download_posters`
-   - Если в процессе сохранения образовались дублирующие постеры, удалите их скриптом `cleanup_posters.sh`
-   - Если ссылки на дублирующие постеры попали в бд, замените их командой `uv run manage.py fix_posters_names`
+- Если ссылки на дублирующие постеры попали в бд, замените их командой `uv run manage.py fix_posters_names`
 
 [kinorium](https://ru.kinorium.com/collections/kinorium/)
 [постеры](https://www.movieposters.com/)

@@ -5,6 +5,7 @@ from rest_framework.request import Request
 from classes import MovieHandler, Statistic
 from mixins import GlobalDataMixin
 from utils.response_handler import handle_response
+from icecream import ic
 
 
 class Catalog(GlobalDataMixin, APIView):
@@ -20,15 +21,21 @@ class MoviesStatistic(GlobalDataMixin, APIView):
     async def get(self, request: Request):
         # fig = await Statistic.draw()
 
-        statistic = await Statistic.get_movies_statistic()
-        top_imdb_movies = await Statistic.most_rated_imdb_movies()
-        top_users_movies = await Statistic.most_rated_users_movies()
+        statistic = Statistic()
+        await statistic.extract_data()
+
+        common_stats = await statistic.statistic()
+
+        movies = await statistic.outstanding_movies()
+        genres = await statistic.outstanding_genres()
+        # actors = await statistic.outstanding_actors()
+
 
         context = {
             # "graph_div": fig,
-            "statistic": statistic,
-            "movies": top_users_movies,
-            "imdb_movies": top_imdb_movies,
+            "statistic": common_stats,
+            "movies_rating": movies,
+            "genres_table": genres,
         }
 
         return render(

@@ -9,45 +9,63 @@
 
 {% block center-content %}
 
-    <div id="movies-users" class="row movies-container">
-        <h1>Лучшие фильмы по мнению пользователей</h1>
-        {% for m in movies %}
+    <div id="main-container">
+        {% for rate_name, rate_movies in movies_rating.items %}
 
-            <div class="movie" data-kp-id="{{ m.kp_id }}">
-                <img src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
-                <h4>{{ m.name }}</h4>
+            <div class="row movies-container">
+
+                <h2>{{ rate_name }}</h2>
+                {% for m in rate_movies %}
+
+                    <div class="movie" data-kp-id="{{ m.kp_id }}">
+                        <div class="poster-container">
+                            <img src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
+                            <span>{{ m.rating }}</span>
+                        </div>
+
+                        <h4>{{ m.name }}</h4>
+                    </div>
+
+                {% endfor %}
             </div>
 
+            <br>
         {% endfor %}
+
     </div>
 
-    <br>
 
-    <div id="movies-imdb" class="row movies-container">
-        <h1>Лучшие фильмы по мнению imdb</h1>
-        {% for m in imdb_movies %}
 
-            <div class="movie" data-kp-id="{{ m.kp_id }}">
-                <img src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
-                <h4>{{ m.name }}</h4>
-            </div>
 
-        {% endfor %}
-    </div>
 
-    <br>
+    {#    <div class="graph">#}
+    {#        {{ graph_div|safe }}#}
+    {#    </div>#}
+{% endblock %}
+
+{% block right-content %}
 
     <div id="stats">
-        <ul>
-            <li>Всего посмотрено фильмов: <span>{{ statistic.count }} </span></li>
-            <li>Общая продолжительность: <span>{{ statistic.total_duration }}</span></li>
-            <li>Средняя оценка на кинополке: <span>{{ statistic.rating_kinopolka }}</span></li>
-            <li>Средняя оценка на imdb: <span>{{ statistic.rating_imdb }}</span></li>
-            <li>Средняя оценка на кинопоиске: <span>{{ statistic.rating_kp }}</span></li>
-        </ul>
+        <h3>Общее</h3>
+        <table>
+            <tbody>
+            {% for stat_name, stat in statistic.items %}
+                <tr>
+                    <td>{{ stat_name }}</td>
+                    <td>{{ stat }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+    <br>
+
+    <div id="genres">
+        <h3>Жанры</h3>
+        {% autoescape off %} {{ genres_table }} {% endautoescape %}
     </div>
 
-{#    <div class="graph">#}
-{#        {{ graph_div|safe }}#}
-{#    </div>#}
+
+
 {% endblock %}

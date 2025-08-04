@@ -7,16 +7,27 @@ from rest_framework.serializers import (
     ReturnDict,
 )
 
-from lists.models import Genre, Movie, Note, User
+from lists.models import Movie, Note, User
+from features.serializers import GenreSerializer
 
 
-class GenreSerializer(ModelSerializer):
+DEFAULT_POSTER = "/media/posters/default.png"
+
+
+class NoteSerializer(ModelSerializer):
+    """
+    Сериализатор для оценок пользователей
+    """
     class Meta:
-        model = Genre
+        model = Note
         fields = "__all__"
 
 
 class MovieListSerializer(ListSerializer):
+    """
+    Класс для изменения типа возвращаемых сериализатором данных: из list в dict
+    """
+
     def to_representation(self, data):
         iterable = data.all() if isinstance(data, models.manager.BaseManager) else data
 
@@ -34,6 +45,10 @@ class MovieListSerializer(ListSerializer):
 
 
 class MovieDictSerializer(ModelSerializer):
+    """
+    Сериализатор для детальной обработки фильмов. Обычно на клиенте.
+    {kp_id: {kp_id: 1, name: "boss nigger" ...}}
+    """
     premiere = DateTimeField(format="%d/%m/%Y")
     genres = GenreSerializer(many=True)
 
@@ -69,25 +84,12 @@ class MovieDictSerializer(ModelSerializer):
         return representation
 
 
-class MovieRatingSerializer(ModelSerializer):
-    class Meta:
-        model = Movie
-        fields = ["kp_id", "rating_imdb", "rating_kp", "poster", "poster_local", "name"]
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        poster_local = (
-            instance.poster_local.url
-            if instance.poster_local
-            else "/media/posters/default.png"
-        )
-        representation["poster_local"] = (
-            instance.poster if "default" in poster_local else poster_local
-        )
-        return representation
-
-
 class MoviePosterSerializer(ModelSerializer):
+    """
+    Сериализтаор для отрисовки постеров в html.
+    Поэтому многие поля не нужны.
+    Жанры добавлены для сортировки.
+    """
     genres = GenreSerializer(many=True)
 
     class Meta:
@@ -102,16 +104,11 @@ class MoviePosterSerializer(ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         notes = instance.note_set.all()
+        poster_local = instance.poster_local
+        representation["poster_local"] = poster_local.url if poster_local else DEFAULT_POSTER
         representation["notes"] = NoteSerializer(notes, many=True).data
         representation["genres"] = [genre["name"] for genre in representation["genres"]]
-        poster_local = (
-            instance.poster_local.url
-            if instance.poster_local
-            else "/media/posters/default.png"
-        )
-        representation["poster_local"] = (
-            instance.poster if "default" in poster_local else poster_local
-        )
+
         return representation
 
 
@@ -125,9 +122,3 @@ class UserSerializer(ModelSerializer):
             "last_name",
             "email",
         ]
-
-
-class NoteSerializer(ModelSerializer):
-    class Meta:
-        model = Note
-        fields = "__all__"

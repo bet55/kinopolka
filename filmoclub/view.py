@@ -2,7 +2,8 @@ from django.core.exceptions import BadRequest, PermissionDenied
 from django.http import Http404, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import requires_csrf_token
-
+from django.urls import Resolver404
+from icecream import ic
 # ======================
 # ОБРАБОТЧИКИ ОШИБОК
 # requires_csrf_token не используется, но оставим на будущее
@@ -51,14 +52,14 @@ def handler403(request, exception=None):
 
 
 @requires_csrf_token
-def handler404(request, exception=None):
+def handler404(request, exception: Resolver404=None):
 
     if is_media_or_static(request):
         return HttpResponseNotFound()
 
     context = {
         "error": "Страница не найдена",
-        "message": str(exception) if exception else None,
+        "message": "увы",
         "request_path": request.path,
     }
     if is_json_request(request):
