@@ -7,12 +7,21 @@ body {
     overflow-x: hidden; /* чтобы не было горизонтального скролла */
     scrollbar-gutter: stable; /* предотвращает "прыгание" контента */
     padding-right: 4px; /* место для скроллбара */
+
+    @media screen and (max-width: 800px) {
+        background-image: url('../../static/img/background_vert.jpg');
+    }
 }
 
 /* 1 row =====================================================  */
 .first-row {
     height: 20vh;
     align-items: center;
+
+
+    @media screen and (max-width: 800px) {
+        margin-bottom: 2em;
+    }
 }
 
 
@@ -33,6 +42,11 @@ body {
 
 .header-img {
     height: 100%;
+
+    @media screen and (max-width: 800px) {
+        height: 0;
+        display: none;
+    }
 }
 
 .header-options {
@@ -59,6 +73,11 @@ body {
         text-align: center;
         font-weight: bold;
         color: var(--white-color);
+
+        @media screen and (max-width: 800px) {
+            text-align: center;
+            font-size: 0.7em;
+        }
 
         &:after {
             content: none;
@@ -114,22 +133,6 @@ body {
         }
     }
 }
-
-/*.user-name:nth-child(1) {*/
-/*    background-color: var(--red-color);*/
-/*}*/
-
-/*.user-name:nth-child(2) {*/
-/*    background-color: var(--yellow-color);*/
-/*}*/
-
-/*.user-name:nth-child(3) {*/
-/*    background-color: var(--white-color);*/
-/*}*/
-
-/*.user-name:nth-child(4) {*/
-/*    background-color: var(--orange-color);*/
-/*}*/
 
 
 /* Кнопка корзины - выпадающий список с фильмами */
@@ -232,6 +235,7 @@ body {
 /* 2 row =====================================================*/
 .second-row {
     height: 80vh;
+
 }
 
 .nav-column {
@@ -241,10 +245,27 @@ body {
     justify-content: space-around;
     overflow: hidden;
 
+
+    @media screen and (max-width: 800px) {
+        display: none;
+        position: absolute;
+        top: 5em;
+        z-index: 10;
+
+        background-color: var(--white-color);
+        padding: 0;
+    }
+
+
     .nav-link {
         font-weight: bold;
         font-size: 2rem;
         color: var(--black-color);
+
+        @media screen and (max-width: 800px) {
+            font-size: 1.5em;
+            border: 2px solid black;
+        }
 
         @media screen and (min-width: 2500px) {
             font-size: 3em;
@@ -265,6 +286,13 @@ body {
 
 .nav-img {
     height: 45%;
+
+    @media screen and (max-width: 800px) {
+        backdrop-filter: blur(15px);
+    }
+
 }
 
+
+/* Для мобилок поменяем навигацию */
 
