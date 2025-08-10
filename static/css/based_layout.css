@@ -144,7 +144,7 @@ body {
 }
 
 #cart-img {
-    height: 40%;
+    height: 30%;
 
     &:hover {
         cursor: pointer;
@@ -164,8 +164,6 @@ body {
     max-height: 60vh;
     overflow: auto;
 
-    backdrop-filter: blur(15px);
-
 
     span {
         font-weight: bold;
@@ -183,6 +181,9 @@ body {
     }
 
     li {
+        background-color: var(--black-color);
+        color: var(--white-color);
+
         padding: 0 10px 0 2px;
         border-bottom: 2px solid black;
         display: flex;
@@ -192,8 +193,8 @@ body {
     }
 
     li:hover {
-        background-color: var(--black-color);
-        color: var(--white-color);
+        background-color: lightslategrey;
+        color: var(--black-color);
         cursor: default;
 
         .film-remove {
