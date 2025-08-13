@@ -1,13 +1,13 @@
 import asyncio
 from pathlib import Path
 
-import httpx
 from asgiref.sync import sync_to_async
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
+import httpx
 
 from lists.models import Movie
+
 
 QUESTION_MARK_URL = "https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
 DEFAULT_POSTER = "posters/default.jpg"
@@ -26,9 +26,7 @@ class Command(BaseCommand):
                 await sync_to_async(movie.poster_local.save)(
                     file_name, ContentFile(poster_path.read_bytes()), save=True
                 )
-                self.stdout.write(
-                    f"Linked existing poster for movie {kp_id}: {file_name}"
-                )
+                self.stdout.write(f"Linked existing poster for movie {kp_id}: {file_name}")
                 return True
         return False
 
@@ -39,9 +37,7 @@ class Command(BaseCommand):
         if movie.poster_local and str(movie.poster_local) != DEFAULT_POSTER:
             poster_path = Path(movie.poster_local.path)
             if poster_path.exists():
-                self.stdout.write(
-                    f"Skipping movie {kp_id}: poster_local already exists"
-                )
+                self.stdout.write(f"Skipping movie {kp_id}: poster_local already exists")
                 return kp_id, True
 
         # Check for existing file in media/posters/
@@ -50,9 +46,7 @@ class Command(BaseCommand):
 
         # Skip if no valid poster URL
         if not movie.poster or movie.poster == QUESTION_MARK_URL:
-            self.stdout.write(
-                self.style.WARNING(f"No valid poster URL for movie {kp_id}")
-            )
+            self.stdout.write(self.style.WARNING(f"No valid poster URL for movie {kp_id}"))
             movie.poster_local = None
             await sync_to_async(movie.save)()
             return kp_id, False
@@ -65,58 +59,36 @@ class Command(BaseCommand):
                 content_type = response.headers.get("content-type", "image/jpeg")
                 extension = ".jpg"  # Use .jpg for JPEG posters
                 file_name = f"poster_{kp_id}{extension}"
-                await sync_to_async(movie.poster_local.save)(
-                    file_name, ContentFile(response.content), save=True
-                )
+                await sync_to_async(movie.poster_local.save)(file_name, ContentFile(response.content), save=True)
                 self.stdout.write(f"Downloaded and saved poster for movie {kp_id}")
                 return kp_id, True
             except httpx.HTTPStatusError as e:
                 if e.response.status_code in (404, 403):
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"Poster not found for movie {kp_id}: {str(e)}"
-                        )
-                    )
+                    self.stdout.write(self.style.WARNING(f"Poster not found for movie {kp_id}: {e!s}"))
                     break  # No retry for 404 or 403
                 elif e.response.status_code == 429:
                     self.stdout.write(
-                        self.style.WARNING(
-                            f"Rate limit hit for movie {kp_id}, attempt {attempt}/{max_retries}"
-                        )
+                        self.style.WARNING(f"Rate limit hit for movie {kp_id}, attempt {attempt}/{max_retries}")
                     )
                     if attempt < max_retries:
                         await asyncio.sleep(2**attempt)  # Exponential backoff
                     else:
-                        self.stdout.write(
-                            self.style.ERROR(
-                                f"Max retries reached for movie {kp_id}: {str(e)}"
-                            )
-                        )
+                        self.stdout.write(self.style.ERROR(f"Max retries reached for movie {kp_id}: {e!s}"))
                         break
                 else:
-                    self.stdout.write(
-                        self.style.ERROR(f"HTTP error for movie {kp_id}: {str(e)}")
-                    )
+                    self.stdout.write(self.style.ERROR(f"HTTP error for movie {kp_id}: {e!s}"))
                     break
             except (httpx.RequestError, httpx.TimeoutException) as e:
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"Network error for movie {kp_id}, attempt {attempt}/{max_retries}: {str(e)}"
-                    )
+                    self.style.WARNING(f"Network error for movie {kp_id}, attempt {attempt}/{max_retries}: {e!s}")
                 )
                 if attempt < max_retries:
                     await asyncio.sleep(2**attempt)
                 else:
-                    self.stdout.write(
-                        self.style.ERROR(
-                            f"Max retries reached for movie {kp_id}: {str(e)}"
-                        )
-                    )
+                    self.stdout.write(self.style.ERROR(f"Max retries reached for movie {kp_id}: {e!s}"))
                     break
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(f"Unexpected error for movie {kp_id}: {str(e)}")
-                )
+                self.stdout.write(self.style.ERROR(f"Unexpected error for movie {kp_id}: {e!s}"))
                 break
 
         movie.poster_local = None  # Clear to use model default
@@ -128,7 +100,6 @@ class Command(BaseCommand):
         return list(Movie.mgr.all()[start:end])
 
     def handle(self, *args, **options):
-
         movies = Movie.mgr.all()
         total = movies.count()
         success_count = 0
@@ -153,14 +124,10 @@ class Command(BaseCommand):
                 else:
                     failure_count += 1
 
-            self.stdout.write(
-                f"Processed {min(i + batch_size, total)}/{total} movies..."
-            )
+            self.stdout.write(f"Processed {min(i + batch_size, total)}/{total} movies...")
             if i + batch_size < total:
                 asyncio.run(asyncio.sleep(batch_delay))
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Completed: {success_count} posters processed successfully, {failure_count} failed."
-            )
+            self.style.SUCCESS(f"Completed: {success_count} posters processed successfully, {failure_count} failed.")
         )

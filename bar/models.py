@@ -5,9 +5,7 @@ from django.db import models
 
 
 class Ingredient(models.Model):
-    name = models.CharField(
-        max_length=100, unique=True, verbose_name="Название ингредиента"
-    )
+    name = models.CharField(max_length=100, unique=True, verbose_name="Название ингредиента")
     is_available = models.BooleanField(default=False, verbose_name="Наличие")
     image = models.ImageField(
         upload_to="media/ingredients/",
@@ -32,30 +30,24 @@ class Ingredient(models.Model):
 
     def delete(self, *args, **kwargs):
         # Delete associated image if it exists and is not the default image
-        if self.image and "default.png" not in self.image.name:
-            if os.path.isfile(self.image.path):
-                os.remove(self.image.path)
+        if self.image and "default.png" not in self.image.name and os.path.isfile(self.image.path):
+            os.remove(self.image.path)
         if self.cocktail_ingredients.exists():
             raise ValidationError(
-                "Нельзя удалить ингредиент, который используется в коктейлях. "
-                "Сначала удалите связанные коктейли."
+                "Нельзя удалить ингредиент, который используется в коктейлях. Сначала удалите связанные коктейли."
             )
         super().delete(*args, **kwargs)
 
 
 class Cocktail(models.Model):
-    name = models.CharField(
-        max_length=100, unique=True, verbose_name="Название коктейля"
-    )
+    name = models.CharField(max_length=100, unique=True, verbose_name="Название коктейля")
     ingredients = models.ManyToManyField(
         Ingredient,
         through="CocktailIngredient",
         related_name="cocktails",
         verbose_name="Ингредиенты",
     )
-    instructions = models.TextField(
-        verbose_name="Инструкция приготовления", blank=True, default=""
-    )
+    instructions = models.TextField(verbose_name="Инструкция приготовления", blank=True, default="")
     image = models.ImageField(
         upload_to="media/cocktails/",
         blank=True,

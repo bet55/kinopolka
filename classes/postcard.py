@@ -1,5 +1,4 @@
 import logging
-from typing import Dict
 
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
@@ -8,15 +7,15 @@ from postcard.models import Postcard
 from postcard.serializers import PostcardSerializer
 from utils.exception_handler import handle_exceptions
 
+
 logger = logging.getLogger(__name__)
 
 
 class PostcardHandler:
-
     @classmethod
     @handle_exceptions("Открытка")
     @sync_to_async
-    def create_postcard(cls, data: Dict, request=None) -> dict:
+    def create_postcard(cls, data: dict, request=None) -> dict:
         """
         Создание новой открытки. Деактивирует все предыдущие открытки.
         :param data: Словарь с данными открытки (title, meeting_date, screenshot, movies).
@@ -89,7 +88,7 @@ class PostcardHandler:
 
     @classmethod
     @handle_exceptions("Открытка")
-    async def update_postcard(cls, data: Dict, request=None) -> dict:
+    async def update_postcard(cls, data: dict, request=None) -> dict:
         """
         Обновление открытки.
         :param data: Словарь с данными для обновления (должен содержать 'id').
@@ -100,9 +99,7 @@ class PostcardHandler:
             raise ValidationError("Некорректные данные или отсутствует ID")
 
         postcard = await Postcard.objects.aget(id=data["id"])
-        serializer = PostcardSerializer(
-            postcard, data=data, partial=True, context={"request": request}
-        )
+        serializer = PostcardSerializer(postcard, data=data, partial=True, context={"request": request})
         if not await sync_to_async(serializer.is_valid)():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
         updated_postcard = await sync_to_async(serializer.save)()
@@ -127,9 +124,7 @@ class PostcardHandler:
     @classmethod
     @handle_exceptions("Открытки")
     @sync_to_async
-    def deactivate_postcard(
-        cls, postcard_id: int = None, update_all: bool = True
-    ) -> bool:
+    def deactivate_postcard(cls, postcard_id: int = None, update_all: bool = True) -> bool:
         """
         Деактивация одной или всех открыток.
         :param postcard_id: ID открытки для деактивации (опционально).

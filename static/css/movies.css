@@ -3,6 +3,7 @@
     overflow: auto;
     height: 100%;
 
+
 }
 
 
@@ -54,6 +55,7 @@
     height: 13em;
 
     box-shadow: 10px 5px 5px black;
+
 
     @media (min-width: 2500px) {
         height: 20em;

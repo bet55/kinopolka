@@ -1,11 +1,12 @@
-import logging
 from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, Optional, Union
+import logging
+from typing import Any, ClassVar
 
-import httpx
 from django.conf import settings
+import httpx
 
 from classes.caching import Caching
+
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -21,9 +22,9 @@ class KP:
     CACHE_DURATION: int = 60 * 2  # 2 minutes
     cache: Caching = Caching(CACHE_DIRECTORY, CACHE_DURATION)
 
-    error: Optional[str] = None
+    error: str | None = None
     BASE_URL: ClassVar[str] = "https://api.kinopoisk.dev/v1.4/"
-    headers: ClassVar[Dict[str, str]] = None  # Initialized in __post_init__
+    headers: ClassVar[dict[str, str]] = None  # Initialized in __post_init__
 
     def __post_init__(self):
         """Initialize headers with API key from settings."""
@@ -34,9 +35,7 @@ class KP:
             self.headers = {}
             self.error = "Missing KP_API_TOKEN in settings"
 
-    def _make_request(
-        self, url: str, params: Optional[Dict[str, Any]] = None
-    ) -> Optional[Dict]:
+    def _make_request(self, url: str, params: dict[str, Any] | None = None) -> dict | None:
         """
         Make an HTTP request to the Kinopoisk API with caching.
 
@@ -80,19 +79,19 @@ class KP:
 
         except httpx.HTTPStatusError as e:
             logger.warning("HTTP error for %s: %s", url, str(e))
-            self.error = f"HTTP error: {str(e)}"
+            self.error = f"HTTP error: {e!s}"
             return None
         except httpx.RequestError as e:
             logger.error("Network error for %s: %s", url, str(e))
-            self.error = f"Network error: {str(e)}"
+            self.error = f"Network error: {e!s}"
             return None
         except ValueError as e:
             logger.error("Invalid JSON response for %s: %s", url, str(e))
-            self.error = f"Invalid JSON response: {str(e)}"
+            self.error = f"Invalid JSON response: {e!s}"
             return None
         except Exception as e:
             logger.error("Unexpected error for %s: %s", url, str(e))
-            self.error = f"Unexpected error: {str(e)}"
+            self.error = f"Unexpected error: {e!s}"
             return None
 
 
@@ -104,7 +103,7 @@ class KP_Movie(KP):
 
     BASE_URL: ClassVar[str] = KP.BASE_URL + "movie"
 
-    def get_movie_by_id(self, movie_id: Union[str, int]) -> Optional[Dict]:
+    def get_movie_by_id(self, movie_id: str | int) -> dict | None:
         """
         Получение информации о фильме.
 
@@ -112,11 +111,7 @@ class KP_Movie(KP):
 
         :return: Словарь с информацией о фильме или None в случаи ошибки.
         """
-        if (
-            not movie_id
-            or not isinstance(movie_id, (str, int))
-            or (isinstance(movie_id, int) and movie_id <= 0)
-        ):
+        if not movie_id or not isinstance(movie_id, (str, int)) or (isinstance(movie_id, int) and movie_id <= 0):
             logger.error("Invalid movie_id: %s", movie_id)
             self.error = "Invalid movie_id provided"
             return None

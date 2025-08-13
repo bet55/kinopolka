@@ -40,6 +40,76 @@ dev-dependencies = [
     "icecream>=2.1.3",
     "cowsay>=6.1",
     "notebook>=7.3.3",
-    "black>=25.1.0",
-    "isort>=6.0.1",
+    "ruff>=0.12.8",
 ]
+
+
+[tool.ruff]
+# Уровень детализации сообщений
+#verbosity = 1
+output-format = "concise"
+
+# Исключение файлов
+exclude = [
+    "**/migrations/",
+    "**/__pycache__/",
+    "*.pyi",
+    "*.ipynb",
+    "static/",
+]
+
+# Максимальная длина строки
+line-length = 120
+
+# Целевая версия Python
+target-version = "py310"
+
+
+# Включенные правила
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C",   # flake8-comprehensions
+    "A",   # flake8-builtins
+    "UP",  # pyupgrade
+    "YTT", # flake8-2020
+    "RUF", # ruff-specific rules
+    "DJ",  # Django-specific rules
+    "ANN", # flake8-annotations
+    "PIE", # flake8-pie
+    "SIM", # flake8-simplify
+    "C901", # Ограничение сложности функций
+    "DJ012", # Требовать on_delete в ForeignKey
+    "DJ013", # Требовать related_name в ForeignKey
+    "ASYNC",  # Проверки асинхронного кода
+]
+
+ignore = [
+    "E501",  # Длина строки (если кириллица "ломает" подсчёт символов)
+    "RUF001",  # Смешанные табы и пробелы (может ошибочно срабатывать)
+    "RUF002",  # Неопределённые символы (если Ruff считает кириллицу "неизвестной")
+    "D",      # Игнорировать все pydocstyle-правила (если ругается на docstrings)
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+# Игнорирование правил для конкретных файлов
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"**/settings.py" = ["F403", "E501"]
+"models.py" = ["DJ01"]
+
+
+# Настройки isort
+[tool.ruff.lint.isort]
+known-first-party = ["filmoclub"]
+known-third-party = ["django", "rest_framework", "pydantic", "pandas", "matplotlib"]
+combine-as-imports = true  # Объединять from ... import as
+force-single-line = false  # Не принудительно разделять импорты на отдельные строки
+force-sort-within-sections = true  # Сортировать импорты внутри секций
+lines-after-imports = 2  # Две пустые строки после импортов (как в black/isort)

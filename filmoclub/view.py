@@ -1,9 +1,10 @@
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.http import Http404, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
-from django.views.decorators.csrf import requires_csrf_token
 from django.urls import Resolver404
-from icecream import ic
+from django.views.decorators.csrf import requires_csrf_token
+
+
 # ======================
 # ОБРАБОТЧИКИ ОШИБОК
 # requires_csrf_token не используется, но оставим на будущее
@@ -18,9 +19,7 @@ def is_media_or_static(request):
 
 def is_json_request(request):
     """Определяет, нужно ли вернуть JSON"""
-    return request.GET.get(
-        "format"
-    ) == "json" or "application/json" in request.META.get("HTTP_ACCEPT", "")
+    return request.GET.get("format") == "json" or "application/json" in request.META.get("HTTP_ACCEPT", "")
 
 
 @requires_csrf_token
@@ -52,8 +51,7 @@ def handler403(request, exception=None):
 
 
 @requires_csrf_token
-def handler404(request, exception: Resolver404=None):
-
+def handler404(request, exception: Resolver404 = None):
     if is_media_or_static(request):
         return HttpResponseNotFound()
 

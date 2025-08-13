@@ -10,6 +10,7 @@ from classes import Invitation, PostcardHandler, Tools
 from mixins import GlobalDataMixin
 from utils.response_handler import handle_response
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -59,9 +60,7 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         postcard_data = await PostcardHandler.get_postcard()
 
         if not postcard_data.get("error"):
-            postcard_url = postcard_data.get("screenshot") or random_images.get(
-                "postcard"
-            )
+            postcard_url = postcard_data.get("screenshot") or random_images.get("postcard")
             is_active = postcard_data.get("is_active", False)
 
         context = {
@@ -76,9 +75,7 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         """
         Создание новой открытки.
         """
-        postcard_data = await PostcardHandler.create_postcard(
-            request.data, request=request
-        )
+        postcard_data = await PostcardHandler.create_postcard(request.data, request=request)
         return handle_response(postcard_data, status=status.HTTP_201_CREATED)
 
     async def put(self, request: Request):

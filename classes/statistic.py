@@ -1,19 +1,19 @@
-import logging
 from collections import namedtuple
-from itertools import zip_longest
+import logging
 
 from asgiref.sync import sync_to_async
 import numpy as np
 import pandas as pd
 import plotly
 import plotly.express as px
-from icecream import ic
+
+from features.serializers import ActorSerializer, DirectorSerializer, GenreSerializer, WriterSerializer
+from lists.models import Actor, Director, Genre, Writer
 
 from .movie import MovieHandler
 from .note import NoteHandler
 from .postcard import PostcardHandler
-from lists.models import Actor, Director, Writer, Genre
-from features.serializers import GenreSerializer, ActorSerializer, DirectorSerializer, WriterSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +57,8 @@ class Statistic:
 
     TOP_MOVIES = 4
     USERS_COUNT = 4
-    MOVIES_DISPLAY_COLUMNS = ['kp_id', 'poster_local', 'name']
-    Rating = namedtuple('Rating', ['top', 'bot'])
+    MOVIES_DISPLAY_COLUMNS = ["kp_id", "poster_local", "name"]
+    Rating = namedtuple("Rating", ["top", "bot"])
 
     async def extract_data(self):
         """
@@ -71,7 +71,7 @@ class Statistic:
         writers = await ModelsHandler.get_all(Writer)
         directors = await ModelsHandler.get_all(Director)
 
-        archive_movies = await MovieHandler.get_all_movies('rating', is_archive=True)
+        archive_movies = await MovieHandler.get_all_movies("rating", is_archive=True)
         movies = await MovieHandler.get_all_movies("rating")
 
         self.postcards = pd.DataFrame(postcards)
@@ -95,7 +95,7 @@ class Statistic:
         notes = self.notes
 
         rate_counts = notes.groupby(["movie"]).size().reset_index().rename(columns={0: "count"})
-        movies_rated_by_all_users = rate_counts[rate_counts['count'] == self.USERS_COUNT]['movie'].tolist()
+        movies_rated_by_all_users = rate_counts[rate_counts["count"] == self.USERS_COUNT]["movie"].tolist()
 
         notes = notes[notes.movie.isin(movies_rated_by_all_users)]
         return notes
@@ -135,27 +135,27 @@ class Statistic:
         top_movies = agg_by_rating.head(self.TOP_MOVIES)
         bot_movies = agg_by_rating.tail(self.TOP_MOVIES)
 
-        top_movies = pd.merge(top_movies, display_movies, on="kp_id").to_dict(orient='records')
-        bot_movies = pd.merge(bot_movies, display_movies, on="kp_id").to_dict(orient='records')
+        top_movies = pd.merge(top_movies, display_movies, on="kp_id").to_dict(orient="records")
+        bot_movies = pd.merge(bot_movies, display_movies, on="kp_id").to_dict(orient="records")
 
         return self.Rating(top=top_movies, bot=bot_movies)
 
-    async def outstanding_actors(self) -> dict[str: list[dict]]:
+    async def outstanding_actors(self) -> dict[str : list[dict]]:
         """
         Собираем актёров с лучшими и худшими оценками фильмов по разным агрегаторам
         """
         return {
-            'Топ рейтинг на imdb': [],
-            'Топ рейтинг на кинополке': [],
-            'Бот рейтинг на imdb': [],
-            'Бот рейтинг на кинополке': [],
+            "Топ рейтинг на imdb": [],
+            "Топ рейтинг на кинополке": [],
+            "Бот рейтинг на imdb": [],
+            "Бот рейтинг на кинополке": [],
         }
 
-    async def outstanding_directors(self) -> dict[str: list[dict]]:
+    async def outstanding_directors(self) -> dict[str : list[dict]]:
         pass
 
     async def outstanding_genres(self) -> str:
-        df = self.genres.loc[:, ['name', 'movies_count']]
+        df = self.genres.loc[:, ["name", "movies_count"]]
         df = df.sort_values(by="movies_count", ascending=False)
 
         # Берём топ-5 и редкие 5 жанров
@@ -163,22 +163,19 @@ class Statistic:
         rare_genres = df.tail(5).reset_index(drop=True)
 
         # Создаём DataFrame с MultiIndex напрямую
-        result_df = pd.DataFrame({
-            ("Популярные", "жанр"): common_genres['name'],
-            ("Популярные", "фильмов"): common_genres['movies_count'],
-            ("Редкие", "жанр"): rare_genres['name'],
-            ("Редкие", "фильмов"): rare_genres['movies_count']
-        })
-
-        # Генерируем HTML (Pandas сам сделает colspan)
-        return result_df.to_html(
-            index=False,
-            classes='genres-table',
-            border=0,
-            justify='center'
+        result_df = pd.DataFrame(
+            {
+                ("Популярные", "жанр"): common_genres["name"],
+                ("Популярные", "фильмов"): common_genres["movies_count"],
+                ("Редкие", "жанр"): rare_genres["name"],
+                ("Редкие", "фильмов"): rare_genres["movies_count"],
+            }
         )
 
-    async def outstanding_movies(self) -> dict[str: list[dict]]:
+        # Генерируем HTML (Pandas сам сделает colspan)
+        return result_df.to_html(index=False, classes="genres-table", border=0, justify="center")
+
+    async def outstanding_movies(self) -> dict[str : list[dict]]:
         """
         Собираем фильмы с лучшими и худшими оценками по разным агрегаторам
         """
@@ -186,13 +183,11 @@ class Statistic:
         imdb_movies = await self._get_movies_by_imdb_rating()
 
         return {
-            'Топ рейтинг на imdb': imdb_movies.top,
-            'Топ рейтинг на кинополке': kinopolka_movies.top,
-            'Бот рейтинг на imdb': imdb_movies.bot,
-            'Бот рейтинг на кинополке': kinopolka_movies.bot,
+            "Топ рейтинг на imdb": imdb_movies.top,
+            "Топ рейтинг на кинополке": kinopolka_movies.top,
+            "Бот рейтинг на imdb": imdb_movies.bot,
+            "Бот рейтинг на кинополке": kinopolka_movies.bot,
         }
-
-
 
     async def statistic(self):
         """

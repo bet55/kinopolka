@@ -14,6 +14,7 @@ import logging
 import os
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,17 +22,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY", "django-insecure-moq19!=-t5w#&p!h4aw=b4hzs9k8^290t513qhm-86r39=4&#y"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS", "0.0.0.0;127.0.0.1;localhost;185.80.91.29"
-).split(";")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(";")
+
+
+# ssl настройки
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 
 # Application definition
 
@@ -68,7 +73,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "filmoclub.urls"
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "https://kinopolka.com",
+    "https://kinopolka.рф",
+    # Add any trusted frontend domains
+]
 
 TEMPLATES = [
     {
@@ -165,9 +176,6 @@ TELEGRAM_GROUP_ID = os.getenv("TELEGRAM_GROUP_ID")
 KP_API_TOKEN = os.getenv("KP_API_TOKEN")
 
 # настройки логгера
-from logging.config import dictConfig
-
-import logging_loki  # pass
 
 
 class LogFilter(logging.Filter):

@@ -8,11 +8,10 @@ class Command(BaseCommand):
     help = "Обновление календаря с темами. filmoclub/theme_calendar"
 
     def handle(self, *args, **options):
-
-        self.stdout.write((self.style.SUCCESS(f"Поехали")))
+        self.stdout.write(self.style.SUCCESS("Поехали"))
 
         new_calendar = create_theme_calendar()
         print(new_calendar)
         CALENDAR.update(new_calendar)
 
-        self.stdout.write(self.style.SUCCESS(f"Приехали"))
+        self.stdout.write(self.style.SUCCESS("Приехали"))

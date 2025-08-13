@@ -1,18 +1,17 @@
+from colorama import Fore, Style, init
 import cowsay
-from colorama import init, Fore, Style
+
 
 # Initialize colorama for cross-platform color support
 init()
 
 
-
 # Function to color nipples red
 def color_nipples(text):
-    nipples = ['⣜⣁⣾', '⡤⣥⣙']
+    nipples = ["⣜⣁⣾", "⡤⣥⣙"]
     for n in nipples:
-        text = text.replace(n, f'{Fore.RED}{n}{Style.RESET_ALL}')
+        text = text.replace(n, f"{Fore.RED}{n}{Style.RESET_ALL}")
     return text
-
 
 
 booba = r"""

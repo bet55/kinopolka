@@ -1,4 +1,4 @@
-__all__ = ["create_theme_calendar", "handle_response", "handle_exceptions"]
+__all__ = ["create_theme_calendar", "handle_exceptions", "handle_response"]
 
 
 from .create_theme_calendar import create_theme_calendar

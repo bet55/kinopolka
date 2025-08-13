@@ -1,7 +1,6 @@
 # tests.py
 from django.test import TestCase
 
-from bar.models import Ingredient
 from classes import Error, IngredientHandler
 
 

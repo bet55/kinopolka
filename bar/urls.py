@@ -10,6 +10,7 @@ from .views import (
     IngredientTelegramRequest,
 )
 
+
 urlpatterns = [
     # Ингредиенты
     path("", Bar.as_view(), name="bar"),

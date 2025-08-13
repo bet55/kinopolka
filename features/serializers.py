@@ -1,14 +1,16 @@
-from django.db import models
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
-from lists.models import Genre, Movie, Actor, Director, Writer
+from lists.models import Actor, Director, Genre, Movie, Writer
+
 
 DEFAULT_POSTER = "/media/posters/default.png"
+
 
 class BaseMovieSerializer(ModelSerializer):
     class Meta:
         model = Movie
         fields = ["kp_id", "name", "poster"]
+
 
 class BaseRelatedSerializer(ModelSerializer):
     movies = SerializerMethodField()
@@ -29,25 +31,30 @@ class BaseRelatedSerializer(ModelSerializer):
         related_manager = getattr(obj, self.related_field)
         return related_manager.all().count()
 
+
 class ActorSerializer(BaseRelatedSerializer):
     class Meta(BaseRelatedSerializer.Meta):
         model = Actor
         fields = BaseRelatedSerializer.Meta.fields + ["kp_id", "photo"]
+
 
 class DirectorSerializer(BaseRelatedSerializer):
     class Meta(BaseRelatedSerializer.Meta):
         model = Director
         fields = BaseRelatedSerializer.Meta.fields + ["kp_id", "photo"]
 
+
 class WriterSerializer(BaseRelatedSerializer):
     class Meta(BaseRelatedSerializer.Meta):
         model = Writer
         fields = BaseRelatedSerializer.Meta.fields + ["kp_id", "photo"]
 
+
 class GenreSerializer(BaseRelatedSerializer):
     class Meta(BaseRelatedSerializer.Meta):
         model = Genre
         fields = BaseRelatedSerializer.Meta.fields + ["watch_counter"]
+
 
 class MovieRatingSerializer(ModelSerializer):
     poster_local = SerializerMethodField()

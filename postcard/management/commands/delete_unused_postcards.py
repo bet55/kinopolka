@@ -18,11 +18,7 @@ class Command(BaseCommand):
         db_rows = Postcard.objects.all()
         db_postcards = set(p.screenshot.url.split("/")[-1] for p in db_rows)
 
-        directory_postcards = {
-            f.name
-            for f in postcard_folder.glob("*")
-            if f.is_file() and f.name != "screenshot.png"
-        }
+        directory_postcards = {f.name for f in postcard_folder.glob("*") if f.is_file() and f.name != "screenshot.png"}
 
         postcards_to_delete = directory_postcards - db_postcards
         ic("Открыток в базе", len(db_postcards))

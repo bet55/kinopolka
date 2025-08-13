@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/global_settings.css' %}">
+
     <link rel="stylesheet" href="{% static 'css/based_layout.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/toast.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/confirmation_tooltip.css' %}">
@@ -43,7 +44,7 @@
                 <img id="cart-img" src="{% static 'img/based_options/shopping-cart.png' %}" alt=""
                      data-bs-toggle="tooltip"
                      data-bs-placement="top"
-                     data-bs-title="Корзина закладок">
+                     data-bs-title="Закладки">
                 <ul id="cart-list"></ul>
             </div>
 
@@ -69,8 +70,7 @@
 
     <div class="row second-row">
 
-        <div class="col-md-3 h-100">
-            <div class="container nav-column">
+        <div class="col-md-3 container nav-column">
                 <nav class="nav flex-column">
                     <a class="nav-link" href="/movies/">Фильмы</a>
                     <a class="nav-link" href="/movies/archive/">Архив</a>
@@ -81,8 +81,6 @@
                     <a class="nav-link" href="/features/catalog/">Фишки</a>
                 </nav>
                 <img class="align-self-center mt-auto nav-img" src="{{ random.navigation }}">
-            </div>
-
         </div>
 
         <div class="col-md-6 h-100">

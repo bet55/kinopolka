@@ -6,12 +6,11 @@ from rest_framework.status import HTTP_200_OK
 
 from classes.exceptions import ErrorHandler
 
+
 logger = logging.getLogger(__name__)
 
 
-def handle_response(
-    data, success_data: dict = None, status: drf_status = HTTP_200_OK
-) -> Response:
+def handle_response(data: dict, success_data: dict | None = None, status: drf_status = HTTP_200_OK) -> Response:
     """
     Унифицированная функция для обработки ответов API.
     :param data: Данные для валидации ответа
@@ -21,9 +20,7 @@ def handle_response(
     """
 
     if isinstance(data, dict) and data.get("error"):
-        data = ErrorHandler(
-            message=data["error"]["message"], status=data["error"]["status"]
-        )
+        data = ErrorHandler(message=data["error"]["message"], status=data["error"]["status"])
 
     if isinstance(data, ErrorHandler):
         return Response({"error": data.message}, status=data.status)
