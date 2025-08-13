@@ -7,8 +7,8 @@ from rest_framework.serializers import (
     ReturnDict,
 )
 
-from lists.models import Movie, Note, User
 from features.serializers import GenreSerializer
+from lists.models import Movie, Note, User
 
 
 DEFAULT_POSTER = "/media/posters/default.png"
@@ -18,6 +18,7 @@ class NoteSerializer(ModelSerializer):
     """
     Сериализатор для оценок пользователей
     """
+
     class Meta:
         model = Note
         fields = "__all__"
@@ -32,10 +33,7 @@ class MovieListSerializer(ListSerializer):
         iterable = data.all() if isinstance(data, models.manager.BaseManager) else data
 
         return {
-            self.child.to_representation(item).get(
-                "kp_id"
-            ): self.child.to_representation(item)
-            for item in iterable
+            self.child.to_representation(item).get("kp_id"): self.child.to_representation(item) for item in iterable
         }
 
     @property
@@ -49,6 +47,7 @@ class MovieDictSerializer(ModelSerializer):
     Сериализатор для детальной обработки фильмов. Обычно на клиенте.
     {kp_id: {kp_id: 1, name: "boss nigger" ...}}
     """
+
     premiere = DateTimeField(format="%d/%m/%Y")
     genres = GenreSerializer(many=True)
 
@@ -73,14 +72,8 @@ class MovieDictSerializer(ModelSerializer):
         representation = super().to_representation(instance)
 
         representation["genres"] = [genre["name"] for genre in representation["genres"]]
-        poster_local = (
-            instance.poster_local.url
-            if instance.poster_local
-            else "/media/posters/default.png"
-        )
-        representation["poster_local"] = (
-            instance.poster if "default" in poster_local else poster_local
-        )
+        poster_local = instance.poster_local.url if instance.poster_local else "/media/posters/default.png"
+        representation["poster_local"] = instance.poster if "default" in poster_local else poster_local
         return representation
 
 
@@ -90,6 +83,7 @@ class MoviePosterSerializer(ModelSerializer):
     Поэтому многие поля не нужны.
     Жанры добавлены для сортировки.
     """
+
     genres = GenreSerializer(many=True)
 
     class Meta:

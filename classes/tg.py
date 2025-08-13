@@ -1,11 +1,11 @@
-import logging
 from functools import wraps
+import logging
 
 from django.conf import settings
 from telegram import Bot
-from telegram.error import TelegramError
 
 from .exceptions import ErrorHandler
+
 
 logger = logging.getLogger(__name__)
 
@@ -18,19 +18,16 @@ def handle_exceptions(func):
         try:
             return await func(*args, **kwargs)
         except FileNotFoundError as e:
-            logger.error(f"Файл для отправки не найден: {str(e)}")
+            logger.error(f"Файл для отправки не найден: {e!s}")
             return ErrorHandler(message=str(e), status=404)
         except Exception as e:
-            logger.error(f"Ошибка отправки telegram сообщения : {str(e)}")
-            return ErrorHandler(
-                message=f"Ошибка отправки telegram сообщения : {str(e)}"
-            )
+            logger.error(f"Ошибка отправки telegram сообщения : {e!s}")
+            return ErrorHandler(message=f"Ошибка отправки telegram сообщения : {e!s}")
 
     return wrapper
 
 
 class Telegram:
-
     def __init__(self):
         self.is_init = False
         self._create_bot_instance()
@@ -59,9 +56,7 @@ class Telegram:
 
     @handle_exceptions
     async def send_message(self, message: str) -> str:
-        await self.bot.send_message(
-            chat_id=self.group_id, text=message, parse_mode="HTML"
-        )
+        await self.bot.send_message(chat_id=self.group_id, text=message, parse_mode="HTML")
 
         logger.info(
             "Telegram message sent to group",

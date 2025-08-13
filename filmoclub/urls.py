@@ -27,11 +27,8 @@ from .view import (
     handler403,
     handler404,
     handler500,
-    test_400,
-    test_403,
-    test_404,
-    test_500,
 )
+
 
 # Обрабатываем ошибки всего проекта
 handler400 = handler400

@@ -12,11 +12,11 @@ from bar.serializers import (
 )
 from utils.exception_handler import handle_exceptions
 
+
 logger = logging.getLogger(__name__)
 
 
 class CocktailHandler:
-
     @staticmethod
     @handle_exceptions("Коктейль")
     @sync_to_async
@@ -30,9 +30,7 @@ class CocktailHandler:
         if not data.get("name"):
             raise ValidationError("Поле 'name' обязательно")
 
-        serializer = CocktailCreateUpdateSerializer(
-            data=data, context={"request": request}
-        )
+        serializer = CocktailCreateUpdateSerializer(data=data, context={"request": request})
         if not serializer.is_valid():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
 
@@ -92,9 +90,7 @@ class CocktailHandler:
         """
         cocktail = await Cocktail.objects.aget(pk=cocktail_id)
         old_image = cocktail.image.name if cocktail.image else None
-        serializer = CocktailCreateUpdateSerializer(
-            cocktail, data=data, partial=True, context={"request": request}
-        )
+        serializer = CocktailCreateUpdateSerializer(cocktail, data=data, partial=True, context={"request": request})
 
         if not await sync_to_async(serializer.is_valid)():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
@@ -118,16 +114,11 @@ class CocktailHandler:
             )
 
         # Удаление старого изображения#
-        if (
-            old_image != cocktail.image.name
-            and old_image != "media/cocktails/default.png"
-        ):
+        if old_image != cocktail.image.name and old_image != "media/cocktails/default.png":
             if os.path.isfile(old_image):
                 os.remove(old_image)
 
-        serialized_data = await sync_to_async(
-            lambda: CocktailSerializer(cocktail).data
-        )()
+        serialized_data = await sync_to_async(lambda: CocktailSerializer(cocktail).data)()
         return serialized_data
 
     @staticmethod
@@ -162,7 +153,5 @@ class CocktailHandler:
         :return: список сериализованных ингредиентов
         """
         cocktail = await Cocktail.objects.aget(pk=cocktail_id)
-        ingredients = await cocktail.ingredient_amounts.all().select_related(
-            "ingredient"
-        )
+        ingredients = await cocktail.ingredient_amounts.all().select_related("ingredient")
         return CocktailIngredientSerializer(ingredients, many=True).data

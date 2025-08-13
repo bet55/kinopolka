@@ -1,9 +1,8 @@
 import os
-import re
 from pathlib import Path
+import re
 
 from django.core.management.base import BaseCommand
-from icecream import ic
 
 from lists.models import Movie
 
@@ -42,9 +41,7 @@ class Command(BaseCommand):
 
             if not match or int(match.group(1)) != kp_id:
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"Skipping movie {kp_id}: invalid poster_local format ({current_path})"
-                    )
+                    self.style.WARNING(f"Skipping movie {kp_id}: invalid poster_local format ({current_path})")
                 )
                 skipped_count += 1
                 continue
@@ -57,9 +54,7 @@ class Command(BaseCommand):
 
             try:
                 if not new_file_path.exists():
-                    self.stdout.write(
-                        self.style.ERROR(f"movie {kp_id}: doesn't have correct file")
-                    )
+                    self.stdout.write(self.style.ERROR(f"movie {kp_id}: doesn't have correct file"))
                     error_count += 1
                     continue
 
@@ -74,19 +69,13 @@ class Command(BaseCommand):
                 movie.save()
                 urls_renamed += 1
 
-                print(
-                    f"Updated movie {kp_id}: renamed {current_path} to {new_relative_path}"
-                )
+                print(f"Updated movie {kp_id}: renamed {current_path} to {new_relative_path}")
 
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(
-                        f"Error for movie {kp_id}: failed to update ({str(e)})"
-                    )
-                )
+                self.stdout.write(self.style.ERROR(f"Error for movie {kp_id}: failed to update ({e!s})"))
                 error_count += 1
 
-        self.stdout.write(self.style.SUCCESS(f"Completed"))
+        self.stdout.write(self.style.SUCCESS("Completed"))
         self.stdout.write(self.style.SUCCESS(f"posters updated: {urls_renamed} \t "))
         self.stdout.write(self.style.SUCCESS(f"files renamed: {files_renamed}\t "))
         self.stdout.write(self.style.SUCCESS(f"skipped: {skipped_count}\t "))

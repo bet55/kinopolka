@@ -7,11 +7,11 @@ from bar.models import Ingredient
 from bar.serializers import IngredientSerializer
 from utils.exception_handler import handle_exceptions
 
+
 logger = logging.getLogger(__name__)
 
 
 class IngredientHandler:
-
     @staticmethod
     @handle_exceptions("Ингредиент")
     @sync_to_async
@@ -66,9 +66,7 @@ class IngredientHandler:
         """
         ingredient = await Ingredient.objects.aget(pk=ingredient_id)
         old_image = ingredient.image.name if ingredient.image else None
-        serializer = IngredientSerializer(
-            ingredient, data=data, partial=True, context={"request": request}
-        )
+        serializer = IngredientSerializer(ingredient, data=data, partial=True, context={"request": request})
 
         if not await sync_to_async(serializer.is_valid)():
             raise ValidationError(f"Невалидные данные: {serializer.errors}")
@@ -79,11 +77,7 @@ class IngredientHandler:
 
         await ingredient.asave()
 
-        if (
-            old_image
-            and old_image != ingredient.image.name
-            and "default.png" not in old_image
-        ):
+        if old_image and old_image != ingredient.image.name and "default.png" not in old_image:
             import os
 
             if os.path.isfile(old_image):

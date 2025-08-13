@@ -6,6 +6,7 @@
 
 from .theme_settings import Themes
 
+
 CALENDAR: {str: Themes} = {
     "18.12": "Danya",
     "01.06": "Lexa",

@@ -76,11 +76,11 @@ async def import_films(self):
     failed_movies_file = "data/failed_movies.json"
     error_file = "data/save_error.json"
 
-    with open(archive_movies_json, "r") as f:
+    with open(archive_movies_json) as f:
         archive_movies = json.load(f)
-        archive_movies = [{**arch, **{"is_archive": True}} for arch in archive_movies]
+        archive_movies = [{**arch, "is_archive": True} for arch in archive_movies]
 
-    with open(movies_json, "r") as f:
+    with open(movies_json) as f:
         movies = json.load(f)
 
     all_movies = movies + archive_movies
@@ -102,6 +102,4 @@ async def import_films(self):
     with open(failed_movies_file, "w") as f:
         f.write(json.dumps(bad_results, indent=4, ensure_ascii=False))
 
-    return Response(
-        data={"success_count": success_results_count, "all_count": len(all_movies)}
-    )
+    return Response(data={"success_count": success_results_count, "all_count": len(all_movies)})

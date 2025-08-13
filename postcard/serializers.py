@@ -1,8 +1,8 @@
-from asgiref.sync import sync_to_async
 from rest_framework import serializers
 
 from lists.serializers import MovieDictSerializer
 from postcard.models import Postcard
+
 
 # class PostcardSerializer(serializers.ModelSerializer):
 #     movies = MovieDictSerializer(many=True)

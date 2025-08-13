@@ -2,6 +2,7 @@ from django.urls import path
 
 from lists.views import MovieAddingViewSet, MovieRatingViewSet, MoviesViewSet
 
+
 urlpatterns = [
     path("", MoviesViewSet.as_view(), name="view_movies"),
     path("archive/", MoviesViewSet.as_view(), name="view_archive_movies"),

@@ -1,6 +1,7 @@
 import logging
 import time
 
+
 logger = logging.getLogger("django_requests")
 
 
@@ -19,18 +20,14 @@ class RequestLoggerMiddleware:
             "method": request.method,
             "path": request.path,
             "get_params": (
-                dict(request.query_params.items())
-                if hasattr(request, "query_params")
-                else dict(request.GET.items())
+                dict(request.query_params.items()) if hasattr(request, "query_params") else dict(request.GET.items())
             ),
             "post_params": (
                 dict(request.data.items())
                 if request.method in ["POST", "PUT"] and hasattr(request, "data")
                 else dict(request.POST.items())
             ),
-            "user": (
-                request.user.username if request.user.is_authenticated else "Anonymous"
-            ),
+            "user": (request.user.username if request.user.is_authenticated else "Anonymous"),
         }
         logger.info(f"Incoming Request: {log_data}")
 
@@ -52,4 +49,4 @@ class RequestLoggerMiddleware:
         """
         Логирование исключений, если они возникли во время обработки запроса.
         """
-        logger.error(f"Exception in {request.method} {request.path}: {str(exception)}")
+        logger.error(f"Exception in {request.method} {request.path}: {exception!s}")

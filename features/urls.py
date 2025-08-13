@@ -2,6 +2,7 @@ from django.urls import path
 
 from features.views import Carousel, Catalog, MoviesStatistic, Tarots
 
+
 urlpatterns = [
     path("catalog/", Catalog.as_view(), name="catalog"),
     path("carousel/", Carousel.as_view(), name="carousel"),

@@ -4,13 +4,14 @@ import logging
 import os
 import random
 
-import pendulum
 from django.conf import settings
+import pendulum
 
 from classes import MovieHandler
 from filmoclub.calendar.theme_calendar import CALENDAR
 from filmoclub.calendar.theme_settings import IMAGES_PATH, ImageFolders, Themes
 from lists.models import User
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,7 @@ class Tools:
         try:
             current_date = pendulum.now(tz=settings.TIME_ZONE).format("DD.MM")
             theme = CALENDAR.get(current_date, Themes.default.value)
-            logger.debug(
-                "Determined current theme: %s for date %s", theme, current_date
-            )
+            logger.debug("Determined current theme: %s for date %s", theme, current_date)
             return theme
         except Exception as e:
             logger.error("Failed to determine current theme: %s", str(e))
@@ -51,9 +50,7 @@ class Tools:
 
         return {
             "poster": cls._choose_random_image(theme, ImageFolders.poster.value),
-            "navigation": cls._choose_random_image(
-                theme, ImageFolders.navigation.value
-            ),
+            "navigation": cls._choose_random_image(theme, ImageFolders.navigation.value),
             "header": cls._choose_random_image(theme, ImageFolders.header.value),
             "postcard": cls._choose_random_image(theme, ImageFolders.postcard.value),
         }
@@ -133,13 +130,11 @@ class Tools:
         failed_movies_file = "data/failed_movies.json"
         error_file = "data/save_error.json"
 
-        with open(archive_movies_json, "r") as f:
+        with open(archive_movies_json) as f:
             archive_movies = json.load(f)
-            archive_movies = [
-                {**arch, **{"is_archive": True}} for arch in archive_movies
-            ]
+            archive_movies = [{**arch, "is_archive": True} for arch in archive_movies]
 
-        with open(movies_json, "r") as f:
+        with open(movies_json) as f:
             movies = json.load(f)
 
         all_movies = movies + archive_movies

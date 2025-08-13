@@ -1,6 +1,5 @@
-import logging
 from collections import defaultdict
-from typing import Dict, List, Union
+import logging
 
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
@@ -9,6 +8,7 @@ from lists.models import Movie, Note, User
 from lists.serializers import NoteSerializer
 from pydantic_models import RateMovieRequestModel
 from utils.exception_handler import handle_exceptions
+
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -22,9 +22,7 @@ class NoteHandler:
     @classmethod
     @handle_exceptions("Заметки")
     @sync_to_async
-    def get_all_notes(
-        cls, result_format: str = "dict"
-    ) -> Union[Dict[int, List[Dict]], List[Dict]]:
+    def get_all_notes(cls, result_format: str = "dict") -> dict[int, list[dict]] | list[dict]:
         """
         Получение всех заметок с оценками фильмов.
         :param result_format: Формат возвращаемых данных ('dict' для группировки по movie_id, иначе 'list').
@@ -48,7 +46,7 @@ class NoteHandler:
 
     @classmethod
     @handle_exceptions("Заметка")
-    async def create_note(cls, note_body: Dict) -> int:
+    async def create_note(cls, note_body: dict) -> int:
         """
         Создание или обновление заметки с оценкой о фильме.
         :param note_body: Данные заметки (user ID, movie kp_id, rating, optional text).
@@ -57,16 +55,12 @@ class NoteHandler:
         if not isinstance(note_body, dict):
             raise ValidationError("Некорректный тип данных note_body")
 
-        if not isinstance(note_body, dict) or not all(
-            key in note_body for key in ["user", "movie", "rating"]
-        ):
+        if not isinstance(note_body, dict) or not all(key in note_body for key in ["user", "movie", "rating"]):
             raise ValidationError("Некорректные данные заметки")
 
         try:
             modeling = RateMovieRequestModel(**note_body)
-            formatted_request = modeling.model_dump(
-                exclude_none=True, exclude_defaults=True, exclude_unset=True
-            )
+            formatted_request = modeling.model_dump(exclude_none=True, exclude_defaults=True, exclude_unset=True)
         except RateMovieRequestModel.ValidationError as e:
             logger.warning("Некорректные данные заметки: %s", str(e))
             raise ValidationError("Некорректные данные заметки")
@@ -113,7 +107,5 @@ class NoteHandler:
         note = await Note.mgr.aget(user__id=user_id, movie__kp_id=movie_kp_id)
         note_id = note.id
         await note.adelete()
-        logger.info(
-            "Удалена заметка для пользователя %s, фильма %s", user_id, movie_kp_id
-        )
+        logger.info("Удалена заметка для пользователя %s, фильма %s", user_id, movie_kp_id)
         return note_id

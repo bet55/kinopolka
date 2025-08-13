@@ -1,8 +1,9 @@
 import logging
 from sqlite3 import OperationalError
-from typing import Any, Union
+from typing import Any
 
 from diskcache import Cache
+
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -49,19 +50,17 @@ class Caching:
         try:
             self.__cache = Cache(self.__dirname)
         except OperationalError as e:
-            self.__error_message = (
-                f"При инициализации кэшировальщика возникла ошибка. [{str(e)}]"
-            )
+            self.__error_message = f"При инициализации кэшировальщика возникла ошибка. [{e!s}]"
             logger.error(self.__error_message)
             self.__initialized = False
             return None
         except Exception as e:
-            self.__error_message = f"При инициализации кэшировальщика возникла непредвиденная ошибка. [{str(e)}]"
+            self.__error_message = f"При инициализации кэшировальщика возникла непредвиденная ошибка. [{e!s}]"
             logger.error(self.__error_message)
             self.__initialized = False
             return None
 
-    def check_cache(self, key: Union[str, int] = None) -> bool:
+    def check_cache(self, key: str | int = None) -> bool:
         """
         Проверка наличия параметра в кэше.
         :param key: (int|str) параметр в кэше.
@@ -71,15 +70,13 @@ class Caching:
         if key is None:
             return False
         if type(key) not in [int, str]:
-            self.__error_message = (
-                "Переданный key не является целым числом или строкой."
-            )
+            self.__error_message = "Переданный key не является целым числом или строкой."
             logger.error(self.__error_message)
             return False
 
         return key in self.__cache
 
-    def get_cache(self, key: Union[str, int] = None) -> Any:
+    def get_cache(self, key: str | int = None) -> Any:
         """
         Получение данных из кэша.
         :param key: (int|str) ключ размещения данных в кэше.
@@ -91,9 +88,7 @@ class Caching:
             logger.error(self.__error_message)
             return None
         if key and type(key) not in [int, str]:
-            self.__error_message = (
-                "Переданный key не является целым числом или строкой."
-            )
+            self.__error_message = "Переданный key не является целым числом или строкой."
             logger.error(self.__error_message)
             return None
 
@@ -105,9 +100,7 @@ class Caching:
             logger.error(self.__error_message)
             return False
         except Exception:
-            self.__error_message = (
-                "При получении данных из кэша возникла непредвиденная ошибка."
-            )
+            self.__error_message = "При получении данных из кэша возникла непредвиденная ошибка."
             logger.error(self.__error_message)
             return False
 
@@ -117,7 +110,7 @@ class Caching:
     def get_status(self) -> bool:
         return self.__initialized
 
-    def set_cache(self, key: Union[str, int] = None, value: Any = None) -> bool:
+    def set_cache(self, key: str | int = None, value: Any = None) -> bool:
         """
         Размещение данных в кэш.
         :param key: (int|str) ключ размещения данных в кэше.
@@ -130,9 +123,7 @@ class Caching:
             logger.error(self.__error_message)
             return False
         if key and type(key) not in [int, str]:
-            self.__error_message = (
-                "Переданный key не является целым числом или строкой."
-            )
+            self.__error_message = "Переданный key не является целым числом или строкой."
             logger.error(self.__error_message)
             return False
 
@@ -144,8 +135,6 @@ class Caching:
             logger.error(self.__error_message)
             return False
         except Exception:
-            self.__error_message = (
-                "При кэшировании данных возникла непредвиденная ошибка."
-            )
+            self.__error_message = "При кэшировании данных возникла непредвиденная ошибка."
             logger.error(self.__error_message)
             return False

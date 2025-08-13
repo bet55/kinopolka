@@ -1,10 +1,10 @@
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from rest_framework.request import Request
-from rest_framework.response import Response
 
 from classes import Caching, Tools, UserHandler
+
 
 logger = logging.getLogger("kinopolka")
 
@@ -18,9 +18,7 @@ class GlobalDataMixin:
     CACHE_USERS_TIMEOUT: int = 60 * 15
     cache: Caching = Caching(CACHE_DIRECTORY, CACHE_USERS_TIMEOUT)
 
-    async def get_global_data(
-        self, request: Request, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def get_global_data(self, request: Request, context: dict[str, Any]) -> dict[str, Any]:
         """Возвращает кэшированные или свежие данные."""
         response = {}
         try:
@@ -50,15 +48,13 @@ class GlobalDataMixin:
     async def add_context_data(
         self,
         request: Request,
-        context: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        context: dict[str, Any],
+    ) -> dict[str, Any]:
         """Для TemplateResponse."""
         context.update(await self.get_global_data(request, context))
         return context
 
-    async def add_response_data(
-        self, request: Request, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def add_response_data(self, request: Request, data: dict[str, Any]) -> dict[str, Any]:
         """Для JSON-ответов."""
 
         data.update(await self.get_global_data(request, data))

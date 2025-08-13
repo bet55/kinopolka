@@ -1,7 +1,7 @@
 __all__ = [
     "KPFilmModel",
-    "KpFilmPersonModel",
     "KpFilmGenresModel",
+    "KpFilmPersonModel",
     "RateMovieRequestModel",
 ]
 

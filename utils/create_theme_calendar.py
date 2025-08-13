@@ -34,6 +34,7 @@ def create_theme_calendar() -> dict[str, str]:
 
 from collections import OrderedDict
 
+
 res = create_theme_calendar()
 
 # Сортируем словарь по ключам (датам)
