@@ -30,12 +30,13 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(";")
 
-
 # ssl настройки
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SSL_REDIRECT = os.environ.get('SSL_REDIRECT', 'False') == 'True'
+if SSL_REDIRECT:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -67,13 +68,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "utils.middleware.RequestLoggerMiddleware"
+    "utils.middleware.RequestLoggerMiddleware"
 ]
 
 
 ROOT_URLCONF = "filmoclub.urls"
 
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://kinopolka.com",
@@ -196,6 +197,7 @@ class LogFilter(logging.Filter):
 loki_url = os.getenv("LOKI_URL", "") + "/loki/api/v1/push"
 application = os.getenv("APP_NAME")
 service = os.getenv("SERVICE_NAME")
+logs_handlers = ["console", "loki"] if os.getenv("ENVIRONMENT") == "prod" else ["console"]
 
 LOGGING = {
     "version": 1,
@@ -226,16 +228,16 @@ LOGGING = {
     "loggers": {
         "kinopolka": {
             "level": "INFO",
-            "handlers": ["console", "loki"],
+            "handlers": logs_handlers,
         },
         "django": {
             "level": "WARNING",
-            "handlers": ["console", "loki"],
+            "handlers": logs_handlers,
             "propagate": False,
         },
         "django.request": {
-            "level": "ERROR",
-            "handlers": ["console", "loki"],
+            "level": "WARNING",
+            "handlers": logs_handlers,
             "propagate": False,
         },
         # '': {  # Root logger
