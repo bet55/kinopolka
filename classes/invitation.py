@@ -8,8 +8,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 from postcard.models import Postcard
+from utils import ErrorHandler
 
-from .exceptions import ErrorHandler
 from .postcard import PostcardHandler
 from .tg import Telegram
 from .user import UserHandler

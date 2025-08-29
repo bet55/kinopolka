@@ -1,7 +1,6 @@
 __all__ = [
     "Caching",
     "CocktailHandler",
-    "ErrorHandler",
     "IngredientHandler",
     "Invitation",
     "KP_Movie",
@@ -17,7 +16,6 @@ __all__ = [
 
 from .caching import Caching
 from .cocktail import CocktailHandler
-from .exceptions import ErrorHandler
 from .ingredient import IngredientHandler
 from .invitation import Invitation
 from .kp import KP_Movie

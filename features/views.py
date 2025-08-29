@@ -60,3 +60,12 @@ class Tarots(GlobalDataMixin, APIView):
             "features/tarot.html",
             context=await self.add_context_data(request, {}),
         )
+
+
+class Gym(GlobalDataMixin, APIView):
+    async def get(self, request: Request):
+        return render(
+            request,
+            "features/gym.html",
+            context=await self.add_context_data(request, {}),
+        )

@@ -61,7 +61,7 @@
 
             // Нейро голосок
             document.querySelector('.mb').addEventListener('click', () => {
-                const sound = new Audio("/static/sound/maybe.mp3");
+                const sound = new Audio("/static/sound/mb.mp3");
                 sound.play()
                     .then(() => console.log("Звук воспроизводится автоматически"))
                     .catch(e => console.log("Автовоспроизведение звука заблокировано"));

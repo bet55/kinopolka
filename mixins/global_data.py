@@ -22,18 +22,19 @@ class GlobalDataMixin:
         """Возвращает кэшированные или свежие данные."""
         response = {}
         try:
-            if not hasattr(context, "users"):
+            if "users" not in context:
                 response["users"] = await self._get_cached_users()
 
-            if not hasattr(context, "random"):
-                theme = request.query_params.get("theme")
+            if "random" not in context:
+                query_params = getattr(request, "query_params", dict())
+                theme = query_params.get("theme")
                 response["random"] = Tools.get_random_images(theme)
 
             return response
 
         except Exception as e:
             logger.error(f"Failed to fetch global data: {e}")
-            return {}
+            return response
 
     async def _get_cached_users(self) -> list:
         """Возвращает кэшированных пользователей или запрашивает свежих."""
@@ -45,17 +46,7 @@ class GlobalDataMixin:
         self.cache.set_cache(self.CACHE_USERS_KEY, users)
         return users
 
-    async def add_context_data(
-        self,
-        request: Request,
-        context: dict[str, Any],
-    ) -> dict[str, Any]:
+    async def add_context_data(self, request: Request, context: dict[str, Any]) -> dict[str, Any]:
         """Для TemplateResponse."""
         context.update(await self.get_global_data(request, context))
         return context
-
-    async def add_response_data(self, request: Request, data: dict[str, Any]) -> dict[str, Any]:
-        """Для JSON-ответов."""
-
-        data.update(await self.get_global_data(request, data))
-        return data

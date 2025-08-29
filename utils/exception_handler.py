@@ -5,7 +5,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
 
-from classes.exceptions import ErrorHandler
+from .exceptions import ErrorHandler
 
 
 logger = logging.getLogger(__name__)

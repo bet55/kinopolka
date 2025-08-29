@@ -1,8 +1,10 @@
 import logging
 import time
 
+from django.http import JsonResponse
 
-logger = logging.getLogger("django_requests")
+
+logger = logging.getLogger(__name__)
 
 
 class RequestLoggerMiddleware:
@@ -50,3 +52,8 @@ class RequestLoggerMiddleware:
         Логирование исключений, если они возникли во время обработки запроса.
         """
         logger.error(f"Exception in {request.method} {request.path}: {exception!s}")
+        return JsonResponse(
+            {"error": "ttt", "message": "usama", "exception": str(exception)},
+            status=418,
+            json_dumps_params={"ensure_ascii": False},
+        )
