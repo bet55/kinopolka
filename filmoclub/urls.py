@@ -50,10 +50,6 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # path('test/400/', test_400),
-    # path('test/403/', test_403),
-    # path('test/404/', test_404),
-    # path('test/500/', test_500),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("movies/", include("lists.urls")),
@@ -76,5 +72,6 @@ urlpatterns = [
 ]
 
 # Когда-то пришлось добавить, чтобы локально грузилась статика. Работает только в дебаг моде
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

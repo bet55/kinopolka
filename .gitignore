@@ -24,3 +24,5 @@ media/cocktails/*
 
 media/ingredients/*
 !media/ingredients/default.png
+
+staticfiles

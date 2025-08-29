@@ -4,7 +4,7 @@ from rest_framework import status as drf_status
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
-from classes.exceptions import ErrorHandler
+from .exceptions import ErrorHandler
 
 
 logger = logging.getLogger(__name__)

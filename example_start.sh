@@ -26,14 +26,20 @@ export SERVICE_NAME='django'
 # Заменим переменные, если на проде
 if [ "$ENVIRONMENT" = "prod" ]; then
   export DEBUG="0"
-  export ALLOWED_HOSTS="xn--80apfbelhai.xn--p1ai,kinopolka.com"
+  export ALLOWED_HOSTS="xn--80apfbelhai.xn--p1ai;kinopolka.com"
   export LOKI_URL=""
   export TELEGRAM_GROUP_ID=""
   export SSL_REDIRECT='True'
+
 fi
+
+# Собираем статику
+echo "== Collecting static files =="
+uv run manage.py collectstatic --noinput
 
 # start
 uv run utils/top_secret.py
 echo "== Starting in $ENVIRONMENT mode =="
-#uv run manage.py runserver 0.0.0.0:8000
-uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port 8000
+
+uv run manage.py runserver 0.0.0.0:8000
+#uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port 8000 --reload

@@ -27,17 +27,19 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 
+# Запуск в dev или prod режиме
+PRODUCTION = os.getenv("ENVIRONMENT", "dev") == "prod"
+
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(";")
 
 # ssl настройки
-SSL_REDIRECT = os.environ.get('SSL_REDIRECT', 'False') == 'True'
+SSL_REDIRECT = os.environ.get("SSL_REDIRECT", "False") == "True"
 if SSL_REDIRECT:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
 
 # Application definition
 
@@ -58,9 +60,9 @@ INSTALLED_APPS = [
     "bar",
 ]
 
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -68,19 +70,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "utils.middleware.RequestLoggerMiddleware"
+    # "utils.middleware.RequestLoggerMiddleware"
 ]
-
 
 ROOT_URLCONF = "filmoclub.urls"
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    "https://kinopolka.com",
-    "https://kinopolka.рф",
-    # Add any trusted frontend domains
-]
+if PRODUCTION:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        "https://kinopolka.com",
+        "https://kinopolka.рф",
+        # Add any trusted frontend domains
+    ]
 
 TEMPLATES = [
     {
@@ -99,6 +101,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "filmoclub.wsgi.application"
+ASGI_APPLICATION = "filmoclub.asgi.application"
+
+WHITENOISE_USE_ASYNC = True
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -109,7 +114,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -140,20 +144,28 @@ USE_TZ = True
 # Хранение изображений(открытки) из бд
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # Для WhiteNoise
 
 MEDIA_URL = ""
 MEDIA_ROOT = ""
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = {}
+REST_FRAMEWORK = {
+    # 'EXCEPTION_HANDLER': 'utils.drf_exception_handler.drf_exception_handler',
+    # 'DEFAULT_RENDERER_CLASSES': [
+    #     'rest_framework.renderers.JSONRenderer',
+    #     'rest_framework.renderers.BrowsableAPIRenderer',
+    # ],
+}
 
 # email для отправки приглашений
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -162,11 +174,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "0")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "0")
-
 EMAIL_SERVER = EMAIL_HOST_USER
-
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 # telegram для отправки рассылки в группу телеграмма
@@ -176,9 +185,8 @@ TELEGRAM_GROUP_ID = os.getenv("TELEGRAM_GROUP_ID")
 # kinopoisk api token
 KP_API_TOKEN = os.getenv("KP_API_TOKEN")
 
+
 # настройки логгера
-
-
 class LogFilter(logging.Filter):
     def filter(self, record: logging.LogRecord):
         """Добавляем в логи данные для фильтрации. Формат: tags: {'thread': 11}"""

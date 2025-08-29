@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 from telegram import Bot
 
-from .exceptions import ErrorHandler
+from utils import ErrorHandler
 
 
 logger = logging.getLogger(__name__)

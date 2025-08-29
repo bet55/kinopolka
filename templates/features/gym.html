@@ -1,0 +1,62 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    {#    <link rel="stylesheet" href="{% static 'css/features/gym.css' %}">#}
+{% endblock %}
+
+{% block title %}GYM{% endblock %}
+
+{% block center-content %}
+    <div id="pinterest">
+
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const videosIds = ['292030357109841287',
+                '5207355815109644',
+                '2181499816348337',
+                '11681280279781922',
+                '11681280279781922',
+                '360780620171639282',
+                '222717144067958506',
+                '236227942951569006',
+                '63331938504210798',
+                '115756652917546858',
+                '19914423347665004',
+                '34621490881232795',
+                '52846995623267410',
+                '122441683614709037',
+                '239464905182720675',
+                '190277153003702450',
+                '377669118764244955',
+                '411938697187756686',
+                '115756652917546858',
+                '948430002758262848',
+                '106467978686291829'];
+
+            // Установка случайного видео
+            let randomNum = Math.floor(Math.random() * videosIds.length);
+            let videoSrc = `https://assets.pinterest.com/ext/embed.html?id=${videosIds[randomNum]}`;
+
+            const iframeContainer = document.getElementById('pinterest')
+            const iframe = document.createElement('iframe');
+            iframe.src = videoSrc;
+            iframe.width = '345';
+            iframe.height = '714';
+            iframe.frameborder = '0';
+            iframe.id = 'myDynamicIframe';
+
+            console.log(randomNum, videoSrc, videosIds[randomNum])
+            
+            iframeContainer.appendChild(iframe);
+        })
+
+    </script>
+{% endblock %}
