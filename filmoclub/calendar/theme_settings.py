@@ -38,10 +38,10 @@ class Themes(Enum):
 # Каким временным отрезкам соответствуют темы
 # Из отрезков формируется календарь
 THEMES_RANGES = {
-    "01.12-08.12": Themes.winter.value,
-    "01.03-08.03": Themes.spring.value,
-    "02.06-08.06": Themes.summer.value,
-    "01.09-08.09": Themes.fall.value,
+    "01.12-15.12": Themes.winter.value,
+    "01.03-15.03": Themes.spring.value,
+    "02.06-15.06": Themes.summer.value,
+    "01.09-15.09": Themes.fall.value,
     "21.03-21.03": Themes.Nikita.value,
     "01.06-01.06": Themes.Lexa.value,
     "19.06-19.06": Themes.Sanya.value,
