@@ -24,31 +24,12 @@ https://kinopolka.рф/
 2. Добавить рубрику "Угадай кино"
 
 
-
 Логи приложения:  
 https://kinopolka.com/application/grafana/
 
-
-
-# Скопируем все необходимые файлы для старта
-__копировать базу данных из сервера__  
-scp root@185.80.91.29:/var/www/kinopolka/db.sqlite3 /home/stephan/projects/vps_db
-
-__копировать media папку из сервера__  
-scp root@185.80.91.29:/var/www/kinopolka/media/postcards/* /home/stephan/projects/kinopolka/media/postcards/
-
-__копировать все media файлы из сервера__  
-scp -r root@185.80.91.29:/var/www/kinopolka/media/{postcards,posters,cocktails,ingredients} /home/stephan/projects/kinopolka/media
-
-__копировать start.sh файл из сервера__  
-scp root@185.80.91.29:/var/www/kinopolka/start.sh /home/stephan/projects/kinopolka/start.sh
-
-текущий порт узнавать у администратора
-
 # Старт приложения
-- В start.sh указываем ENVIRONMENT (dev или prod)  
-- Запустить докер контейнер grafana/loki (иначе логи не смогут записываться)
-- Запустить докер контейнер django либо файл _start.sh_
+- Создаём **start.sh** и заполняем данными(или качаем с сервера)
+- Запускаем докер контейнер либо файл _start.sh_
 
 # Разрешение ошибок
 - Если ссылки на дублирующие постеры попали в бд, замените их командой `uv run manage.py fix_posters_names`

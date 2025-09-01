@@ -5,7 +5,12 @@
 
 #postcard {
     height: 100%;
-    width: 100%
+    width: 100%;
+    /*object-fit: contain;*/
+
+    @media screen and (max-width: 800px) {
+        height: auto;
+    }
 }
 
 
@@ -153,16 +158,6 @@
 
 
     }
-
-    /*@media (min-height: 1080px) {*/
-    /*    left: 65%;*/
-    /*}*/
-
-    /*@media (min-height: 1200px) {*/
-    /*    width: 51%;*/
-    /*    left: 54%;*/
-    /*    font-size: 2.4em;*/
-    /*}*/
 
 
     @media (min-height: 1340px) {

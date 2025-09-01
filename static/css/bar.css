@@ -55,7 +55,7 @@
     img {
         width: 20%;
         flex-grow: 1;
-        /*height: 8em;*/
+        object-fit: contain;
     }
 
     h3 {
@@ -112,6 +112,35 @@
         padding: 1em;
     }
 
+}
+
+/* Мобильная вёрстка */
+@media screen and (max-width: 800px) {
+    #cocktails-list {
+        padding-left: 0;
+    }
+
+    .cocktail {
+        font-size: 12px;
+
+        img {
+            width: 25%;
+            flex-shrink: 0;
+        }
+
+        h3 {
+            font-size: 1em
+        }
+
+        .cocktail-ingredients {
+            flex-wrap: nowrap;
+            overflow: auto;
+        }
+
+        .instruction {
+            display: none;
+        }
+    }
 }
 
 .cocktail:hover {
