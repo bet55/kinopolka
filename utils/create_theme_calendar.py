@@ -36,9 +36,9 @@ from collections import OrderedDict
 
 
 res = create_theme_calendar()
-print(res)
+
 # Сортируем словарь по ключам (датам)
-# sorted_items = sorted(res.items(), key=lambda x: (x[1], x[0]))
-# ordered_dict = OrderedDict(sorted_items)
-#
+sorted_items = sorted(res.items(), key=lambda x: (x[1], x[0]))
+ordered_dict = OrderedDict(sorted_items)
+
 # print(dict(ordered_dict))

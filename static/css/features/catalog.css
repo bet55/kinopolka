@@ -23,18 +23,39 @@
     }
 
     img {
-        max-width: 100%;
-        max-height: 15em;
+        height: 80%;
+        object-fit: contain;
+    }
+
+    figure {
+        height: 100%;
+        width: 100%;
     }
 
     figcaption {
         font-weight: bold;
         font-size: 1.5em;
+        height: 15%;
     }
 
     &:hover {
         filter: contrast(60%);
 
+    }
+
+}
+
+@media screen and (max-width: 800px) {
+    #features_catalog {
+        flex-direction: column;
+        overflow: auto;
+        flex-wrap: nowrap;
+    }
+
+    .feature {
+        figcaption {
+            font-size: 1em;
+        }
     }
 
 }
@@ -52,6 +73,8 @@
             font-weight: bold;
             font-size: 3em;
         }
+
+
     }
 
 
@@ -70,7 +93,6 @@
             font-size: 4em;
         }
     }
-
 
 
 }
