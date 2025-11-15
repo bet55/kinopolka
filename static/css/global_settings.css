@@ -7,6 +7,17 @@
     --white-color: #d8e0d3;
     --green-color: darkolivegreen;
 
+    /* Breakpoints */
+    --breakpoint-xl: 2500px;
+    --breakpoint-xxl: 3000px;
+
+    /* Common values */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --spacing-sm: 0.5em;
+    --spacing-md: 1em;
+    --spacing-lg: 2em;
+
 }
 
 /* Стилизация скроллбаров */

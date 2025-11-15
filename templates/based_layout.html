@@ -11,10 +11,16 @@
     <link rel="stylesheet" href="{% static 'css/global_settings.css' %}">
 
     <link rel="stylesheet" href="{% static 'css/based_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/{{ theme }}.css' %}">
+
+
     <link rel="stylesheet" href="{% static 'css/elements/toast.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/confirmation_tooltip.css' %}">
 
-    {#    <link rel="stylesheet" href="{% static 'css/elements/new_year.css' %}">#}
+    {% if theme == 'new_year' %}
+        <link rel="stylesheet" href="{% static 'css/elements/new_year.css' %}">
+    {% endif %}
+        <link rel="stylesheet" href="{% static 'css/elements/new_year.css' %}">
 
     {% block style %} {% endblock %}
 
@@ -97,13 +103,18 @@
 
 {% block fixed %} {% endblock %}
 
-{#<div class="gir_1" id="gir"></div> Гирлянда#}
+{# для нового года оставим гирлянду #}
+{% if  theme == 'new_year'%}
+	<div class="gir_1" id="gir"></div> Гирлянда
+{% endif %}
+
 
 {% include "elements/toast.html" %}
 
 
 <script type="module" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script type="module" src="{% static 'js/based_layout.js' %}"></script>
+<script type="module" src="{% static 'js/themes/{{ theme }}.js' %}"></script>
 
 {% block script %} {% endblock %}
 

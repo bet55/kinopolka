@@ -333,4 +333,4 @@ class MovieHandler:
         genres = []
         for movie in movies:
             genres += movie.get("genres", [])
-        return list(set(genres))
+        return sorted(list(set(genres)))

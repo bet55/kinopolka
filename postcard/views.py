@@ -60,12 +60,11 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         postcard_data = await PostcardHandler.get_postcard()
 
         if not postcard_data.get("error"):
-            postcard_url = postcard_data.get("screenshot") or random_images.get("postcard")
+            postcard_url = postcard_data.get("screenshot") or postcard_url
             is_active = postcard_data.get("is_active", False)
 
         context = {
             "postcard": postcard_url,
-            "random": random_images,
             "is_active": is_active,
         }
         context = await self.add_context_data(request, context)

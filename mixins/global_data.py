@@ -22,13 +22,17 @@ class GlobalDataMixin:
         """Возвращает кэшированные или свежие данные."""
         response = {}
         try:
+            query_params = getattr(request, "query_params", dict())
+            theme = query_params.get("theme")
+
             if "users" not in context:
                 response["users"] = await self._get_cached_users()
 
             if "random" not in context:
-                query_params = getattr(request, "query_params", dict())
-                theme = query_params.get("theme")
                 response["random"] = Tools.get_random_images(theme)
+
+            if "theme" not in context:
+                response["theme"] = theme
 
             return response
 
