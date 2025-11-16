@@ -1,4 +1,5 @@
 import {createToast} from "./create_toast.js";
+import {getCookie} from "./cookie.js";
 
 // Общий метод отправки запросов
 
@@ -24,13 +25,28 @@ class Request {
         return await Request.send({method: 'patch', url: url, body: body, headers: headers, showToast: showToast})
     }
 
+    static permissionsIsAllowed(method) {
+        if(method === 'GET') {
+            return true;
+        }
+        const user = getCookie('user');
+        console.log(user);
+        return !!user;
+    }
+
     static async send({method, url, body = null, headers = {}, showToast = true}) {
 
         const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
         const successEmo = '🌟';
         const errorEmo = '☠';
 
-        method = method.toUpperCase()
+        method = method.toUpperCase();
+
+        if(!Request.permissionsIsAllowed(method)) {
+            createToast('Только пользователи могут это сделать', 'error');
+            return null;
+        }
+
 
         const requestOptions = {
             method: method,
