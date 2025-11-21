@@ -20,7 +20,11 @@
                     <div class="movie" data-kp-id="{{ m.kp_id }}">
                         <div class="poster-container">
                             <img src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
-                            <span>{{ m.rating }}</span>
+                            <div class="rating">
+                                <span><img src="{% static 'img/imdb.svg' %}" alt="imdb">{{ m.rating_imdb }}</span>
+                                <span><img src="{% static 'img/kinopoisk.svg' %}" alt="kp">{{ m.rating_kp }}</span>
+                                <span><img src="{% static 'img/icon.png' %}" alt="polka">{{ m.rating }}</span>
+                            </div>
                         </div>
 
                         <h4>{{ m.name }}</h4>
@@ -37,10 +41,22 @@
 
 
 
+    <h2>Мы vs Мир</h2>
+    {{ graphs.club_vs_imdb|safe }}
 
-    {#    <div class="graph">#}
-    {#        {{ graph_div|safe }}#}
-    {#    </div>#}
+    <h2>Переоценённые шедевры</h2>
+    {{ graphs.overrated|safe }}
+
+    <h2>Недооценённые нами</h2>
+    {{ graphs.underrated|safe }}
+
+    <h2>Эволюция вкуса</h2>
+    {{ graphs.yearly_trend|safe }}
+
+    <h2>Жанровая карта</h2>
+    {{ graphs.genres_treemap|safe }}
+
+
 {% endblock %}
 
 {% block right-content %}

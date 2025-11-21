@@ -50,15 +50,6 @@ class Genre(Model):
 
 
 class Movie(Model):
-    # class CustomJSONField(models.JSONField):
-    #
-    #     def get_prep_value(self, value):
-    #         import json
-    #         if value is None:
-    #             return value
-    #         # Почему не работает????????????????????????
-    #         return json.dumps(value, ensure_ascii=False)
-
     mgr = models.Manager()
     kp_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50, validators=[validators.validate_name])

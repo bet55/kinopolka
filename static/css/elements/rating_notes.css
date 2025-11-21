@@ -61,9 +61,9 @@
         font-size: 3em;
     }
 
-    @media (min-width: 3000px) {
-        height: 6em;
-        width: 6em;
+    @media (min-width: 2500px) {
+        height: 5em;
+        width: 5em;
 
         h2 {
             font-size: 3em;
@@ -79,6 +79,11 @@
     top: 1em;
     left: 1em;
     background: var(--red-color);
+
+    @media (min-width: 2500px) {
+        top: 2em;
+        left: 1em;
+    }
 }
 
 .note[data-user-id="3"] {
@@ -87,9 +92,9 @@
     left: 5em;
     background: var(--yellow-color);
 
-    @media (min-width: 3000px) {
+    @media (min-width: 2500px) {
         top: 4em;
-        left: 11em;
+        left: 7em;
     }
 }
 
@@ -99,9 +104,9 @@
     left: 1em;
     background: var(--white-color);
 
-    @media (min-width: 3000px) {
-        top: 11em;
-        left: 2em;
+    @media (min-width: 2500px) {
+        top: 12em;
+        left: 1em;
     }
 }
 
@@ -111,9 +116,9 @@
     left: 5em;
     background: var(--orange-color);
 
-    @media (min-width: 3000px) {
-        top: 14em;
-        left: 10em;
+    @media (min-width: 2500px) {
+        top: 12em;
+        left: 7em;
     }
 }
 

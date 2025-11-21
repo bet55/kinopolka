@@ -60,13 +60,19 @@ class MovieHandler:
         :return: Список сериализованных фильмов.
         """
         raw_films = Movie.mgr.filter(is_archive=is_archive)
+        serialisers = {
+            MoviesStructure.posters: MoviePosterSerializer,
+            MoviesStructure.rating: MovieRatingSerializer
+        }
+        serializer = serialisers.get(info_type, MovieDictSerializer)
+        movies = serializer(raw_films, many=True)
 
-        if info_type == MoviesStructure.posters:
-            serializer = MoviePosterSerializer(raw_films, many=True)
-        elif info_type == MoviesStructure.rating:
-            serializer = MovieRatingSerializer(raw_films, many=True)
-        else:
-            serializer = MovieDictSerializer(raw_films, many=True)
+        # if info_type == MoviesStructure.posters:
+        #     serializer = MoviePosterSerializer(raw_films, many=True)
+        # elif info_type == MoviesStructure.rating:
+        #     serializer = MovieRatingSerializer(raw_films, many=True)
+        # else:
+        #     serializer = MovieDictSerializer(raw_films, many=True)
 
         logger.info(
             "Получено %d фильмов (is_archive=%s, info_type=%s)",
@@ -74,7 +80,7 @@ class MovieHandler:
             is_archive,
             info_type,
         )
-        return serializer.data
+        return movies.data
 
     @classmethod
     @handle_exceptions("Фильм")

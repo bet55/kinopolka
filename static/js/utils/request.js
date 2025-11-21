@@ -25,7 +25,7 @@ class Request {
         return await Request.send({method: 'patch', url: url, body: body, headers: headers, showToast: showToast})
     }
 
-    static permissionsIsAllowed(method) {
+    static _permissionsIsAllowed(method) {
         if(method === 'GET') {
             return true;
         }
@@ -34,20 +34,7 @@ class Request {
         return !!user;
     }
 
-    static async send({method, url, body = null, headers = {}, showToast = true}) {
-
-        const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
-        const successEmo = '🌟';
-        const errorEmo = '☠';
-
-        method = method.toUpperCase();
-
-        if(!Request.permissionsIsAllowed(method)) {
-            createToast('Только пользователи могут это сделать', 'error');
-            return null;
-        }
-
-
+    static _prepareRequest(method, headers, body) {
         const requestOptions = {
             method: method,
             headers: {
@@ -69,6 +56,23 @@ class Request {
             }
 
         }
+        return requestOptions;
+    }
+
+    static async send({method, url, body = null, headers = {}, showToast = true}) {
+
+        const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
+        const successEmo = '🌟';
+        const errorEmo = '☠';
+
+        method = method.toUpperCase();
+
+        if(!Request._permissionsIsAllowed(method)) {
+            createToast('Только пользователи могут это сделать', 'error');
+            return null;
+        }
+
+        const requestOptions = Request._prepareRequest(method, headers, body);
 
         try {
             const response = await fetch(url, requestOptions);
