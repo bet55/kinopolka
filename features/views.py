@@ -26,14 +26,13 @@ class MoviesStatistic(GlobalDataMixin, APIView):
 
         movies = await statistic.outstanding_movies()
         genres = await statistic.outstanding_genres()
-        # graphs = await statistic.draw()
+        graphs = await statistic.draw()
 
         context = {
-            # "graph_div": fig,
             "statistic": common_stats,
             "movies_rating": movies,
             "genres_table": genres,
-            # "graphs": graphs,
+            "graphs": graphs,
         }
 
         return render(

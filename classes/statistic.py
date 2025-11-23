@@ -8,9 +8,8 @@ import plotly
 import plotly.express as px
 from icecream import ic
 
-from features.serializers import ActorSerializer, DirectorSerializer, GenreSerializer, WriterSerializer, NoteFlatSerializer
-from lists.serializers import NoteSerializer
-from lists.models import Actor, Director, Genre, Writer, Note
+from features.serializers import ActorSerializer, DirectorSerializer, GenreSerializer, WriterSerializer
+from lists.models import Actor, Director, Genre, Writer
 
 from .movie import MovieHandler, MoviesStructure
 from .note import NoteHandler
@@ -43,9 +42,7 @@ class ModelsHandler:
         :returns:List of serialized data.
         """
         queryset = model.mgr.all()
-
-        if is_archive is not None:
-            queryset = queryset.filter(movie__is_archive=is_archive)
+        queryset = queryset.filter(movie__is_archive=is_archive).distinct()
 
         # Serialize data
         serializer = cls.MODEL_SERIALIZER[model](queryset, many=True)
@@ -70,6 +67,7 @@ class Statistic:
         """
         archive_movies = await MovieHandler.get_all_movies("rating", is_archive=True)
         notes = await NoteHandler.get_all_notes("list")
+        genres = await ModelsHandler.get_all(Genre)
 
         notes = pd.DataFrame(notes)
         archive_movies = pd.DataFrame(archive_movies)
@@ -80,28 +78,31 @@ class Statistic:
         archive_movies[wrong_types] = archive_movies[wrong_types].replace(',', '.', regex=True)
         archive_movies[wrong_types] = archive_movies[wrong_types].astype(np.float64).round(2)
 
-        polka_rating = notes.groupby('movie', as_index=False).agg({'rating': 'mean', 'user': 'count'})
+        # добавляем наши оценки фильмов
+        polka = notes.groupby('movie', as_index=False).agg({'rating': 'mean', 'user': 'count'}).round(1)
+        archive_movies = pd.merge(archive_movies, polka, left_on="kp_id", right_on="movie", how="inner")
 
-        self.archive_movies =  pd.merge(archive_movies, polka_rating, left_on="kp_id", right_on="movie", how="inner")
+        genres.sort_values(by="movies_count", ascending=False)
 
+        self.archive_movies = archive_movies
         self.notes = notes
-        self.genres = await ModelsHandler.get_all(Genre)
+        self.genres = genres
 
-
-
-    def _get_top_and_bot_rated_movies(self, rating_platform: str) -> Rating:
+    def _get_top_and_bot_rated_movies(self, rating_type: str) -> Rating:
         """
         Получаем фильмы с самой высокой и самой низкой оценкой
-        :param rating_platform: где выставлены оценки - кинополка, imdb, кинопоиск
+        :param rating_type: какой рейтинг считаем - ratin, rating_imdb, rating_kp
         :return: Rating
         """
+        movies = self.archive_movies.copy()
 
-        agg_by_rating = self.archive_movies.sort_values(by=rating_platform, ascending=False)
+        if rating_type == 'rating':
+            movies = movies[movies.user == self.USERS_COUNT]
 
-        top_movies = agg_by_rating.head(self.TOP_MOVIES).to_dict(orient='records')
-        bot_movies = agg_by_rating.tail(self.TOP_MOVIES).to_dict(orient='records')
+        movies = movies.sort_values(by=rating_type, ascending=False)
 
-        ic(top_movies)
+        top_movies = movies.head(self.TOP_MOVIES).to_dict(orient='records')
+        bot_movies = movies.tail(self.TOP_MOVIES).to_dict(orient='records')
 
         return self.Rating(top=top_movies, bot=bot_movies)
 
@@ -121,12 +122,12 @@ class Statistic:
         return writers[writers['movies_count'] == self.TOP_PERSONS]
 
     async def outstanding_genres(self) -> str:
-        df = self.genres.loc[:, ["name", "movies_count"]]
-        df = df.sort_values(by="movies_count", ascending=False)
+        """
+        Получаем самые частые и самые редкие жанры
+        """
 
-        # Берём топ-5 и редкие 5 жанров
-        common_genres = df.head(5).reset_index(drop=True)
-        rare_genres = df.tail(5).reset_index(drop=True)
+        common_genres = self.genres.head(5).reset_index(drop=True)
+        rare_genres = self.genres.tail(5).reset_index(drop=True)
 
         # Создаём DataFrame с MultiIndex напрямую
         result_df = pd.DataFrame(
@@ -160,7 +161,7 @@ class Statistic:
             "Бот рейтинг на кинополке": kinopolka_movies.bot,
         }
 
-    async def statistic(self):
+    async def statistic(self) -> dict[str: int | float]:
         """
         Базовая статистика по таблице с фильмами
         """
@@ -168,11 +169,11 @@ class Statistic:
         postcards = await PostcardHandler.get_all_postcards()
 
         df = self.archive_movies
-        users_mean_rating = df.rating.mean()
+        users_mean_rating = df.rating.mean().round(2)
 
         stats = {
             "Общая продолжительность": df["duration"].sum(),
-            "Количество собраний": len(movies),
+            "Количество собраний": len(postcards),
             "Средняя оценка на кинопоиске": df["rating_kp"].mean().round(2),
             "Средняя оценка на imdb": df["rating_imdb"].mean().round(2),
             "Средняя оценка на кинополке": users_mean_rating,
@@ -182,55 +183,33 @@ class Statistic:
 
         return stats
 
-    async def draw_old(self):
-        film_model = await MovieHandler.get_all_movies(is_archive=True)
-        film_model = film_model.values()
-
-        df = pd.DataFrame(film_model)
-        figure_config = {
-            "x": "rating_kp",
-            "width": 800,
-            "color_discrete_sequence": ["#9bab6e"],
-            "labels": {
-                "rating_kp": "Средняя оценка пользователей",
-                "count": "Количество оценок",
-            },
-        }
-        figure = px.histogram(df, **figure_config)
-        graph_div = plotly.offline.plot(figure, auto_open=False, output_type="div")
-
-        return graph_div
 
     async def draw(self) -> dict[str, str]:
         """
-        Возвращает 6 крутых графиков в виде HTML-div
+        Возвращает 5 крутых графиков в виде HTML-div
         """
 
         am = self.archive_movies.copy()
-        notes = self.notes.copy()
+        notes = self.notes
 
-        # 1. Распределение оценок Кинопоиска (классика, но красивая)
+        # 1. Распределение оценок Кинополки
         fig1 = px.histogram(
-            am,
-            x="rating_kp",
-            nbins=25,
-            title="Распределение оценок на Кинопоиске",
-            labels={"rating_kp": "Оценка КП", "count": "Количество фильмов"},
+            notes,
+            x="rating",
+            nbins=10,
+            title="Распределение оценок на Кинополке",
+            labels={"rating": "Оценки кинополки", "count": "Количество фильмов"},
             color_discrete_sequence=["#e67e22"],
             template="simple_white",
         )
         fig1.update_layout(bargap=0.1, title_x=0.5, font_size=14)
 
         # 2. Наши оценки vs IMDb — главная фишка кинопоики!
-        club_ratings = notes.groupby("movie").agg({"rating": "mean"}).round(1)
-        merged = am[["kp_id", "name", "rating_imdb"]].merge(
-            club_ratings, left_on="kp_id", right_on="movie", how="left"
-        )
-        merged["diff"] = merged["rating"] - merged["rating_imdb"]
-        merged = merged.dropna()
+        am["diff"] = round(am["rating"] - am["rating_imdb"], 2)
+        am = am.dropna()
 
         fig2 = px.scatter(
-            merged,
+            am,
             x="rating_imdb",
             y="rating",
             hover_name="name",
@@ -245,9 +224,8 @@ class Statistic:
         fig2.update_layout(title_x=0.5, coloraxis_colorbar=dict(title="Мы - IMDb"))
 
         # 3. Топ-10 переоценённых и недооценённых нами фильмов
-        merged['diff'] = merged['diff'].astype(np.float32)
-        top_overrated = merged.nlargest(10, "diff")[["name", "rating_imdb", "rating", "diff"]]
-        top_underrated = merged.nsmallest(10, "diff")[["name", "rating_imdb", "rating", "diff"]]
+        top_overrated = am.nlargest(10, "diff")[["name", "rating_imdb", "rating", "diff"]]
+        top_underrated = am.nsmallest(10, "diff")[["name", "rating_imdb", "rating", "diff"]]
 
         fig3 = px.bar(
             top_overrated,
@@ -275,25 +253,9 @@ class Statistic:
         fig4.update_yaxes(autorange="reversed")
         fig4.update_layout(title_x=0.5, showlegend=False)
 
-        # 5. Эволюция среднего рейтинга по годам премьеры
-        # am["year"] = pd.to_datetime(am["premiere"]).dt.year
-        # yearly = am.groupby("year").agg({"rating_kp": "mean", "kp_id": "count"}).reset_index()
-        # yearly = yearly[yearly["kp_id"] >= 2]  # фильтруем единичные годы
-        #
-        # fig5 = px.line(
-        #     yearly,
-        #     x="year",
-        #     y="rating_kp",
-        #     markers=True,
-        #     title="Как меняется средняя оценка КП по годам премьеры",
-        #     labels={"rating_kp": "Средняя оценка КП", "year": "Год"},
-        #     color_discrete_sequence=["#9b59b6"],
-        # )
-        # fig5.update_layout(title_x=0.5)
-
-        # 6. Жанры — не таблица, а красивая treemap!
-        genre_counts = self.genres.sort_values("movies_count", ascending=False)
-        fig6 = px.treemap(
+        # 5. Жанры — не таблица, а красивая treemap!
+        genre_counts = self.genres
+        fig5 = px.treemap(
             genre_counts,
             path=["name"],
             values="movies_count",
@@ -301,7 +263,7 @@ class Statistic:
             color="movies_count",
             color_continuous_scale="Viridis",
         )
-        fig6.update_layout(title_x=0.5)
+        fig5.update_layout(title_x=0.5)
 
         # Конвертируем в HTML div
         def to_div(fig):
@@ -312,8 +274,7 @@ class Statistic:
             "club_vs_imdb": to_div(fig2),
             "overrated": to_div(fig3),
             "underrated": to_div(fig4),
-            # "yearly_trend": to_div(fig5),
-            "genres_treemap": to_div(fig6),
+            "genres_treemap": to_div(fig5),
         }
 
         return graphs
