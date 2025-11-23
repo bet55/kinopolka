@@ -1,60 +1,91 @@
 {% extends "based_layout.html" %}
-
 {% load static %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <meta name="description" content="Статистика киноклуба">
+{% endblock %}
 
 {% block style %}
     <link rel="stylesheet" href="{% static 'css/features/statistic.css' %}">
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 {% endblock %}
-{% block title %}Статистика{% endblock %}
 
 {% block center-content %}
 
-    <div id="main-container">
-        {% for rate_name, rate_movies in movies_rating.items %}
+<div class="container-fluid">
 
-            <div class="row movies-container">
+    <!-- Вкладки -->
+    <ul class="nav nav-tabs justify-content-center stats-tabs" id="statsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="imdb-tab" data-bs-toggle="tab"
+                    data-bs-target="#imdb" type="button" role="tab">
+                IMDb
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="kp-tab" data-bs-toggle="tab"
+                    data-bs-target="#kp" type="button" role="tab">
+                Кинопоиск
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="polka-tab" data-bs-toggle="tab"
+                    data-bs-target="#polka" type="button" role="tab">
+                Кинополка
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="graphs-tab" data-bs-toggle="tab"
+                    data-bs-target="#graphs" type="button" role="tab">
+                Графики
+            </button>
+        </li>
+    </ul>
 
-                <h2>{{ rate_name }}</h2>
-                {% for m in rate_movies %}
 
-                    <div class="movie" data-kp-id="{{ m.kp_id }}">
-                        <div class="poster-container">
-                            <img class="poster" src="{{ m.poster_local }}" alt="" loading="lazy" data-kp-id="{{ m.kp_id }}">
-                            <div class="rating">
-                                <span><img src="{% static 'img/imdb.svg' %}" alt="imdb">{{ m.rating_imdb }}</span>
-                                <span><img src="{% static 'img/kinopoisk.svg' %}" alt="kp">{{ m.rating_kp }}</span>
-                                <span><img src="{% static 'img/icon.png' %}" alt="polka">{{ m.rating }}</span>
-                            </div>
-                        </div>
 
-                        <h4>{{ m.name }}</h4>
-                    </div>
+    <div class="tab-content" id="statsTabContent">
 
-                {% endfor %}
-            </div>
 
-            <br>
-        {% endfor %}
+        <div class="tab-pane fade show active" id="imdb" role="tabpanel">
+            {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.imdb.top %}
+            {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.imdb.bot %}
+        </div>
+
+        <!-- 2. Кинопоиск -->
+        <div class="tab-pane fade" id="kp" role="tabpanel">
+            {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.kp.top %}
+            {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kp.bot %}
+        </div>
+
+        <!-- 3. Кинополка (наши оценки) -->
+        <div class="tab-pane fade" id="polka" role="tabpanel">
+            {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.kinopolka.top %}
+            {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kinopolka.bot %}
+        </div>
+
+        <!-- 4. Графики -->
+        <div class="tab-pane fade" id="graphs" role="tabpanel">
+            <h2 class="tab-title">Распределение оценок на Кинопоиске</h2>
+            {{ graphs.kp_distribution|safe }}
+
+            <h2 class="tab-title">Мы vs Мир: где мы добрее/суровее IMDb</h2>
+            {{ graphs.club_vs_imdb|safe }}
+
+            <h2 class="tab-title">Топ-10 переоценённых нами</h2>
+            {{ graphs.overrated|safe }}
+
+            <h2 class="tab-title">Топ-10 недооценённых нами</h2>
+            {{ graphs.underrated|safe }}
+
+            <h2 class="tab-title">Жанровая карта кинополки</h2>
+            {{ graphs.genres_treemap|safe }}
+        </div>
 
     </div>
-
-
-
-    <h2>Распределение оценок на Кинопоиске</h2>
-    {{ graphs.kp_distribution|safe }}
-
-    <h2>Мы vs Мир: где мы добрее/суровее IMDb</h2>
-    {{ graphs.club_vs_imdb|safe }}
-
-    <h2>Топ-10 переоценённых нами фильмов</h2>
-    {{ graphs.overrated|safe }}
-
-    <h2 sash="true">Топ-10 недооценённых нами фильмов</h2>
-    {{ graphs.underrated|safe }}
-
-    <h2>Жанровая карта кинополки</h2>
-    {{ graphs.genres_treemap|safe }}
+</div>
 
 {% endblock %}
 
@@ -63,24 +94,57 @@
     <div id="stats">
         <h3>Общее</h3>
         <table>
-            <tbody>
             {% for stat_name, stat in statistic.items %}
-                <tr>
-                    <td>{{ stat_name }}</td>
-                    <td>{{ stat }}</td>
-                </tr>
+                <tr><td>{{ stat_name }}</td><td>{{ stat }}</td></tr>
             {% endfor %}
-            </tbody>
-
         </table>
     </div>
+
     <br>
 
     <div id="genres">
         <h3>Жанры</h3>
-        {% autoescape off %} {{ genres_table }} {% endautoescape %}
+        {% autoescape off %}{{ genres_table }}{% endautoescape %}
     </div>
+{% endblock %}
 
+{% block script %}
+<script>
+// Ресайзим все графики Plotly при открытии вкладки "Графики"
+document.addEventListener('DOMContentLoaded', function () {
+    const graphsTab = document.getElementById('graphs-tab');
 
+    graphsTab.addEventListener('shown.bs.tab', function () {
+        // Небольшая задержка, чтобы DOM успел перестроиться
+        setTimeout(function () {
+            // Перебираем все графики на странице и делаем resize
+            const graphs = document.querySelectorAll('#graphs .plotly-graph-div');
+            graphs.forEach(div => {
+                if (window.Plotly && div.id) {
+                    try {
+                        Plotly.Plots.resize(div);
+                        // Или полная перерисовка (на всякий случай):
+                        // Plotly.relayout(div, {});
+                    } catch (e) {
+                        console.log('Plotly resize skipped for', div.id);
+                    }
+                }
+            });
+        }, 100);
+    });
 
+    // Опционально: ресайз при изменении размера окна
+    window.addEventListener('resize', function () {
+        if (document.querySelector('#graphs.tab-pane.active')) {
+            setTimeout(() => {
+                document.querySelectorAll('#graphs .plotly-graph-div').forEach(div => {
+                    if (window.Plotly && div.id) {
+                        Plotly.Plots.resize(div);
+                    }
+                });
+            }, 100);
+        }
+    });
+});
+</script>
 {% endblock %}

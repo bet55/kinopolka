@@ -67,8 +67,9 @@ class Statistic:
         """
         archive_movies = await MovieHandler.get_all_movies("rating", is_archive=True)
         notes = await NoteHandler.get_all_notes("list")
-        genres = await ModelsHandler.get_all(Genre)
 
+        # формат dataframe
+        genres = await ModelsHandler.get_all(Genre)
         notes = pd.DataFrame(notes)
         archive_movies = pd.DataFrame(archive_movies)
 
@@ -82,11 +83,9 @@ class Statistic:
         polka = notes.groupby('movie', as_index=False).agg({'rating': 'mean', 'user': 'count'}).round(1)
         archive_movies = pd.merge(archive_movies, polka, left_on="kp_id", right_on="movie", how="inner")
 
-        genres.sort_values(by="movies_count", ascending=False)
-
         self.archive_movies = archive_movies
         self.notes = notes
-        self.genres = genres
+        self.genres = genres.sort_values(by="movies_count", ascending=False)
 
     def _get_top_and_bot_rated_movies(self, rating_type: str) -> Rating:
         """
@@ -151,15 +150,12 @@ class Statistic:
         imdb_movies = self._get_top_and_bot_rated_movies('rating_imdb')
         kp_movies = self._get_top_and_bot_rated_movies('rating_kp')
 
-
         return {
-            "Топ рейтинг на imdb": imdb_movies.top,
-            "Топ рейтинг на кинопоиске": kp_movies.top,
-            "Топ рейтинг на кинополке": kinopolka_movies.top,
-            "Бот рейтинг на imdb": imdb_movies.bot,
-            "Бот рейтинг на кинопоиске": kp_movies.bot,
-            "Бот рейтинг на кинополке": kinopolka_movies.bot,
+            "imdb": imdb_movies,
+            "kp": kp_movies,
+            "kinopolka": kinopolka_movies
         }
+
 
     async def statistic(self) -> dict[str: int | float]:
         """

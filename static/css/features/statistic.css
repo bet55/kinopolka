@@ -1,10 +1,41 @@
-#main-container {
-    overflow: auto;
-    max-height: 80vh;
+/* =============  Центральная часть с постерами =============*/
+
+/* Вкладки */
+.stats-tabs {
+    margin-bottom: 2rem;
 }
 
+.nav-tabs .nav-link {
+    font-weight: bold;
+    color: var(--black-color);
+    border: 2px solid var(--orange-color);
+    border-radius: 12px;
+    margin: 0 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.3rem;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--orange-color);
+    color: white;
+    border-color: var(--orange-color);
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--red-color);
+    color: var(--red-color);
+}
+
+/* Постеры */
 .movies-container {
     width: 100%;
+
+    .tab-title {
+        text-align: center;
+        margin: 30px 0;
+        font-size: 2.2rem;
+        color: var(--red-color);
+    }
 
     h2 {
         color: var(--black-color);
@@ -38,6 +69,15 @@
             bottom: 0;
             left: 0;
 
+            display: flex;
+            justify-content: space-evenly;
+
+            span {
+                max-width: 32%;
+                display: flex;
+                align-items: center;
+            }
+
             img {
                 height: 1em;
                 margin: 5px;
@@ -51,7 +91,17 @@
     }
 }
 
+/* Чтобы графики не ломали высоту */
+.plotly-graph-div {
+    width: 100% !important;
+    height: 600px !important;
+    margin: 30px 0;
+}
 
+
+
+
+/* ============= Правая часть со статистикой ============= */
 #stats {
     display: flex;
     justify-content: center;
