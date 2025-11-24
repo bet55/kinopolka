@@ -18,13 +18,13 @@
 
     }
 
-    &:not(.active):hover {
-        img {
-            filter: contrast(115%);
-            cursor: pointer;
-        }
+    /*&:not(.active):hover {*/
+    /*    img {*/
+    /*        filter: contrast(115%);*/
+    /*        cursor: pointer;*/
+    /*    }*/
 
-    }
+    /*}*/
 
     @media screen and (max-width: 800px) {
         max-width: 90%;

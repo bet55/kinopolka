@@ -21,14 +21,18 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
         """
         Получение страницы архива всех открыток.
         """
-        postcards = await PostcardHandler.get_all_postcards()
+
 
         response_format = request.query_params.get("format")
         if response_format == "json":
+            postcards = await PostcardHandler.get_all_postcards()
             return Response(postcards, status=status.HTTP_200_OK)
 
+
+        postcards = await PostcardHandler.get_all_postcards_with_ratings()
+
         context = await self.add_context_data(request, {"postcards": postcards})
-        return render(request, "postcards_archive.html", context=context)
+        return render(request, "postcards_archive2.html", context=context)
 
 
 class InvitationViewSet(APIView):

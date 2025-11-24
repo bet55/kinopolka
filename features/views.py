@@ -7,6 +7,8 @@ from mixins import GlobalDataMixin
 
 
 class Catalog(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
     async def get(self, request: Request):
         return render(
             request,
@@ -16,14 +18,14 @@ class Catalog(GlobalDataMixin, APIView):
 
 
 class MoviesStatistic(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
     async def get(self, request: Request):
-        # fig = await Statistic.draw()
 
         statistic = Statistic()
         await statistic.extract_data()
 
         common_stats = await statistic.statistic()
-
         movies = await statistic.outstanding_movies()
         genres = await statistic.outstanding_genres()
         graphs = await statistic.draw()
@@ -43,6 +45,8 @@ class MoviesStatistic(GlobalDataMixin, APIView):
 
 
 class Carousel(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
     async def get(self, request: Request):
         movies = await MovieHandler.get_all_movies(info_type="posters")
 
@@ -54,6 +58,8 @@ class Carousel(GlobalDataMixin, APIView):
 
 
 class Tarots(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
     async def get(self, request: Request):
         return render(
             request,
@@ -63,6 +69,8 @@ class Tarots(GlobalDataMixin, APIView):
 
 
 class Gym(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
     async def get(self, request: Request):
         return render(
             request,

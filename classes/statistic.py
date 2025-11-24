@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import plotly
 import plotly.express as px
-from icecream import ic
 
 from features.serializers import ActorSerializer, DirectorSerializer, GenreSerializer, WriterSerializer
 from lists.models import Actor, Director, Genre, Writer

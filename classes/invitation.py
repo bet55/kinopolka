@@ -88,7 +88,6 @@ class Invitation:
 
             users = await UserHandler.get_all_users()
             emails = [user.get("email") for user in users if user.get("email")]
-            emails = []
 
             if not emails:
                 logger.warning("No valid email addresses found for invitation")
