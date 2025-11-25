@@ -1,15 +1,14 @@
+from collections import defaultdict
 import logging
 
 from asgiref.sync import sync_to_async
+from django.db.models import Prefetch
 from rest_framework.exceptions import ValidationError
 
+from lists.models import Movie, Note
 from postcard.models import Postcard
 from postcard.serializers import PostcardSerializer
 from utils.exception_handler import handle_exceptions
-
-from collections import defaultdict
-from django.db.models import Prefetch
-from lists.models import Movie, Note, User
 
 
 logger = logging.getLogger(__name__)
@@ -155,7 +154,6 @@ class PostcardHandler:
                 'average_rating': average_rating,
                 'movies': movies_list,  # ← список словарей!
             }
-        from icecream import ic
         # ic(result)
         return result
 

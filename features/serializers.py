@@ -1,6 +1,6 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, ReadOnlyField, DateTimeField
+from rest_framework.serializers import DateTimeField, ModelSerializer, ReadOnlyField, SerializerMethodField
 
-from lists.models import Actor, Director, Genre, Movie, Writer, Note
+from lists.models import Actor, Director, Genre, Movie, Note, Writer
 
 
 DEFAULT_POSTER = "/media/posters/default.png"
