@@ -148,6 +148,7 @@ class PostcardHandler:
 
             result[pc_id] = {
                 'screenshot': postcard.screenshot.url if postcard.screenshot else None,
+                'is_active': postcard.is_active,
                 'meeting_date': postcard.meeting_date.strftime("%d.%m.%Y %H:%M"),
                 'created_at': postcard.created_at.strftime("%d.%m.%Y"),
                 'title': postcard.title or f"Встреча {postcard.meeting_date.strftime('%d.%m.%Y')}",

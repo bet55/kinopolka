@@ -32,7 +32,7 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
         postcards = await PostcardHandler.get_all_postcards_with_ratings()
 
         context = await self.add_context_data(request, {"postcards": postcards})
-        return render(request, "postcards_archive2.html", context=context)
+        return render(request, "postcards_archive.html", context=context)
 
 
 class InvitationViewSet(APIView):

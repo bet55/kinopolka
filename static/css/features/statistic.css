@@ -50,6 +50,7 @@
         width: 100%;
         height: 80%;
         position: relative;
+        border: 4px solid black;
 
         .poster {
             width: 100%;

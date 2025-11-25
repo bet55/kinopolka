@@ -1,5 +1,4 @@
 {% extends "based_layout.html" %}
-
 {% load static %}
 
 {% block style %}
@@ -13,43 +12,56 @@
     {% include "elements/rating_notes.html" %}
 {% endblock %}
 
-
 {% block center-content %}
-
     <div id="postcards-container">
+        {% for postcard_id, p in postcards.items %}
+            <figure class="postcard" data-postcard-id="{{ postcard_id }}">
 
-
-        {% for p in postcards %}
-
-            {% if p.is_active %}
-                <figure class="postcard active">
-                    <img src="{{ p.screenshot }}" alt="открытка">
-                    <figcaption><b>Собрание: </b>{{ p.meeting_date }}</figcaption>
+                <!-- Обычный вид -->
+                <div class="postcard-normal">
+                    <img src="{{ p.screenshot }}" alt="открытка" class="main-screenshot" data-active="{{ p.is_active }}">
+                    <figcaption><b>Собрание:</b> {{ p.meeting_date }}</figcaption>
                     <figcaption><b>Создание:</b> {{ p.created_at }}</figcaption>
-                </figure>
-            {% else %}
-                <figure class="postcard"
-                        data-postcard-id="{{ p.id }}"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        data-bs-title="Нажмите, чтобы удалить открытку">
+                </div>
 
-                    <img src="{{ p.screenshot }}" alt="открытка">
-                    <figcaption><b>Собрание: </b>{{ p.meeting_date }}</figcaption>
-                    <figcaption><b>Создание:</b> {{ p.created_at }}</figcaption>
-                    
-                    {% include "elements/confirmation_tooltip.html" with title="Удалить открытку?" %}
-                </figure>
-            {% endif %}
+                <!-- Режим с оценками -->
+                <div class="postcard-rating-mode">
 
+                    <div class="average-rating">{{ p.average_rating }}</div>
 
+                    <div class="movies-with-notes">
+                        {% for movie in p.movies %}
+                            <div class="movie-note">
+                                <img src="{{ movie.poster_local }}" class="movie-poster" alt="{{ movie.name }}">
+
+                                <div class="movie-ratings-bar">
+
+                                    <div class="rating-cell" data-user="2">
+                                        {{ movie.ratings.2|default:"-" }}
+                                    </div>
+                                    <div class="rating-cell" data-user="3">
+                                        {{ movie.ratings.3|default:"-" }}
+                                    </div>
+                                    <div class="rating-cell" data-user="4">
+                                        {{ movie.ratings.4|default:"-" }}
+                                    </div>
+                                    <div class="rating-cell" data-user="5">
+                                        {{ movie.ratings.5|default:"-" }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% include "elements/confirmation_tooltip.html" with title="Удалить открытку?" %}
+
+            </figure>
         {% endfor %}
     </div>
 {% endblock %}
 
-
 {% block script %}
     <script type="module" src="{% static 'js/postcards_archive.js' %}"></script>
 {% endblock %}
-
-

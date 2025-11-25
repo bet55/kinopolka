@@ -12,29 +12,158 @@
     position: relative;
     margin-top: 1em;
 
-    img {
-        width: 100%;
-        height: 85%;
-
-    }
-
-    /*&:not(.active):hover {*/
-    /*    img {*/
-    /*        filter: contrast(115%);*/
-    /*        cursor: pointer;*/
-    /*    }*/
-
-    /*}*/
-
     @media screen and (max-width: 800px) {
         max-width: 90%;
     }
 }
 
+.postcard-normal {
 
-.postcard.active {
+    transition: opacity 0.4s ease;
+
     img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 8px;
+    }
+
+    img:hover {
+        filter: grayscale(50%);
+        cursor: pointer;
+    }
+
+    img[data-active="True"] {
         box-shadow: 0 2px 8px 8px var(--green-color);
+
+    }
+
+    figcaption {
+        padding: 0.5em 1em;
+        text-align: center;
+        font-size: 1.1em;
     }
 
 }
+
+
+.postcard-rating-mode {
+    position: absolute;
+
+    inset: 0;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    pointer-events: none; /* чтобы не мешал клику по кнопке удаления */
+    background-image: url(/static/img/postcard_options/bg2.jpg);
+    /*background-size: cover;*/
+    border-radius: 8px;
+}
+
+.postcard.show-ratings .postcard-rating-mode {
+    opacity: 1;
+    visibility: visible;
+    z-index: 3;
+}
+
+.postcard.show-ratings .postcard-normal {
+    opacity: 0;
+    z-index: -1;
+}
+
+
+/* Средняя оценка — в правом верхнем углу */
+.average-rating {
+    position: absolute;
+    top: 16px;
+    left: 50%; /* Сдвигаем элемент к центру */
+    transform: translateX(-50%); /* Смещаем назад на половину своей ширины */
+
+    background: rgba(0, 0, 0, 0.85);
+    color: gold;
+    font-weight: bold;
+    font-size: 2.5em;
+    padding: 10px 20px;
+    border-radius: 12px;
+    z-index: 5;
+    border: 3px solid gold;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+
+}
+
+.movies-with-notes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1em 4em;
+    flex-wrap: wrap; /* на случай, если не влезут — перенесутся */
+    pointer-events: auto;
+}
+
+.movie-note {
+    position: relative;
+    width: 9em;
+    height: 14em;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    background: #000;
+
+    @media screen and (max-width: 800px) {
+        width: 6em;
+        height: 9em;
+    }
+}
+
+.movie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-ratings-bar {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    width: 100%;
+    height: 2em;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.rating-cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.8em;
+    color: #000;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.rating-cell[data-user="2"] {
+    background: var(--red-color);
+}
+
+.rating-cell[data-user="3"] {
+    background: var(--yellow-color);
+}
+
+.rating-cell[data-user="4"] {
+    background: var(--white-color);
+}
+
+.rating-cell[data-user="5"] {
+    background: var(--orange-color);
+}
+
+
+

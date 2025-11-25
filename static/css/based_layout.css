@@ -30,7 +30,7 @@ body {
     color: var(--red-color);
     font-weight: bold;
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2400px) {
         font-size: 6em;
 
     }
@@ -86,7 +86,7 @@ body {
 
     .dropdown-menu {
         color: var(--black-color);
-        background-color: var(--white-color);
+        background-color: bisque;
         height: 16em;
     }
 
@@ -104,9 +104,12 @@ body {
         }
 
     }
+    .user-note {
+        width: 1em;
+    }
 
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2400px) {
         border-radius: 8%;
         height: 29%;
         width: 29%;
@@ -156,7 +159,7 @@ body {
     visibility: hidden;
 
     position: absolute;
-    z-index: 2;
+    z-index: 10;
 
     top: 20vh;
     right: 6vw;
@@ -203,7 +206,7 @@ body {
 
     }
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2400px) {
         right: 5vw;
         width: 33em;
 
@@ -268,7 +271,7 @@ body {
             border: 2px solid black;
         }
 
-        @media screen and (min-width: 2500px) {
+        @media screen and (min-width: 2400px) {
             font-size: 3em;
         }
 

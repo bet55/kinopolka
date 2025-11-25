@@ -60,7 +60,11 @@
 
                         <li class="user-name">
 {#                            <img src="/static/img/avatars/{{ u.id }}.jpg" alt="">#}
-                            <button class="dropdown-item" data-user-id="{{ u.id }}">{{ u.first_name }}</button>
+
+                            <button class="dropdown-item" data-user-id="{{ u.id }}">
+                                <img class="user-note" data-user-id="{{ u.id }}" src="/static/img/stickynotes/note{{ u.id }}.png">
+                                {{ u.first_name }}
+                            </button>
                         </li>
 
                     {% endfor %}
