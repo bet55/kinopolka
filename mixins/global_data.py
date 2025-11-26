@@ -6,11 +6,14 @@ from rest_framework.request import Request
 from classes import Caching, Tools, UserHandler
 
 
-logger = logging.getLogger("kinopolka")
+logger = logging.getLogger(__name__)
 
 
 class GlobalDataMixin:
-    """Миксин для добавления users и random_images (с theme) в тело ответа."""
+    """
+    Миксин для добавления users и random_images (с theme) в тело ответа.
+    Эти данные используются во всех html шаблонах, поэтому можно получать их в одном месте.
+    """
 
     # Настройки кэширования (в секундах)
     CACHE_DIRECTORY: str = "app_cache"
@@ -22,13 +25,17 @@ class GlobalDataMixin:
         """Возвращает кэшированные или свежие данные."""
         response = {}
         try:
+            query_params = getattr(request, "query_params", dict())
+            theme = query_params.get("theme", Tools.get_current_theme())
+
             if "users" not in context:
                 response["users"] = await self._get_cached_users()
 
             if "random" not in context:
-                query_params = getattr(request, "query_params", dict())
-                theme = query_params.get("theme")
                 response["random"] = Tools.get_random_images(theme)
+
+            if "theme" not in context:
+                response["theme"] = theme
 
             return response
 

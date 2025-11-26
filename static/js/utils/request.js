@@ -1,4 +1,5 @@
 import {createToast} from "./create_toast.js";
+import {getCookie} from "./cookie.js";
 
 // Общий метод отправки запросов
 
@@ -24,14 +25,16 @@ class Request {
         return await Request.send({method: 'patch', url: url, body: body, headers: headers, showToast: showToast})
     }
 
-    static async send({method, url, body = null, headers = {}, showToast = true}) {
+    static _permissionsIsAllowed(method) {
+        if(method === 'GET') {
+            return true;
+        }
+        const user = getCookie('user');
+        console.log(user);
+        return !!user;
+    }
 
-        const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
-        const successEmo = '🌟';
-        const errorEmo = '☠';
-
-        method = method.toUpperCase()
-
+    static _prepareRequest(method, headers, body) {
         const requestOptions = {
             method: method,
             headers: {
@@ -53,6 +56,23 @@ class Request {
             }
 
         }
+        return requestOptions;
+    }
+
+    static async send({method, url, body = null, headers = {}, showToast = true}) {
+
+        const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
+        const successEmo = '🌟';
+        const errorEmo = '☠';
+
+        method = method.toUpperCase();
+
+        if(!Request._permissionsIsAllowed(method)) {
+            createToast('Только пользователи могут это сделать', 'error');
+            return null;
+        }
+
+        const requestOptions = Request._prepareRequest(method, headers, body);
 
         try {
             const response = await fetch(url, requestOptions);

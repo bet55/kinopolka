@@ -1,39 +1,44 @@
-import {Request} from "./utils/request.js";
-import {confirmModalAction} from "./utils/confirm_modal_action.js";
+// postcards_archive2.js
+import { Request } from "./utils/request.js";
+import { confirmModalAction } from "./utils/confirm_modal_action.js";
 
-// Функция удаления открытки
+// УДАЛЕНИЕ ОТКРЫТКИ
 async function removePostcard(postcardNode, postcardId) {
-
-    const response = await Request.delete({url: '/', body: {id: postcardId}})
-
+    const response = await Request.delete({ url: '/', body: { id: postcardId } });
     if (response !== null) {
-
-        // удаляем подсказку
-        const tooltip = document.querySelector('.tooltip');
-        if (tooltip) {
-            tooltip.remove()
-        }
-
+        const tooltip = document.querySelector('.tooltip.show');
+        if (tooltip) tooltip.remove();
         postcardNode.remove();
     }
-
 }
 
-// Для каждой открытки создаем слушателя на удаление
-const postcards = document.querySelectorAll('.postcard:not(.active)');
+// Подключаем удаление
+document.querySelectorAll('.postcard:not(.active)').forEach(postcard => {
+    const img = postcard.querySelector('.postcard-normal img');
+    const confirmContainer = postcard.querySelector('.confirmation');
 
-postcards.forEach(p => {
-
-    const img = p.querySelector('img');  //
-    const confirmContainer = p.querySelector('.confirmation');   // Окно подтверждения удаления
-
-    // Отображаем окно подтверждения удаления
-    const confirmModalOptions = {
-        triggerNode: img,
-        modalNode: confirmContainer,
-        confirmAction: async () => await removePostcard(p, p.dataset.postcardId)
+    if (img && confirmContainer) {
+        confirmModalAction({
+            triggerNode: img,
+            modalNode: confirmContainer,
+            confirmAction: () => removePostcard(postcard, postcard.dataset.postcardId)
+        });
     }
-    confirmModalAction(confirmModalOptions);
+});
 
-})
+// ПЕРЕКЛЮЧЕНИЕ РЕЖИМА ОЦЕНОК
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("rate-toggle");
+    if (!toggleBtn) return;
 
+    const postcards = document.querySelectorAll(".postcard");
+
+    toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isActive = document.body.classList.toggle("ratings-mode");
+        postcards.forEach(card => {
+            card.classList.toggle("show-ratings", isActive);
+        });
+    });
+
+});

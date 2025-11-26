@@ -1,6 +1,6 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import DateTimeField, ModelSerializer, ReadOnlyField, SerializerMethodField
 
-from lists.models import Actor, Director, Genre, Movie, Writer
+from lists.models import Actor, Director, Genre, Movie, Note, Writer
 
 
 DEFAULT_POSTER = "/media/posters/default.png"
@@ -77,3 +77,41 @@ class MovieRatingSerializer(ModelSerializer):
 
     def get_poster_local(self, obj):
         return obj.poster_local.url if obj.poster_local else DEFAULT_POSTER
+
+
+class NoteFlatSerializer(ModelSerializer):
+    """
+    Заметка с РАЗВЁРНУТЫМИ полями фильма на одном уровне.
+    Идеально для pandas/DataFrame, аналитики, экспорта и т.д.
+    """
+    # Префиксы, чтобы не было коллизий (например, если в Note появится поле name)
+    kp_id = ReadOnlyField(source="movie.kp_id")
+    name = ReadOnlyField(source="movie.name")
+    poster_local = SerializerMethodField()
+    premiere = DateTimeField(source="movie.premiere", format="%d/%m/%Y")
+    duration = ReadOnlyField(source="movie.duration")
+    rating_kp = ReadOnlyField(source="movie.rating_kp")
+    rating_imdb = ReadOnlyField(source="movie.rating_imdb")
+    votes_kp = ReadOnlyField(source="movie.votes_kp")
+
+    # Опционально: пользователь тоже можно развернуть
+    username = ReadOnlyField(source="user.username")
+    avatar = ReadOnlyField(source="user.avatar")
+
+    class Meta:
+        model = Note
+        fields = [
+            # Поля самой заметки
+            "id", "text", "rating", "user",
+            # Развёрнутые поля фильма
+            "kp_id", "name", "poster_local",
+            "premiere", "duration",
+            "rating_kp", "rating_imdb", "votes_kp",
+            # Поля пользователя (по желанию)
+            "username", "avatar",
+        ]
+
+    def get_movie_poster_local(self, obj):
+        if obj.movie.poster_local and hasattr(obj.movie.poster_local, "url"):
+            return obj.movie.poster_local.url
+        return DEFAULT_POSTER

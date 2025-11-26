@@ -11,11 +11,14 @@
     <link rel="stylesheet" href="{% static 'css/global_settings.css' %}">
 
     <link rel="stylesheet" href="{% static 'css/based_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/'|add:theme|add:'.css' %}">
+
+
     <link rel="stylesheet" href="{% static 'css/elements/toast.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/confirmation_tooltip.css' %}">
 
-    {#    <link rel="stylesheet" href="{% static 'css/elements/new_year.css' %}">#}
 
+    {% block extra_head %}{% endblock %}
     {% block style %} {% endblock %}
 
     <link rel="icon" href="{% static 'img/icon.png' %}">
@@ -57,7 +60,11 @@
 
                         <li class="user-name">
 {#                            <img src="/static/img/avatars/{{ u.id }}.jpg" alt="">#}
-                            <button class="dropdown-item" data-user-id="{{ u.id }}">{{ u.first_name }}</button>
+
+                            <button class="dropdown-item" data-user-id="{{ u.id }}">
+                                <img class="user-note" data-user-id="{{ u.id }}" src="/static/img/stickynotes/note{{ u.id }}.png">
+                                {{ u.first_name }}
+                            </button>
                         </li>
 
                     {% endfor %}
@@ -97,13 +104,18 @@
 
 {% block fixed %} {% endblock %}
 
-{#<div class="gir_1" id="gir"></div> Гирлянда#}
+{# для нового года оставим гирлянду #}
+{% if  theme == 'new_year'%}
+	<div class="gir_1" id="gir"></div> Гирлянда
+{% endif %}
+
 
 {% include "elements/toast.html" %}
 
 
 <script type="module" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script type="module" src="{% static 'js/based_layout.js' %}"></script>
+<script type="module" src="{% static 'js/themes/'|add:theme|add:'.js' %}"></script>
 
 {% block script %} {% endblock %}
 

@@ -22,7 +22,7 @@ class Tools:
     """
 
     @classmethod
-    def _get_current_theme(cls) -> Themes:
+    def get_current_theme(cls) -> Themes:
         """
         Вычисляем текущую тему оформления приложения
 
@@ -38,7 +38,7 @@ class Tools:
             return Themes.default.value
 
     @classmethod
-    def get_random_images(cls, theme: str = None) -> dict:
+    def get_random_images(cls, theme: str | Themes = None) -> dict:
         """
         Получаем набор путей до изображений для размещения на странице приложения
 
@@ -46,7 +46,7 @@ class Tools:
         """
 
         # Вычисляем текущую тему или используем из аргумента функции
-        theme = theme if hasattr(Themes, str(theme)) else cls._get_current_theme()
+        theme = theme if hasattr(Themes, str(theme)) else cls.get_current_theme()
 
         return {
             "poster": cls._choose_random_image(theme, ImageFolders.poster.value),

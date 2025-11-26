@@ -22,10 +22,11 @@ class NoteHandler:
     @classmethod
     @handle_exceptions("Заметки")
     @sync_to_async
-    def get_all_notes(cls, result_format: str = "dict") -> dict[int, list[dict]] | list[dict]:
+    def get_all_notes(cls, result_format: str = "dict", movie_info: bool = False) -> dict[int, list[dict]] | list[dict]:
         """
         Получение всех заметок с оценками фильмов.
         :param result_format: Формат возвращаемых данных ('dict' для группировки по movie_id, иначе 'list').
+        :param movie_info: нужно ли добывать по внешним ключам информацию о фильмах.
         :return: Словарь {movie_id: [заметки]} или список заметок.
         """
         if result_format not in ("dict", "list"):

@@ -115,7 +115,16 @@
         <p class="card-description card-description-hidden"></p>
         <h3 class="card-realise"></h3>
         <p class="card-duration"></p>
-        <p class="card-link"><a href="" target="_blank"></a></p>
+        <p class="card-rating hidden">
+            <a id="kp-rating" target="_blank">
+                <img src="{% static 'img/kinopoisk.svg' %}" alt="kinopoisk">
+                <span></span>
+            </a>
+            <a id="imdb-rating" target="_blank">
+                <img src="{% static 'img/imdb.svg' %}" alt="imdb">
+                <span></span>
+            </a>
+        </p>
     </div>
 {% endblock %}
 
