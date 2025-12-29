@@ -84,7 +84,7 @@
     }
 
     @media (min-width: 2500px) {
-        height: 3em;
+        height: 2.4em;
     }
     @media (min-width: 3000px) {
         height: 4em;
@@ -166,7 +166,7 @@
 
         img {
             max-width: 100%;
-            max-height: 3em;
+            max-height: 2em;
         };
         span {
             margin: 0.5em;

@@ -23,7 +23,7 @@ class KP:
     cache: Caching = Caching(CACHE_DIRECTORY, CACHE_DURATION)
 
     error: str | None = None
-    BASE_URL: ClassVar[str] = "https://poiskkino.dev/v1.4/"
+    BASE_URL: ClassVar[str] = "https://api.poiskkino.dev/v1.4/"
     headers: ClassVar[dict[str, str]] = None  # Initialized in __post_init__
 
     def __post_init__(self):
