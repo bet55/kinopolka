@@ -30,7 +30,7 @@ jobs:
 
       - name: Deploy to remote server
         run: |
-          ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
+          ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} -p {{ secrets.REMOTE_PORT }} '
             cd ${{ secrets.REMOTE_DIR }} &&
             git fetch origin master &&
             git reset --hard origin/master
