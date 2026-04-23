@@ -30,16 +30,16 @@ class KpFilmPersonModel(BaseModel):
 
 class KPFilmModel(BaseModel):
     kp_id: int = Field(..., validation_alias="id")
-    name: str
+    name: str =  Field(default='Таинственный фильм без названия')
 
     countries: ListDict = field(default_factory=create_empty_list)
 
     budget: int | None = Field(0, validation_alias=AliasChoices("", AliasPath("budget", "value")))
     fees: int | None = Field(0, validation_alias=AliasChoices("", AliasPath("fees", "world", "value")))
     premiere: str | None = Field("1970-01-01T00:00:00.000Z", validation_alias=AliasPath("premiere", "world"))
-    description: str | None
+    description: str | None = Field(default='Без описания')
     short_description: str | None = Field("...", validation_alias="shortDescription")
-    slogan: str | None
+    slogan: str | None = Field(default='Без слогана')
     duration: int | None = Field(0, validation_alias="movieLength")
     poster: str | None = Field(n_url, validation_alias=AliasPath("poster", "url"))
     rating_kp: float | None = Field(0.0, validation_alias=AliasPath("rating", "kp"))
