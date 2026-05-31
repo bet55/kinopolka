@@ -1,6 +1,14 @@
 #postcard-container {
-    height: 90%;
+    height: 80%;
     position: relative;
+
+    @media screen and (min-width: 2000px) {
+        height: 90%;
+    }
+
+    @media screen and (min-width: 3000px) {
+        height: 80%;
+    }
 }
 
 #postcard {
@@ -39,12 +47,12 @@
 
     }
 
-    @media (min-width: 2400px) {
+    @media (min-width: 2000px) {
         height: 22em;
         width: 17em;
     }
 
-    @media (min-width: 3400px) {
+    @media (min-width: 3000px) {
         height: 34em;
         width: 26em;
     }
@@ -59,10 +67,14 @@
 .poster {
     position: absolute;
     height: 90%;
-    width: 85%;
+    width: 90%;
 
     &:hover {
         filter: hue-rotate(180deg);
+    }
+
+    @media (min-width: 2000px) {
+        width: 85%;
     }
 }
 

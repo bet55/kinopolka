@@ -36,6 +36,17 @@
         border: 2px solid black;
         filter: brightness(1.5);
     }
+
+    @media screen and (min-width: 2000px) {
+            font-size: 1em;
+
+    }
+
+    @media screen and (min-width: 3000px) {
+        font-size: 2em;
+        min-width: 20em;
+
+    }
 }
 
 .confirmation.center {
@@ -55,7 +66,7 @@
 
 .confirmation.bot {
     top: 80%;
-    left: -1em;
+    left: 0;
 }
 
 .confirmation.active {

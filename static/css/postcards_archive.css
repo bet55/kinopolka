@@ -109,8 +109,8 @@
 
 .movie-note {
     position: relative;
-    width: 9em;
-    height: 14em;
+    width: 7em;
+    height: 11em;
     flex-shrink: 0;
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
@@ -120,6 +120,12 @@
         width: 6em;
         height: 9em;
     }
+
+    @media screen and (min-width: 2000px) {
+        width: 10em;
+        height: 14em;
+    }
+
 }
 
 .movie-poster {
