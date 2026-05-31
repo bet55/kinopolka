@@ -3,6 +3,10 @@
 /* Вкладки */
 .stats-tabs {
     margin-bottom: 2rem;
+
+    @media (max-width: 800px) {
+        margin-bottom: 5px;
+    }
 }
 
 .nav-tabs .nav-link {
@@ -13,6 +17,11 @@
     margin: 0 0.5rem;
     padding: 0.8rem 1.5rem;
     font-size: 1.3rem;
+
+    @media (max-width: 800px) {
+        padding: 2px 4px;
+        font-size: 0.7em;
+    }
 }
 
 .nav-tabs .nav-link.active {
@@ -27,6 +36,11 @@
 }
 
 /* Постеры */
+#statsTabContent {
+    overflow: scroll;
+    max-height: 33em;
+}
+
 .movies-container {
     width: 100%;
 
@@ -41,14 +55,20 @@
         color: var(--black-color);
         font-weight: bold;
     }
+
+    @media (max-width: 800px) {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+    }
 }
 
 .movie {
     width: 25%;
 
     .poster-container {
-        width: 100%;
-        height: 80%;
+        width: 90%;
+        height: 70%;
         position: relative;
         border: 4px solid black;
 
@@ -60,7 +80,7 @@
         }
 
         .rating {
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
             background-color: var(--orange-color);
 
@@ -90,6 +110,24 @@
     h4 {
         color: var(--red-color);
     }
+
+    @media (max-width: 800px) {
+        width: 50%;
+
+        .rating {
+
+            padding: 0;
+            margin:0;
+
+            span {
+                font-size: 0.4em;
+            }
+        }
+
+        h4 {
+            font-size: 1em;
+        }
+    }
 }
 
 /* Чтобы графики не ломали высоту */
@@ -100,9 +138,11 @@
 }
 
 
-
-
 /* ============= Правая часть со статистикой ============= */
+#pivotStats {
+    height: 100%;
+}
+
 #stats {
     display: flex;
     justify-content: center;
@@ -129,6 +169,14 @@
         list-style: none;
     }
 
+    @media (max-width: 800px) {
+        margin: 0;
+        font-size: 1em;
+    }
+    @media (min-width: 3000px) {
+        font-size: 2.5em;
+
+    }
 }
 
 #genres {
@@ -136,6 +184,10 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+
+    @media (max-width: 800px) {
+        font-size: 0.8em;
+    }
 }
 
 .genres-table {
@@ -161,9 +213,7 @@
 
 
 @media (min-width: 3000px) {
-    #stats {
-        font-size: 2.5em;
-    }
+
 
     .svg-container {
         width: 40vw;

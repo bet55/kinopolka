@@ -14,98 +14,103 @@
 
 {% block center-content %}
 
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <!-- Вкладки -->
-    <ul class="nav nav-tabs justify-content-center stats-tabs" id="statsTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="imdb-tab" data-bs-toggle="tab"
-                    data-bs-target="#imdb" type="button" role="tab">
-                IMDb
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="kp-tab" data-bs-toggle="tab"
-                    data-bs-target="#kp" type="button" role="tab">
-                Кинопоиск
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="polka-tab" data-bs-toggle="tab"
-                    data-bs-target="#polka" type="button" role="tab">
-                Кинополка
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="graphs-tab" data-bs-toggle="tab"
-                    data-bs-target="#graphs" type="button" role="tab">
-                Графики
-            </button>
-        </li>
-    </ul>
-
-
-
-    <div class="tab-content" id="statsTabContent">
+        <!-- Вкладки -->
+        <ul class="nav nav-tabs justify-content-center stats-tabs" id="statsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="imdb-tab" data-bs-toggle="tab"
+                        data-bs-target="#imdb" type="button" role="tab">
+                    IMDb
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="kp-tab" data-bs-toggle="tab"
+                        data-bs-target="#kp" type="button" role="tab">
+                    Кинопоиск
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="polka-tab" data-bs-toggle="tab"
+                        data-bs-target="#polka" type="button" role="tab">
+                    Кинополка
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="graphs-tab" data-bs-toggle="tab"
+                        data-bs-target="#graphs" type="button" role="tab">
+                    Графики
+                </button>
+            </li>
+        </ul>
 
 
-        <div class="tab-pane fade show active" id="imdb" role="tabpanel">
-            {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.imdb.top %}
-            {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.imdb.bot %}
+        <div class="tab-content" id="statsTabContent">
+
+
+            <div class="tab-pane fade show active" id="imdb" role="tabpanel">
+                {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.imdb.top %}
+                {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.imdb.bot %}
+            </div>
+
+            <!-- 2. Кинопоиск -->
+            <div class="tab-pane fade" id="kp" role="tabpanel">
+                {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.kp.top %}
+                {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kp.bot %}
+            </div>
+
+            <!-- 3. Кинополка (наши оценки) -->
+            <div class="tab-pane fade" id="polka" role="tabpanel">
+                {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.kinopolka.top %}
+                {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kinopolka.bot %}
+            </div>
+
+            <!-- 4. Графики -->
+            <div class="tab-pane fade" id="graphs" role="tabpanel">
+                <h2 class="tab-title">Распределение оценок на Кинопоиске</h2>
+                {{ graphs.kp_distribution|safe }}
+
+                <h2 class="tab-title">Мы vs Мир: где мы добрее/суровее IMDb</h2>
+                {{ graphs.club_vs_imdb|safe }}
+
+                <h2 class="tab-title">Топ-10 переоценённых нами</h2>
+                {{ graphs.overrated|safe }}
+
+                <h2 class="tab-title">Топ-10 недооценённых нами</h2>
+                {{ graphs.underrated|safe }}
+
+                <h2 class="tab-title">Жанровая карта кинополки</h2>
+                {{ graphs.genres_treemap|safe }}
+            </div>
+
         </div>
-
-        <!-- 2. Кинопоиск -->
-        <div class="tab-pane fade" id="kp" role="tabpanel">
-            {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.kp.top %}
-            {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kp.bot %}
-        </div>
-
-        <!-- 3. Кинополка (наши оценки) -->
-        <div class="tab-pane fade" id="polka" role="tabpanel">
-            {% include "elements/movie_card.html" with position="Лучшие" movies_list=movies_rating.kinopolka.top %}
-            {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kinopolka.bot %}
-        </div>
-
-        <!-- 4. Графики -->
-        <div class="tab-pane fade" id="graphs" role="tabpanel">
-            <h2 class="tab-title">Распределение оценок на Кинопоиске</h2>
-            {{ graphs.kp_distribution|safe }}
-
-            <h2 class="tab-title">Мы vs Мир: где мы добрее/суровее IMDb</h2>
-            {{ graphs.club_vs_imdb|safe }}
-
-            <h2 class="tab-title">Топ-10 переоценённых нами</h2>
-            {{ graphs.overrated|safe }}
-
-            <h2 class="tab-title">Топ-10 недооценённых нами</h2>
-            {{ graphs.underrated|safe }}
-
-            <h2 class="tab-title">Жанровая карта кинополки</h2>
-            {{ graphs.genres_treemap|safe }}
-        </div>
-
     </div>
-</div>
 
 {% endblock %}
 
 {% block right-content %}
 
-    <div id="stats">
-        <h3>Общее</h3>
-        <table>
-            {% for stat_name, stat in statistic.items %}
-                <tr><td>{{ stat_name }}</td><td>{{ stat }}</td></tr>
-            {% endfor %}
-        </table>
+    <div id="pivotStats">
+        <div id="stats">
+            <h3>Общее</h3>
+            <table>
+                {% for stat_name, stat in statistic.items %}
+                    <tr>
+                        <td>{{ stat_name }}</td>
+                        <td>{{ stat }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <br>
+
+        <div id="genres">
+            <h3>Жанры</h3>
+            {% autoescape off %}{{ genres_table }}{% endautoescape %}
+        </div>
     </div>
 
-    <br>
-
-    <div id="genres">
-        <h3>Жанры</h3>
-        {% autoescape off %}{{ genres_table }}{% endautoescape %}
-    </div>
 {% endblock %}
 
 {% block script %}
