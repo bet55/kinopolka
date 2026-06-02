@@ -5,7 +5,7 @@
 Приложение призванное увековечить киноклубные вечера, а также
 разнообразить их наполнение активностями.
 
-https://kinopolka.com/  
+https://kinopolka.com/
 https://kinopolka.рф/
 
 Реализованно:
@@ -24,7 +24,7 @@ https://kinopolka.рф/
 2. Добавить рубрику "Угадай кино"
 3. Раздел с фото клуба
 
-Логи приложения:  
+Логи приложения:
 https://kinopolka.com/application/grafana/
 
 # Настройка на новом устройстве
@@ -41,6 +41,8 @@ https://kinopolka.com/application/grafana/
     bash sync_from_remote.sh
     ```
 4. В start.sh меняем переменную с prod на dev
+5. uv sync - установить зависимости
+6. uv run pre-commit install - установить гит хук
 
 # Разрешение ошибок
 - Если ссылки на дублирующие постеры попали в бд, замените их командой `uv run manage.py fix_posters_names`
@@ -48,13 +50,13 @@ https://kinopolka.com/application/grafana/
 [kinorium](https://ru.kinorium.com/collections/kinorium/)
 [постеры](https://www.movieposters.com/)
 
-[figma](https://www.figma.com/design/iEelBzbgfnGmk810JXHGGn/%D0%BA%D0%B8%D0%BD%D0%BE%D0%BA%D0%BB%D1%83%D0%B1?node-id=0-1&node-type=canvas&t=ZwrMRzvz8z7EbmCr-0)  
-[github](https://github.com/bet55/kinopolka)  
-[kanban](https://github.com/users/bet55/projects/2)  
-[github old](https://github.com/bet55/-)  
-[kinopoisk](https://www.kinopoisk.ru/mykp/folders/4583/?format=posters&limit=50)  
+[figma](https://www.figma.com/design/iEelBzbgfnGmk810JXHGGn/%D0%BA%D0%B8%D0%BD%D0%BE%D0%BA%D0%BB%D1%83%D0%B1?node-id=0-1&node-type=canvas&t=ZwrMRzvz8z7EbmCr-0)
+[github](https://github.com/bet55/kinopolka)
+[kanban](https://github.com/users/bet55/projects/2)
+[github old](https://github.com/bet55/-)
+[kinopoisk](https://www.kinopoisk.ru/mykp/folders/4583/?format=posters&limit=50)
 [kinopoisk api](https://api.kinopoisk.dev/documentation#/)
 
-Использованы изображения со следующих сайтов:  
-https://www.flaticon.com  
-https://www.pngwing.com  
+Использованы изображения со следующих сайтов:
+https://www.flaticon.com
+https://www.pngwing.com

@@ -22,12 +22,10 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
         Получение страницы архива всех открыток.
         """
 
-
         response_format = request.query_params.get("format")
         if response_format == "json":
             postcards = await PostcardHandler.get_all_postcards()
             return Response(postcards, status=status.HTTP_200_OK)
-
 
         postcards = await PostcardHandler.get_all_postcards_with_ratings()
 

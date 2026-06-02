@@ -13,7 +13,6 @@ from lists.models import Actor, Director, Genre, Writer
 from .movie import MovieHandler, MoviesStructure
 from .note import NoteHandler
 from .postcard import PostcardHandler
-from .user import UserHandler
 
 
 logger = logging.getLogger(__name__)
@@ -76,11 +75,11 @@ class Statistic:
         # Невероятные приключения с исправлением типа для рейтинга.
         # Скорее всего из-за запятых - 3,5 вместо 3.5
         wrong_types = ["rating_kp", "rating_imdb"]
-        archive_movies[wrong_types] = archive_movies[wrong_types].replace(',', '.', regex=True)
+        archive_movies[wrong_types] = archive_movies[wrong_types].replace(",", ".", regex=True)
         archive_movies[wrong_types] = archive_movies[wrong_types].astype(np.float64).round(2)
 
         # добавляем наши оценки фильмов
-        polka = notes.groupby('movie', as_index=False).agg({'rating': 'mean', 'user': 'count'}).round(1)
+        polka = notes.groupby("movie", as_index=False).agg({"rating": "mean", "user": "count"}).round(1)
         archive_movies = pd.merge(archive_movies, polka, left_on="kp_id", right_on="movie", how="inner")
 
         self.archive_movies = archive_movies
@@ -95,30 +94,27 @@ class Statistic:
         """
         movies = self.archive_movies.copy()
 
-        if rating_type == 'rating':
+        if rating_type == "rating":
             movies = movies[movies.user == self.USERS_COUNT]
 
         movies = movies.sort_values(by=rating_type, ascending=False)
 
-        top_movies = movies.head(self.TOP_MOVIES).to_dict(orient='records')
-        bot_movies = movies.tail(self.TOP_MOVIES).to_dict(orient='records')
+        top_movies = movies.head(self.TOP_MOVIES).to_dict(orient="records")
+        bot_movies = movies.tail(self.TOP_MOVIES).to_dict(orient="records")
 
         return self.Rating(top=top_movies, bot=bot_movies)
 
-    async def users(self) -> pd.DataFrame:
-        users = await UserHandler.get_all_users()
-
     async def outstanding_actors(self) -> pd.DataFrame:
         actors = await ModelsHandler.get_all(Actor)
-        return actors[actors['movies_count'] == self.TOP_PERSONS]
+        return actors[actors["movies_count"] == self.TOP_PERSONS]
 
     async def outstanding_directors(self) -> pd.DataFrame:
         directors = await ModelsHandler.get_all(Director)
-        return directors[directors['movies_count'] == self.TOP_PERSONS]
+        return directors[directors["movies_count"] == self.TOP_PERSONS]
 
     async def outstanding_writers(self) -> pd.DataFrame:
         writers = await ModelsHandler.get_all(Writer)
-        return writers[writers['movies_count'] == self.TOP_PERSONS]
+        return writers[writers["movies_count"] == self.TOP_PERSONS]
 
     async def outstanding_genres(self) -> str:
         """
@@ -141,23 +137,18 @@ class Statistic:
         # Генерируем HTML (Pandas сам сделает colspan)
         return result_df.to_html(index=False, classes="genres-table", border=0, justify="center")
 
-    async def outstanding_movies(self) -> dict[str: list[dict]]:
+    async def outstanding_movies(self) -> dict[str : list[dict]]:
         """
         Собираем фильмы с лучшими и худшими оценками по разным агрегаторам
         """
 
-        kinopolka_movies = self._get_top_and_bot_rated_movies('rating')
-        imdb_movies = self._get_top_and_bot_rated_movies('rating_imdb')
-        kp_movies = self._get_top_and_bot_rated_movies('rating_kp')
+        kinopolka_movies = self._get_top_and_bot_rated_movies("rating")
+        imdb_movies = self._get_top_and_bot_rated_movies("rating_imdb")
+        kp_movies = self._get_top_and_bot_rated_movies("rating_kp")
 
-        return {
-            "imdb": imdb_movies,
-            "kp": kp_movies,
-            "kinopolka": kinopolka_movies
-        }
+        return {"imdb": imdb_movies, "kp": kp_movies, "kinopolka": kinopolka_movies}
 
-
-    async def statistic(self) -> dict[str: int | float]:
+    async def statistic(self) -> dict[str : int | float]:
         """
         Базовая статистика по таблице с фильмами
         """
@@ -178,7 +169,6 @@ class Statistic:
         }
 
         return stats
-
 
     async def draw(self) -> dict[str, str]:
         """
@@ -274,4 +264,3 @@ class Statistic:
         }
 
         return graphs
-

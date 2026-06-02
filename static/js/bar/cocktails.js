@@ -43,7 +43,7 @@ export function telegramRequest(cocktail) {
         const char = getRandomItem(CHARS);
         const cock = getRandomItem(COCKS);
 
-        let text = `${star} Хэллоу ${star} 
+        let text = `${star} Хэллоу ${star}
                             \n До меня дошли слухи, что <b>${userName}</b> ${char} хочет <b>${cockName}</b> ${cock}
                             \nДобудьте мне:`;
         text += '\n — ' + ingredients.join('\n — ');
@@ -493,4 +493,3 @@ function refreshCocktailNode(cocktailData) {
     updateCocktail(cocktailNode);
     removeCocktail(cocktailNode);
 }
-

@@ -37,4 +37,3 @@ form.addEventListener('submit', e => {
 addButton.addEventListener("click", async (event) => {
     await sendData();
 });
-

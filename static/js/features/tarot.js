@@ -184,7 +184,7 @@ class TarotDeck {
 
         cardElement.innerHTML = `
             <div class="card-face card-back"></div>
-            <div class="card-face ${frontClass}" 
+            <div class="card-face ${frontClass}"
                  style="background-image: url('/static/img/tarots/${cardName}.webp')"></div>
         `;
 

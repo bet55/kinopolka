@@ -56,7 +56,6 @@ class Command(BaseCommand):
             try:
                 response = await client.get(movie.poster)
                 response.raise_for_status()
-                content_type = response.headers.get("content-type", "image/jpeg")
                 extension = ".jpg"  # Use .jpg for JPEG posters
                 file_name = f"poster_{kp_id}{extension}"
                 await sync_to_async(movie.poster_local.save)(file_name, ContentFile(response.content), save=True)

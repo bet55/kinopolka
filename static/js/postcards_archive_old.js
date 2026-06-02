@@ -36,4 +36,3 @@ postcards.forEach(p => {
     confirmModalAction(confirmModalOptions);
 
 })
-

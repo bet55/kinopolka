@@ -81,11 +81,14 @@ class Request {
             const rawText = await response.text();
             let responseData = {};
             let responseEmpty = true;
-            try {
-                responseData = JSON.parse(rawText);
-                responseEmpty = false;
-            } catch (e) {
-                console.warn('Не распарсился ответ: ', e);
+            // Пустое тело (например, 204 No Content) — это валидный ответ, не парсим
+            if (rawText) {
+                try {
+                    responseData = JSON.parse(rawText);
+                    responseEmpty = false;
+                } catch (e) {
+                    console.warn('Не распарсился ответ: ', e);
+                }
             }
 
             // Ошибка HTTP (4xx, 5xx)

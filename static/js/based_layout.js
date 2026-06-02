@@ -9,5 +9,3 @@ const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstra
 navigationToggle(); // выпадающая навигация для мобилок
 settingUserHandler(); // выбор пользователя
 cartMoviesHandler(); // корзина с выбранными фильмами
-
-

@@ -84,6 +84,7 @@ class NoteFlatSerializer(ModelSerializer):
     Заметка с РАЗВЁРНУТЫМИ полями фильма на одном уровне.
     Идеально для pandas/DataFrame, аналитики, экспорта и т.д.
     """
+
     # Префиксы, чтобы не было коллизий (например, если в Note появится поле name)
     kp_id = ReadOnlyField(source="movie.kp_id")
     name = ReadOnlyField(source="movie.name")
@@ -102,13 +103,22 @@ class NoteFlatSerializer(ModelSerializer):
         model = Note
         fields = [
             # Поля самой заметки
-            "id", "text", "rating", "user",
+            "id",
+            "text",
+            "rating",
+            "user",
             # Развёрнутые поля фильма
-            "kp_id", "name", "poster_local",
-            "premiere", "duration",
-            "rating_kp", "rating_imdb", "votes_kp",
+            "kp_id",
+            "name",
+            "poster_local",
+            "premiere",
+            "duration",
+            "rating_kp",
+            "rating_imdb",
+            "votes_kp",
             # Поля пользователя (по желанию)
-            "username", "avatar",
+            "username",
+            "avatar",
         ]
 
     def get_movie_poster_local(self, obj):

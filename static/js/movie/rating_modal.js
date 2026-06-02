@@ -63,5 +63,3 @@ export const showRatingModal = (movieId, allMovies) => {
     ratePoster.src = allMovies[movieId].poster_local;
     rateTitle.innerText = allMovies[movieId].name;
 };
-
-

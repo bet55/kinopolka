@@ -93,23 +93,19 @@ class PostcardHandler:
     @sync_to_async
     def get_all_postcards_with_ratings(cls):
         # Все открытки + подгружаем фильмы с нужными полями
-        postcards = Postcard.objects.all().prefetch_related(
-            Prefetch(
-                'movies',
-                queryset=Movie.mgr.only('kp_id', 'name', 'poster_local')
-            )
-        ).order_by('-meeting_date')
+        postcards = (
+            Postcard.objects.all()
+            .prefetch_related(Prefetch("movies", queryset=Movie.mgr.only("kp_id", "name", "poster_local")))
+            .order_by("-meeting_date")
+        )
 
         result = {}
 
         # Один запрос: все оценки по фильмам из открыток
-        notes = Note.mgr.filter(
-            movie__postcard__isnull=False
-        ).select_related('user', 'movie').values(
-            'movie__kp_id',
-            'movie__postcard__id',
-            'user__id',
-            'rating'
+        notes = (
+            Note.mgr.filter(movie__postcard__isnull=False)
+            .select_related("user", "movie")
+            .values("movie__kp_id", "movie__postcard__id", "user__id", "rating")
         )
 
         # Группируем оценки: postcard_id → kp_id → {user_id: rating}
@@ -117,10 +113,10 @@ class PostcardHandler:
         total_ratings_by_postcard = defaultdict(list)
 
         for note in notes:
-            pc_id = note['movie__postcard__id']
-            kp_id = note['movie__kp_id']
-            user_id = note['user__id']
-            rating = note['rating']
+            pc_id = note["movie__postcard__id"]
+            kp_id = note["movie__kp_id"]
+            user_id = note["user__id"]
+            rating = note["rating"]
 
             ratings_by_postcard[pc_id][kp_id][user_id] = rating
             total_ratings_by_postcard[pc_id].append(rating)
@@ -134,25 +130,27 @@ class PostcardHandler:
                 kp_id = movie.kp_id
                 ratings_dict = ratings_by_postcard[pc_id].get(kp_id, {})
 
-                movies_list.append({
-                    'kp_id': kp_id,
-                    'name': movie.name,
-                    'poster_local': movie.poster_local.url if movie.poster_local else "/media/posters/default.png",
-                    'ratings': ratings_dict,  # {user_id: rating}
-                })
+                movies_list.append(
+                    {
+                        "kp_id": kp_id,
+                        "name": movie.name,
+                        "poster_local": movie.poster_local.url if movie.poster_local else "/media/posters/default.png",
+                        "ratings": ratings_dict,  # {user_id: rating}
+                    }
+                )
 
             # Средний рейтинг по всей встрече
             all_ratings = total_ratings_by_postcard[pc_id]
-            average_rating = round(sum(all_ratings) / len(all_ratings), 1) if all_ratings else '-.-'
+            average_rating = round(sum(all_ratings) / len(all_ratings), 1) if all_ratings else "-.-"
 
             result[pc_id] = {
-                'screenshot': postcard.screenshot.url if postcard.screenshot else None,
-                'is_active': postcard.is_active,
-                'meeting_date': postcard.meeting_date.strftime("%d.%m.%Y %H:%M"),
-                'created_at': postcard.created_at.strftime("%d.%m.%Y"),
-                'title': postcard.title or f"Встреча {postcard.meeting_date.strftime('%d.%m.%Y')}",
-                'average_rating': average_rating,
-                'movies': movies_list,  # ← список словарей!
+                "screenshot": postcard.screenshot.url if postcard.screenshot else None,
+                "is_active": postcard.is_active,
+                "meeting_date": postcard.meeting_date.strftime("%d.%m.%Y %H:%M"),
+                "created_at": postcard.created_at.strftime("%d.%m.%Y"),
+                "title": postcard.title or f"Встреча {postcard.meeting_date.strftime('%d.%m.%Y')}",
+                "average_rating": average_rating,
+                "movies": movies_list,  # ← список словарей!
             }
         # ic(result)
         return result

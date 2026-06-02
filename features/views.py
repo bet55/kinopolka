@@ -21,7 +21,6 @@ class MoviesStatistic(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
     async def get(self, request: Request):
-
         statistic = Statistic()
         await statistic.extract_data()
 

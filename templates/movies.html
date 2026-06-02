@@ -40,7 +40,7 @@
                      loading="lazy"
                      data-kp-id="{{ i.kp_id }}"
                      onerror="this.src={% static 'img/poster_placeholder.jpg' %}">
-            
+
                 {# Стикеры с оценками#}
                 <div class="note-container" data-kp-id="{{ i.kp_id }}">
 
@@ -97,7 +97,7 @@
                          data-bs-placement="top"
                          data-bs-title="Удалить">
                 </div>
-            
+
                 {% include "elements/confirmation_tooltip.html" with title="Удалить фильм?" %}
             </div>
 
@@ -138,5 +138,3 @@
 {% block script %}
     <script type="module" src="{% static 'js/movies.js' %}"></script>
 {% endblock %}
-
-

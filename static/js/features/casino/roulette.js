@@ -186,4 +186,3 @@ const roll = async () => {
 start.addEventListener('click', async e => {
     await roll();
 })
-

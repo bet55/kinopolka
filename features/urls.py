@@ -1,14 +1,14 @@
 from django.urls import path
 
 from features.views import (
-    Casino,
-    Roulette,
     Cards,
-    Slots,
-    EightBall,
+    Casino,
     Catalog,
+    EightBall,
     Gym,
     MoviesStatistic,
+    Roulette,
+    Slots,
     Tarots,
 )
 
