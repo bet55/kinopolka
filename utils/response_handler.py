@@ -25,5 +25,10 @@ def handle_response(data: dict, success_data: dict | None = None, status: drf_st
     if isinstance(data, ErrorHandler):
         return Response({"error": data.message}, status=data.status)
 
+    # У 204 тела быть не должно: иначе h11/uvicorn падает с
+    # "Too much data for declared Content-Length".
+    if status == drf_status.HTTP_204_NO_CONTENT:
+        return Response(status=status)
+
     success_data = success_data if success_data else data
     return Response(success_data, status=status)

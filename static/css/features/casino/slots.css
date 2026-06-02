@@ -1,0 +1,309 @@
+#slot-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5em;
+    padding: 1.5em 1em;
+    width: 100%;
+}
+
+/* Корпус автомата */
+#slot-machine {
+    position: relative;
+    background:
+        linear-gradient(180deg, #a01818 0%, #6e1414 30%, #4a0e0e 70%, #2e0808 100%);
+    border: 0.4em solid #1a0202;
+    border-radius: 1.8em 1.8em 0.6em 0.6em / 2.4em 2.4em 0.6em 0.6em;
+    padding: 1.2em 1.5em;
+    box-shadow:
+        0 1em 2.5em rgba(0, 0, 0, 0.7),
+        inset 0 0 2em rgba(0, 0, 0, 0.5),
+        inset 0 0.4em 1em rgba(255, 200, 100, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+}
+
+/* Золотой верх с надписью и лампочками */
+.machine-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6em;
+    background: linear-gradient(180deg, #ffe45a 0%, #f5c542 40%, #a87000 100%);
+    border: 0.18em solid #5a3500;
+    border-radius: 0.5em;
+    padding: 0.4em 0.7em;
+    box-shadow:
+        inset 0 -0.2em 0.4em rgba(80, 50, 0, 0.5),
+        inset 0 0.15em 0.3em rgba(255, 255, 255, 0.4),
+        0 0.2em 0.5em rgba(0, 0, 0, 0.3);
+}
+
+.jackpot-banner {
+    color: #3a0303;
+    font-size: 1.3em;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5),
+        0 -1px 0 rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+}
+
+.top-lights {
+    display: flex;
+    gap: 0.35em;
+    align-items: center;
+}
+
+.top-lights span {
+    display: block;
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffe0e0 0%, #ff3030 50%, #800808 100%);
+    box-shadow:
+        0 0 0.5em rgba(255, 80, 80, 0.8),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.4);
+    animation: light-blink 1.5s ease-in-out infinite;
+}
+
+.top-lights.left  span:nth-child(2) { animation-delay: 0.3s; }
+.top-lights.left  span:nth-child(3) { animation-delay: 0.6s; }
+.top-lights.right span:nth-child(1) { animation-delay: 0.9s; }
+.top-lights.right span:nth-child(2) { animation-delay: 1.2s; }
+.top-lights.right span:nth-child(3) { animation-delay: 0.15s; }
+
+@keyframes light-blink {
+    0%, 100% {
+        background: radial-gradient(circle at 30% 30%, #ffe0e0 0%, #ff3030 50%, #800808 100%);
+        box-shadow: 0 0 0.4em rgba(255, 80, 80, 0.7), inset -1px -1px 2px rgba(0, 0, 0, 0.4);
+    }
+    50% {
+        background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffaa44 50%, #883300 100%);
+        box-shadow: 0 0 1em rgba(255, 200, 80, 1), inset -1px -1px 2px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* Дисплей с барабанами */
+.machine-display {
+    display: flex;
+    gap: 0.4em;
+    background: #0a0a0a;
+    padding: 0.5em;
+    border-radius: 0.4em;
+    border: 0.22em solid #1a0303;
+    box-shadow:
+        inset 0 0.3em 0.8em rgba(0, 0, 0, 0.9),
+        0 0.15em 0.4em rgba(0, 0, 0, 0.4);
+}
+
+.reel {
+    --poster-h: 220px;
+    box-sizing: content-box; /* без этого viewport на 4px меньше высоты постера — победитель смещается */
+    width: 150px;
+    height: var(--poster-h);
+    overflow: hidden;
+    background: #000;
+    border: 0.12em solid #2a2a2a;
+    border-radius: 0.2em;
+    position: relative;
+}
+
+.reel-strip {
+    display: flex;
+    flex-direction: column;
+    transform: translateY(0);
+    will-change: transform;
+}
+
+.reel-strip img {
+    width: 100%;
+    height: var(--poster-h);
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+}
+
+/* Декоративная щель для монет */
+.coin-slot {
+    height: 0.25em;
+    width: 5em;
+    margin: 0.5em auto 0;
+    background: #1a0202;
+    border-radius: 0.15em;
+    box-shadow: inset 0 0.12em 0.3em rgba(0, 0, 0, 0.9);
+}
+
+/* Лоток для выплат с надписью */
+.payout-tray {
+    text-align: center;
+    background: linear-gradient(180deg, #2a0303 0%, #4a0808 50%, #2a0303 100%);
+    border: 0.18em solid #1a0202;
+    border-radius: 0.4em;
+    padding: 0.6em;
+    color: #f5c542;
+    font-size: 1em;
+    letter-spacing: 0.35em;
+    font-weight: 700;
+    text-shadow: 0 0.1em 0.2em rgba(0, 0, 0, 0.6);
+    box-shadow:
+        inset 0 0.25em 0.6em rgba(0, 0, 0, 0.7),
+        inset 0 -0.1em 0.2em rgba(255, 200, 100, 0.1);
+}
+
+/* Рычаг сбоку — кнопка с большой кликабельной зоной */
+.machine-lever {
+    position: absolute;
+    left: 100%;
+    top: 30%;
+    margin-left: 0.3em;
+    width: 3em;
+    height: 8em;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.machine-lever:disabled {
+    cursor: wait;
+}
+
+/* Цокольная «втулка», к которой крепится рычаг */
+.machine-lever::before {
+    content: '';
+    position: absolute;
+    bottom: -0.2em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.4em;
+    height: 0.7em;
+    background: radial-gradient(ellipse at 50% 25%, #999 0%, #555 55%, #1a1a1a 100%);
+    border-radius: 50% 50% 30% 30%;
+    box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.7);
+    z-index: 0;
+}
+
+/* Сама штанга рычага. Крутится вокруг нижней точки крепления. */
+.lever-arm {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0.7em;
+    height: 6.5em;
+    background: linear-gradient(90deg, #2a2a2a 0%, #888 25%, #f5f5f5 50%, #888 75%, #2a2a2a 100%);
+    border-radius: 0.4em;
+    transform: translateX(-50%) rotate(-12deg);
+    transform-origin: 50% 100%;
+    transition: transform 0.45s cubic-bezier(0.34, 0.1, 0.5, 1);
+    box-shadow:
+        0.15em 0 0.4em rgba(0, 0, 0, 0.6),
+        inset 0 0 0.3em rgba(0, 0, 0, 0.4);
+}
+
+.machine-lever.pulled .lever-arm {
+    transform: translateX(-50%) rotate(58deg);
+    transition: transform 0.22s cubic-bezier(0.5, 0, 0.7, 1);
+}
+
+/* Красный шарик-набалдашник на конце штанги */
+.lever-ball {
+    position: absolute;
+    top: -1.6em;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 28%, #ff7878 0%, #d61515 45%, #5a0202 100%);
+    box-shadow:
+        0 0.3em 0.6em rgba(0, 0, 0, 0.6),
+        inset -0.3em -0.4em 0.6em rgba(0, 0, 0, 0.5),
+        inset 0.2em 0.2em 0.4em rgba(255, 255, 255, 0.45);
+}
+
+/* Результат под автоматом */
+#slot-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    color: #eee;
+    text-align: center;
+    animation: result-pop 0.4s ease-out;
+}
+
+.result-title {
+    font-size: 1.4em;
+    margin: 0;
+    color: var(--orange-color);
+}
+
+.result-duration {
+    color: var(--black-color);
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.add-to-bookmark {
+    background: firebrick;
+    color: white;
+    border: none;
+    padding: 0.6em 1.2em;
+    cursor: pointer;
+    border-radius: 0.4em;
+    font-size: 1em;
+    margin-top: 0.3em;
+}
+
+.add-to-bookmark:hover:not(:disabled) {
+    background: #a02020;
+}
+
+.add-to-bookmark.added {
+    background: #2a6b2a;
+    cursor: default;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes result-pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 700px) {
+    .reel {
+        --poster-h: 140px;
+        width: 95px;
+    }
+    .jackpot-banner {
+        font-size: 1em;
+        letter-spacing: 0.08em;
+    }
+    .top-lights span {
+        width: 0.45em;
+        height: 0.45em;
+    }
+    .machine-lever {
+        width: 2.5em;
+        height: 6.5em;
+    }
+    .lever-arm {
+        height: 5em;
+    }
+    .lever-ball {
+        width: 1.8em;
+        height: 1.8em;
+        top: -1.3em;
+    }
+    .payout-tray {
+        font-size: 0.9em;
+        letter-spacing: 0.25em;
+    }
+}

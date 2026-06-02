@@ -1,0 +1,63 @@
+{% extends "features/casino/casino_base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/casino/slots.css' %}">
+{% endblock %}
+
+{% block title %}Автомат{% endblock %}
+
+{% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/wheezy_animation.webp' %}{% endblock %}
+
+
+{% block center-content %}
+    <div id="slot-page">
+        <div id="slot-machine">
+            <div class="machine-top">
+                <div class="top-lights left">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="jackpot-banner">JACKPOT</div>
+                <div class="top-lights right">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <div class="machine-display">
+                <div class="reel" data-reel="0">
+                    <div class="reel-strip"></div>
+                </div>
+                <div class="reel" data-reel="1">
+                    <div class="reel-strip"></div>
+                </div>
+                <div class="reel" data-reel="2">
+                    <div class="reel-strip"></div>
+                </div>
+            </div>
+
+            <div class="coin-slot"></div>
+
+            <div class="payout-tray">КИНО</div>
+
+            <button class="machine-lever" id="lever-btn" aria-label="Дёрнуть рычаг">
+                <span class="lever-arm">
+                    <span class="lever-ball"></span>
+                </span>
+            </button>
+        </div>
+
+        <div id="slot-result" class="hidden">
+            <h3 class="result-title"></h3>
+            <p class="result-duration"></p>
+            <button class="add-to-bookmark">+ в закладки</button>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script type="module" src="{% static 'js/features/casino/slots.js' %}"></script>
+{% endblock %}

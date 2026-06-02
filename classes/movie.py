@@ -60,10 +60,7 @@ class MovieHandler:
         :return: Список сериализованных фильмов.
         """
         raw_films = Movie.mgr.filter(is_archive=is_archive)
-        serialisers = {
-            MoviesStructure.posters: MoviePosterSerializer,
-            MoviesStructure.rating: MovieRatingSerializer
-        }
+        serialisers = {MoviesStructure.posters: MoviePosterSerializer, MoviesStructure.rating: MovieRatingSerializer}
         serializer = serialisers.get(info_type, MovieDictSerializer)
         movies = serializer(raw_films, many=True)
 

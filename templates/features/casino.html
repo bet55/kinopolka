@@ -1,0 +1,57 @@
+{% extends "features/casino/casino_base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/catalog.css' %}">
+{% endblock %}
+
+{% block title %}Казино{% endblock %}
+
+{% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/tipsflip.webp' %}{% endblock %}
+
+{% block center-content %}
+
+    <div id="features_catalog">
+
+        <div id="8ball" class="feature">
+            <a href="/features/casino/8ball/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/casino/8Ball.webp' %}" alt="">
+                    <figcaption>Шар судьбы</figcaption>
+                </figure>
+            </a>
+        </div>
+
+        <div id="roulette" class="feature">
+            <a href="/features/casino/roulette/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/casino/Pirouletta.webp' %}" alt="">
+                    <figcaption>Рулетка</figcaption>
+                </figure>
+            </a>
+        </div>
+
+        <div id="cards" class="feature">
+            <a href="/features/casino/cards/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/casino/cards.png' %}" alt="">
+                    <figcaption>Black jack</figcaption>
+                </figure>
+            </a>
+        </div>
+
+        <div id="slots" class="feature">
+            <a href="/features/casino/slots/">
+                <figure>
+                    <img src="{% static 'img/features_catalog/casino/slots.png' %}" alt="">
+                    <figcaption>Однорукий бандит</figcaption>
+                </figure>
+            </a>
+        </div>
+
+
+    </div>
+
+{% endblock %}

@@ -43,7 +43,7 @@ export function telegramRequest(cocktail) {
         const char = getRandomItem(CHARS);
         const cock = getRandomItem(COCKS);
 
-        let text = `${star} Хэллоу ${star} 
+        let text = `${star} Хэллоу ${star}
                             \n До меня дошли слухи, что <b>${userName}</b> ${char} хочет <b>${cockName}</b> ${cock}
                             \nДобудьте мне:`;
         text += '\n — ' + ingredients.join('\n — ');
@@ -313,7 +313,10 @@ async function submitCocktailForm() {
     // Проверяем, что такого названия коктейля больше нет`
     const existingCocktails = Array.from(document.querySelectorAll('.cocktail'))
         .filter(c => c.dataset.cocktailId !== currentCocktailId)
-    const sameNameCocktails = existingCocktails.filter(c => capitalise(c.querySelector('h3').innerText) === cocktailName);
+    const sameNameCocktails = existingCocktails.filter(c => {
+        const rawName = c.querySelector('h3').innerText.replace('×', '').trim();
+        return capitalise(rawName) === cocktailName;
+    });
 
     if (sameNameCocktails.length > 0) {
         createToast('Коктейль уже существует!', 'error');
@@ -490,4 +493,3 @@ function refreshCocktailNode(cocktailData) {
     updateCocktail(cocktailNode);
     removeCocktail(cocktailNode);
 }
-

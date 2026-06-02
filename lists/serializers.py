@@ -13,14 +13,15 @@ from lists.models import Movie, Note, User
 
 DEFAULT_POSTER = "/media/posters/default.png"
 
+
 class NoteSerializer(ModelSerializer):
     """
     Сериализатор для оценок пользователей
     """
+
     class Meta:
         model = Note
         fields = "__all__"
-
 
 
 class MovieListSerializer(ListSerializer):
@@ -105,16 +106,7 @@ class MoviePosterSerializer(ModelSerializer):
         return representation
 
 
-
-
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "avatar"
-        ]
+        fields = ["id", "username", "first_name", "last_name", "email", "avatar"]

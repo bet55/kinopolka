@@ -1,0 +1,227 @@
+#ball-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2em;
+    padding: 2em 1em;
+    width: 100%;
+}
+
+#ball-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5em;
+}
+
+.magic-ball {
+    width: 18em;
+    height: 18em;
+    perspective: 1400px;
+    cursor: pointer;
+}
+
+.ball-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s ease;
+}
+
+.ball-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.ball-inner.shaking {
+    animation: ball-shake 1.4s ease-in-out;
+}
+
+.ball-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    overflow: hidden;            /* обрезаем всё, что не помещается в сферу */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background:
+        radial-gradient(circle at 30% 25%, #5a5a5a 0%, #1a1a1a 35%, #050505 70%, #000 100%);
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.7),
+        inset -8px -10px 20px rgba(0, 0, 0, 0.6),
+        inset 4px 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+.ball-back {
+    transform: rotateY(180deg);
+}
+
+/* Белый круг с восьмёркой на лицевой стороне.
+   Размер круга и размер цифры разнесены на два элемента: иначе font-size элемента
+   влиял бы на его же em-width и круг улетел бы за границы сферы. */
+.ball-eight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 7em;
+    height: 7em;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 -0.25em 0.5em rgba(0, 0, 0, 0.3);
+}
+
+.ball-eight span {
+    font-size: 4em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Круглое окно с предсказанием на тыльной стороне */
+.ball-window {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #0a1a3a;
+    box-shadow: inset 0 0.25em 1em rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ball-window img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.ball-window img.visible {
+    opacity: 1;
+}
+
+.ball-placeholder {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 4em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.ball-placeholder.hidden {
+    display: none;
+}
+
+#shake-btn {
+    background: firebrick;
+    color: white;
+    border: none;
+    padding: 0.7em 1.4em;
+    cursor: pointer;
+    border-radius: 0.4em;
+    font-size: 1em;
+}
+
+#shake-btn:hover:not(:disabled) {
+    background: #a02020;
+}
+
+#shake-btn:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+#ball-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+    color: #eee;
+    text-align: center;
+    animation: result-pop 0.4s ease-out;
+}
+
+.result-title {
+    font-size: 1.4em;
+    margin: 0;
+    color: #f5c542;
+}
+
+.result-duration {
+    color: #aaa;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.add-to-bookmark {
+    background: firebrick;
+    color: white;
+    border: none;
+    padding: 0.6em 1.2em;
+    cursor: pointer;
+    border-radius: 0.4em;
+    font-size: 1em;
+    margin-top: 0.3em;
+}
+
+.add-to-bookmark:hover:not(:disabled) {
+    background: #a02020;
+}
+
+.add-to-bookmark.added {
+    background: #2a6b2a;
+    cursor: default;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes ball-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    10% { transform: translate(-12px, -6px) rotate(-8deg); }
+    20% { transform: translate(10px, 8px) rotate(7deg); }
+    30% { transform: translate(-10px, 10px) rotate(-6deg); }
+    40% { transform: translate(12px, -4px) rotate(8deg); }
+    50% { transform: translate(-8px, -10px) rotate(-5deg); }
+    60% { transform: translate(10px, 6px) rotate(6deg); }
+    70% { transform: translate(-6px, 8px) rotate(-4deg); }
+    80% { transform: translate(8px, -6px) rotate(5deg); }
+    90% { transform: translate(-4px, 4px) rotate(-2deg); }
+}
+
+@keyframes result-pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .magic-ball {
+        width: 14em;
+        height: 14em;
+    }
+    .ball-eight {
+        width: 5em;
+        height: 5em;
+    }
+    .ball-eight span {
+        font-size: 3em;
+    }
+    .ball-window {
+        width: 7.5em;
+        height: 7.5em;
+    }
+    .ball-placeholder {
+        font-size: 3em;
+    }
+}

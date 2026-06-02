@@ -61,7 +61,7 @@
         font-size: 3em;
     }
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2000px) {
         height: 5em;
         width: 5em;
 
@@ -80,7 +80,7 @@
     left: 1em;
     background: var(--red-color);
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2000px) {
         top: 2em;
         left: 1em;
     }
@@ -92,7 +92,7 @@
     left: 5em;
     background: var(--yellow-color);
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2000px) {
         top: 4em;
         left: 7em;
     }
@@ -104,7 +104,7 @@
     left: 1em;
     background: var(--white-color);
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2000px) {
         top: 12em;
         left: 1em;
     }
@@ -114,9 +114,9 @@
     transform: rotate(4deg);
     top: 8em;
     left: 5em;
-    background: var(--orange-color);
+    background: var(--ligth-green-color);
 
-    @media (min-width: 2500px) {
+    @media (min-width: 2000px) {
         top: 12em;
         left: 7em;
     }
@@ -131,4 +131,3 @@
 
 
 }
-

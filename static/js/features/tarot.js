@@ -1,3 +1,5 @@
+import {shuffleArray} from "../utils/shuffle.js";
+
 // Конфигурация
 const TAROT_CONFIG = {
     cardNames: [
@@ -145,16 +147,6 @@ function initStars() {
     }
 }
 
-// Функция для перемешивания массива (Fisher-Yates shuffle)
-function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-}
-
 // ==================== КАРТЫ ====================
 class TarotDeck {
     constructor() {
@@ -192,8 +184,8 @@ class TarotDeck {
 
         cardElement.innerHTML = `
             <div class="card-face card-back"></div>
-            <div class="card-face ${frontClass}" 
-                 style="background-image: url('/static/img/tarots/${cardName}.png')"></div>
+            <div class="card-face ${frontClass}"
+                 style="background-image: url('/static/img/tarots/${cardName}.webp')"></div>
         `;
 
         cardElement.querySelector(`.${frontClass}`).addEventListener('click', () => {
@@ -247,7 +239,7 @@ class ModalController {
 
     show(cardName, isReversed) {
         const card = CARD_DESCRIPTIONS[cardName];
-        this.modalImage.src = `/static/img/tarots/${cardName}.png`;
+        this.modalImage.src = `/static/img/tarots/${cardName}.webp`;
         this.modalTitle.textContent = isReversed ? `${card.title} (перевёрнута)` : card.title;
         this.modalDescription.textContent = card.description;
         this.modal.style.display = 'block';
@@ -262,7 +254,7 @@ class ModalController {
 function preloadImages(deck) {
     deck.forEach(card => {
         const img = new Image();
-        img.src = `/static/img/tarots/${card}.png`;
+        img.src = `/static/img/tarots/${card}.webp`;
     });
 }
 

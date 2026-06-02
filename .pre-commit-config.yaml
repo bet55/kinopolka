@@ -1,0 +1,37 @@
+# Запускается автоматически перед каждым git commit.
+# Установка на каждом устройстве (один раз): uv run pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Версия ruff для хуков. Держим в одном ключе с ruff в pyproject.toml.
+    rev: v0.12.8
+    hooks:
+      # Линтер + безопасные автофиксы (включая сортировку импортов)
+      - id: ruff-check
+        args: [--fix]
+      # Форматтер (стиль кода)
+      - id: ruff-format
+
+  # Базовые проверки файлов
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-toml            # валидность TOML (ловит битый pyproject.toml)
+      - id: check-yaml            # валидность YAML
+      - id: end-of-file-fixer     # перевод строки в конце файла
+      - id: trailing-whitespace   # лишние пробелы в конце строк
+      - id: check-merge-conflict  # маркеры незавершённого merge
+      - id: detect-private-key    # приватные ключи в коммите
+      - id: check-added-large-files  # защита от случайных тяжёлых файлов
+        args: [--maxkb=5120]
+
+  # Синхронизация uv.lock с pyproject.toml
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.11.18
+    hooks:
+      - id: uv-lock
+
+  # Поиск секретов (токены, пароли, ключи) в коммите
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks

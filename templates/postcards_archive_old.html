@@ -37,7 +37,7 @@
                     <img src="{{ p.screenshot }}" alt="открытка">
                     <figcaption><b>Собрание: </b>{{ p.meeting_date }}</figcaption>
                     <figcaption><b>Создание:</b> {{ p.created_at }}</figcaption>
-                    
+
                     {% include "elements/confirmation_tooltip.html" with title="Удалить открытку?" %}
                 </figure>
             {% endif %}
@@ -51,5 +51,3 @@
 {% block script %}
     <script type="module" src="{% static 'js/postcards_archive_old.js' %}"></script>
 {% endblock %}
-
-

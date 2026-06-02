@@ -77,40 +77,36 @@ class Request {
         try {
             const response = await fetch(url, requestOptions);
 
-            // Парсим ответ сервера. Если пришел не json - значит ошибка не в логике работы (указан неверный url и т.д.)
+            // Читаем тело один раз, потом пробуем распарсить как JSON
+            const rawText = await response.text();
             let responseData = {};
             let responseEmpty = true;
-            try {
-                responseData = await response.json();
-                responseEmpty = false;
-            } catch (e) {
-                console.warn('Не распарсился отверт: ', e);
+            // Пустое тело (например, 204 No Content) — это валидный ответ, не парсим
+            if (rawText) {
+                try {
+                    responseData = JSON.parse(rawText);
+                    responseEmpty = false;
+                } catch (e) {
+                    console.warn('Не распарсился ответ: ', e);
+                }
             }
-
 
             // Ошибка HTTP (4xx, 5xx)
             if (!response.ok) {
                 const status = response.status;
-                let errorText = 'беда!';
+                let errorText;
                 let toastText = '';
                 let logText = '';
-                try {
-                    errorText = await response.text();
-                } catch (e) {
-                    console.warn('Не распарсили ошибку: ', e)
-                }
-
 
                 if (responseEmpty) {
+                    errorText = rawText || 'беда!';
                     toastText = `Ошибка сервера: ${status} ${errorText}`;
                     logText = `server ${method} ${url} failed: ${status}\n${errorText}`;
                 } else {
                     errorText = responseData.error ?? 'Неизвестная ошибка';
-
                     toastText = `Ошибка запроса: ${errorText}`;
                     logText = `api ${method} ${url} failed: ${status}\n${errorText}`;
                 }
-
 
                 createToast(toastText, 'error');
                 console.error(logText);

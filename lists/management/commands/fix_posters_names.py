@@ -53,23 +53,25 @@ class Command(BaseCommand):
             new_file_path = Path("media") / new_relative_path
 
             try:
-                if not new_file_path.exists():
-                    self.stdout.write(self.style.ERROR(f"movie {kp_id}: doesn't have correct file"))
-                    error_count += 1
+                if not old_file_path.exists():
+                    self.stdout.write(self.style.WARNING(f"Skipping movie {kp_id}: suffixed file not found on disk"))
+                    skipped_count += 1
                     continue
 
-                # Check if old file exists
-                if old_file_path.exists():
-                    # Rename the file on disk
+                if new_file_path.exists():
+                    # Clean file already exists — delete the suffixed duplicate
+                    old_file_path.unlink()
+                    print(f"Deleted duplicate {current_path} (clean file already present)")
+                else:
+                    # Clean file missing — rename suffixed file to clean name
                     os.rename(old_file_path, new_file_path)
                     files_renamed += 1
+                    print(f"Renamed {current_path} → {new_relative_path}")
 
                 # Update the model
                 movie.poster_local = str(new_file_path)
                 movie.save()
                 urls_renamed += 1
-
-                print(f"Updated movie {kp_id}: renamed {current_path} to {new_relative_path}")
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Error for movie {kp_id}: failed to update ({e!s})"))

@@ -128,7 +128,6 @@ class Tools:
         archive_movies_json = "data/archive_movies_dump.json"
 
         failed_movies_file = "data/failed_movies.json"
-        error_file = "data/save_error.json"
 
         with open(archive_movies_json) as f:
             archive_movies = json.load(f)

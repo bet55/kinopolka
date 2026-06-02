@@ -1,0 +1,282 @@
+#deck-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5em;
+    padding: 2em 1em;
+    width: 100%;
+}
+
+#deck-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8em;
+}
+
+.deck {
+    position: relative;
+    width: 11em;
+    height: 15.5em;
+    cursor: pointer;
+}
+
+.deck .card {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.6em;
+    background: url('/static/img/tarots/back.jpg') center/cover;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+    border: 2px solid #2a1212;
+    transition: transform 0.2s ease;
+}
+
+.deck .card:nth-child(1) { transform: translate(-6px, -6px); }
+.deck .card:nth-child(2) { transform: translate(-3px, -3px); }
+.deck .card:nth-child(3) { transform: translate(0, 0); }
+.deck .card:nth-child(4) { transform: translate(3px, 3px); }
+
+.deck:not(.empty):not(.shuffling):hover .deck-top {
+    transform: translate(8px, -3px) rotate(2deg);
+}
+
+.deck.empty {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.deck.shuffling {
+    pointer-events: none;
+}
+
+/* Каждая карта танцует чуть-чуть по-разному, чтобы получилась тасовка */
+.deck.shuffling .card:nth-child(1) { animation: shuffle-card-1 0.45s ease-in-out; }
+.deck.shuffling .card:nth-child(2) { animation: shuffle-card-2 0.45s ease-in-out 0.04s; }
+.deck.shuffling .card:nth-child(3) { animation: shuffle-card-3 0.45s ease-in-out 0.08s; }
+.deck.shuffling .card:nth-child(4) { animation: shuffle-card-4 0.45s ease-in-out 0.12s; }
+
+@keyframes shuffle-card-1 {
+    0%   { transform: translate(-6px, -6px); }
+    50%  { transform: translate(-22px, -18px) rotate(-7deg); }
+    100% { transform: translate(-6px, -6px); }
+}
+@keyframes shuffle-card-2 {
+    0%   { transform: translate(-3px, -3px); }
+    50%  { transform: translate(-14px, 10px) rotate(5deg); }
+    100% { transform: translate(-3px, -3px); }
+}
+@keyframes shuffle-card-3 {
+    0%   { transform: translate(0, 0); }
+    50%  { transform: translate(16px, -12px) rotate(7deg); }
+    100% { transform: translate(0, 0); }
+}
+@keyframes shuffle-card-4 {
+    0%   { transform: translate(3px, 3px); }
+    50%  { transform: translate(22px, 16px) rotate(-6deg); }
+    100% { transform: translate(3px, 3px); }
+}
+
+.deck-counter {
+    position: absolute;
+    bottom: -1.8em;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85em;
+    color: #ccc;
+    white-space: nowrap;
+}
+
+#deck-hint {
+    color: #999;
+    font-size: 0.9em;
+    margin: 1.2em 0 0 0;
+}
+
+#reshuffle-btn {
+    background: firebrick;
+    color: white;
+    border: none;
+    padding: 0.7em 1.4em;
+    cursor: pointer;
+    border-radius: 0.4em;
+    font-size: 1em;
+    margin-top: 0.5em;
+}
+
+#reshuffle-btn:hover {
+    background: #a02020;
+}
+
+#drawn-cards {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.2em;
+    padding: 0;
+    margin: 0;
+    max-width: 90vw;
+}
+
+.drawn-card {
+    perspective: 1200px;
+    width: 11em;
+    height: 15.5em;
+}
+
+.drawn-card.invisible {
+    visibility: hidden;
+}
+
+.drawn-card .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.drawn-card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.drawn-card .card-face {
+    position: absolute;
+    inset: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 0.6em;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+    border: 2px solid #2a1212;
+}
+
+.drawn-card .card-back {
+    background: url('/static/img/tarots/back.jpg') center/cover;
+}
+
+.drawn-card .card-front {
+    transform: rotateY(180deg);
+    background: #1a1a1a;
+}
+
+.drawn-card .card-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Описание лежит поверх постера в нижней части карты, не двигает картинку */
+.card-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.6em 0.4em 0.5em;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.65) 65%, transparent 100%);
+    color: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3em;
+}
+
+.card-title {
+    font-weight: bold;
+    font-size: 0.8em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.card-duration {
+    color: #ccc;
+    font-size: 0.7em;
+}
+
+.add-to-bookmark {
+    background: firebrick;
+    color: white;
+    border: none;
+    padding: 0.4em 0.7em;
+    margin-top: 0.2em;
+    cursor: pointer;
+    border-radius: 0.3em;
+    font-size: 0.7em;
+}
+
+.add-to-bookmark:hover:not(:disabled) {
+    background: #a02020;
+}
+
+.add-to-bookmark.added {
+    background: #2a6b2a;
+    cursor: default;
+}
+
+/* Слой для летающих клонов карт */
+#flight-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.flying-card {
+    position: fixed;
+    perspective: 1200px;
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translate(0, 0);
+}
+
+.flying-card .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.flying-card .card-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.flying-card .card-face {
+    position: absolute;
+    inset: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 0.6em;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+    border: 2px solid #2a1212;
+}
+
+.flying-card .card-back {
+    background: url('/static/img/tarots/back.jpg') center/cover;
+}
+
+.flying-card .card-front {
+    transform: rotateY(180deg);
+    background: #1a1a1a;
+}
+
+.flying-card .card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .deck, .drawn-card {
+        width: 8em;
+        height: 11.5em;
+    }
+}

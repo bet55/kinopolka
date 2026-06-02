@@ -21,7 +21,6 @@ class MoviesStatistic(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
     async def get(self, request: Request):
-
         statistic = Statistic()
         await statistic.extract_data()
 
@@ -44,7 +43,18 @@ class MoviesStatistic(GlobalDataMixin, APIView):
         )
 
 
-class Carousel(GlobalDataMixin, APIView):
+class Casino(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
+    async def get(self, request: Request):
+        return render(
+            request,
+            "features/casino.html",
+            context=await self.add_context_data(request, {}),
+        )
+
+
+class Roulette(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
     async def get(self, request: Request):
@@ -52,8 +62,41 @@ class Carousel(GlobalDataMixin, APIView):
 
         return render(
             request,
-            "features/carousel.html",
+            "features/casino/roulette.html",
             context=await self.add_context_data(request, {"movies": movies}),
+        )
+
+
+class Cards(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
+    async def get(self, request: Request):
+        return render(
+            request,
+            "features/casino/cards.html",
+            context=await self.add_context_data(request, {}),
+        )
+
+
+class Slots(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
+    async def get(self, request: Request):
+        return render(
+            request,
+            "features/casino/slots.html",
+            context=await self.add_context_data(request, {}),
+        )
+
+
+class EightBall(GlobalDataMixin, APIView):
+    http_method_names = ["get"]
+
+    async def get(self, request: Request):
+        return render(
+            request,
+            "features/casino/8ball.html",
+            context=await self.add_context_data(request, {}),
         )
 
 

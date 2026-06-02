@@ -27,6 +27,6 @@ export function createToast(text, status) {
         if (toastClassName) {
             toast.classList.remove(toastClassName);
         }
-    })
+    }, {once: true})
 
 }
