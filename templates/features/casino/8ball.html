@@ -1,0 +1,45 @@
+{% extends "features/casino/casino_base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/casino/8ball.css' %}">
+{% endblock %}
+
+{% block title %}Шар-предсказатель{% endblock %}
+
+{% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/devil.png' %}{% endblock %}
+
+{% block center-content %}
+    <div id="ball-page">
+        <div id="ball-area">
+            <div class="magic-ball" id="ball">
+                <div class="ball-inner">
+                    <div class="ball-face ball-front">
+                        <div class="ball-eight"><span>8</span></div>
+                    </div>
+                    <div class="ball-face ball-back">
+                        <div class="ball-window">
+                            <img id="ball-poster" src="" alt="">
+                            <span class="ball-placeholder">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="shake-btn">Встряхнуть</button>
+        </div>
+
+        <div id="ball-result" class="hidden">
+            <h3 class="result-title"></h3>
+            <p class="result-duration"></p>
+            <button class="add-to-bookmark">+ в закладки</button>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script type="module" src="{% static 'js/features/casino/8ball.js' %}"></script>
+{% endblock %}

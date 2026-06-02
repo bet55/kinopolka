@@ -12,7 +12,7 @@ function navigationToggle() {
         const title = document.querySelector('.title');
         const navigation = document.querySelector('.nav-column');
         title.addEventListener('click', () => {
-            navigation.style.display = (navigation.style.display === 'none') ? 'flex' : 'none';
+            navigation.style.display = (getComputedStyle(navigation).display === 'none') ? 'flex' : 'none';
         })
     }
 }

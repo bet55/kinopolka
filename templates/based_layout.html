@@ -36,7 +36,7 @@
         </div>
 
         <div class="col-md-5 header-img">
-            <img class="header-img" src="{{ random.header }}">
+            <img class="header-img" src="{% block header_img %}{{ random.header }}{% endblock %}">
         </div>
 
         <div class="col-md-4 header-options">
@@ -87,7 +87,7 @@
                     <a class="nav-link" href="/movies/add/">Добавление</a>
                     <a class="nav-link" href="/features/catalog/">Фишки</a>
                 </nav>
-                <img class="align-self-center mt-auto nav-img" src="{{ random.navigation }}">
+                <img class="align-self-center mt-auto nav-img" src="{% block nav_img %}{{ random.navigation }}{% endblock %}">
         </div>
 
         <div class="col-md-6 h-100">

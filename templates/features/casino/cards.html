@@ -1,0 +1,43 @@
+{% extends "features/casino/casino_base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/casino/cards.css' %}">
+{% endblock %}
+
+    {% block title %}Black jack{% endblock %}
+
+{% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/spadecard.webp' %}{% endblock %}
+
+{% block center-content %}
+    <div id="deck-page">
+        <div id="deck-area">
+            <div id="deck" class="deck">
+                <div class="card card-back"></div>
+                <div class="card card-back"></div>
+                <div class="card card-back"></div>
+                <div class="card card-back deck-top"></div>
+                <span class="deck-counter"></span>
+            </div>
+            <p id="deck-hint">Нажмите на колоду, чтобы вытянуть фильм</p>
+            <button id="reshuffle-btn" class="hidden">Перемешать заново</button>
+        </div>
+
+        <ul id="drawn-cards"></ul>
+    </div>
+
+    <div id="flight-layer"></div>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script>
+        const cards = ['clubcard.webp', 'diamondcard.webp', 'heartcard.webp', 'spadecard.webp'];
+        document.querySelector('.nav-img').src =
+            "{% static 'img/features_catalog/casino/' %}" + cards[Math.floor(Math.random() * cards.length)];
+    </script>
+    <script type="module" src="{% static 'js/features/casino/cards.js' %}"></script>
+{% endblock %}

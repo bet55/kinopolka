@@ -1,3 +1,5 @@
+import {shuffleArray} from "../utils/shuffle.js";
+
 // Конфигурация
 const TAROT_CONFIG = {
     cardNames: [
@@ -143,16 +145,6 @@ function initStars() {
             stars.push({ x, y });
         }
     }
-}
-
-// Функция для перемешивания массива (Fisher-Yates shuffle)
-function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
 }
 
 // ==================== КАРТЫ ====================

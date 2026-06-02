@@ -313,7 +313,10 @@ async function submitCocktailForm() {
     // Проверяем, что такого названия коктейля больше нет`
     const existingCocktails = Array.from(document.querySelectorAll('.cocktail'))
         .filter(c => c.dataset.cocktailId !== currentCocktailId)
-    const sameNameCocktails = existingCocktails.filter(c => capitalise(c.querySelector('h3').innerText) === cocktailName);
+    const sameNameCocktails = existingCocktails.filter(c => {
+        const rawName = c.querySelector('h3').innerText.replace('×', '').trim();
+        return capitalise(rawName) === cocktailName;
+    });
 
     if (sameNameCocktails.length > 0) {
         createToast('Коктейль уже существует!', 'error');

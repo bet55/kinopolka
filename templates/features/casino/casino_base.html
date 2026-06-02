@@ -1,0 +1,10 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block script %}
+{#    Убираем кэширование анимированной картинки, добавляя метку в название #}
+<script>
+    document.querySelector('img.header-img').src += '?t=' + Date.now();
+</script>
+{% endblock %}

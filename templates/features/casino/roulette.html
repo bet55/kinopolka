@@ -1,0 +1,48 @@
+{% extends "features/casino/casino_base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/casino/roulette.css' %}">
+{% endblock %}
+
+{% block title %}Рулетка{% endblock %}
+
+{% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/chips.webp' %}{% endblock %}
+
+{% block center-content %}
+    <div id="carousel-container">
+
+
+        <div id="carousel">
+
+            {% for m in movies %}
+                <div class="poster" data-kp-id="{{ m.kp_id }}"><img src="{{ m.poster_local }}" alt=""></div>
+            {% endfor %}
+
+
+            <div class="arrow">
+                <img src="{% static 'img/carousel/arrow1.png' %}" alt="">
+            </div>
+        </div>
+
+        <div id="result"></div>
+    
+        <div id="duration">
+            <b></b>
+        </div>
+
+        <div id="start">
+            <button>Стартуем</button>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script type="module" src="{% static 'js/features/casino/roulette.js' %}"></script>
+{% endblock %}
+
+
