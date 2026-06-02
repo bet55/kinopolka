@@ -60,7 +60,7 @@ export const showRatingModal = (movieId, allMovies) => {
     userAlert.show();
     modalForm.dataset.kpId = movieId;
 
-    ratePoster.src = allMovies[movieId].poster;
+    ratePoster.src = allMovies[movieId].poster_local;
     rateTitle.innerText = allMovies[movieId].name;
 };
 

@@ -106,7 +106,7 @@
 }
 
 #result {
-    background-image: url("/static/img/carousel/bg2.png");
+    background-image: url("/static/img/carousel/bg2.webp");
     background-size: contain;
     height: 12em;
     min-width: 21em;

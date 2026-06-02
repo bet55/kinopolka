@@ -185,7 +185,7 @@ class TarotDeck {
         cardElement.innerHTML = `
             <div class="card-face card-back"></div>
             <div class="card-face ${frontClass}" 
-                 style="background-image: url('/static/img/tarots/${cardName}.png')"></div>
+                 style="background-image: url('/static/img/tarots/${cardName}.webp')"></div>
         `;
 
         cardElement.querySelector(`.${frontClass}`).addEventListener('click', () => {
@@ -239,7 +239,7 @@ class ModalController {
 
     show(cardName, isReversed) {
         const card = CARD_DESCRIPTIONS[cardName];
-        this.modalImage.src = `/static/img/tarots/${cardName}.png`;
+        this.modalImage.src = `/static/img/tarots/${cardName}.webp`;
         this.modalTitle.textContent = isReversed ? `${card.title} (перевёрнута)` : card.title;
         this.modalDescription.textContent = card.description;
         this.modal.style.display = 'block';
@@ -254,7 +254,7 @@ class ModalController {
 function preloadImages(deck) {
     deck.forEach(card => {
         const img = new Image();
-        img.src = `/static/img/tarots/${card}.png`;
+        img.src = `/static/img/tarots/${card}.webp`;
     });
 }
 

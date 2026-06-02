@@ -1,73 +1,123 @@
-.modal-content {
-    background-color: burlywood;
+/* Все стили ограничены #rate-modal, чтобы не задевать другие модалки. */
+
+#rate-modal .modal-content {
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(160deg, #4a4150 0%, var(--black-color) 100%);
+    color: var(--white-color);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
 }
 
-.modal-body {
+#rate-modal .modal-header {
+    border-bottom: 1px solid rgba(216, 224, 211, 0.12);
+    padding: 1rem 1.5rem;
+}
+
+#rate-modal .modal-title {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+/* btn-close у Bootstrap тёмный — осветляем для тёмного фона */
+#rate-modal .btn-close {
+    filter: invert(1) grayscale(1) brightness(1.8);
+    opacity: 0.7;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#rate-modal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+#rate-modal .modal-body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 1.1rem;
+    padding: 1.75rem 1.5rem;
 }
 
-#rate-poster {
-    img {
-        height: 12em;
-    }
+#rate-modal #rate-poster img {
+    height: 14em;
+    border-radius: 12px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+    object-fit: cover;
 }
 
-#rate-comment-field {
-    flex-direction: column;
-
-    label {
-        padding: 1em;
-        font-size: 1.2em;
-    }
-
-    textarea {
-        resize: none;
-        font-size: 2em;
-        height: 5em;
-
-    }
+#rate-modal .rate-title {
+    margin: 0;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.02em;
 }
 
-#stars-hint {
-    visibility: hidden;
+/* Звёзды: лейблы плавают вправо, поэтому ~ label работает справа налево */
+#rate-modal #rate-stars {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 0.15em;
 }
 
-.rate-btn-save {
-    color: black;
-    background-color: var(--green-color);
-
-    &:hover {
-        cursor: pointer;
-        background-color: #3c763d;
-    }
+#rate-modal #rate-stars input {
+    display: none;
 }
 
-
-#rate-stars {
-    display: inline-block;
-
-    input {
-        display: none;
-    }
-
-    label {
-        float: right;
-        cursor: pointer;
-        transition: color 0.3s;
-    }
+#rate-modal #rate-stars label {
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.15s ease, color 0.2s ease, text-shadow 0.2s ease;
 }
 
-
-#rate-stars label:before {
+#rate-modal #rate-stars label:before {
     content: "\2605";
-    font-size: 30px;
+    font-size: 2.4rem;
+    color: rgba(216, 224, 211, 0.22);
 }
 
-#rate-stars input:checked ~ label,
-#rate-stars label:hover,
-#rate-stars label:hover ~ label {
-    color: rgb(238, 161, 13);
-    transition: color 0.3s;
+#rate-modal #rate-stars input:checked ~ label,
+#rate-modal #rate-stars label:hover,
+#rate-modal #rate-stars label:hover ~ label {
+    color: var(--yellow-color);
+    text-shadow: 0 0 14px rgba(245, 210, 60, 0.65);
+}
+
+#rate-modal #rate-stars label:hover {
+    transform: scale(1.2);
+}
+
+#rate-modal #stars-hint {
+    visibility: hidden;
+    min-height: 1.6rem;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--yellow-color);
+}
+
+#rate-modal .modal-footer {
+    border-top: 1px solid rgba(216, 224, 211, 0.12);
+    justify-content: center;
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+#rate-modal .rate-btn-save {
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 2.6rem;
+    font-weight: 700;
+    color: var(--black-color);
+    background: var(--yellow-color);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+#rate-modal .rate-btn-save:hover {
+    cursor: pointer;
+    background: #ffe05a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(245, 210, 60, 0.45);
+}
+
+#rate-modal .rate-btn-save:active {
+    transform: translateY(0);
 }
