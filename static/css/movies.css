@@ -83,6 +83,17 @@
 
     }
 
+    /* Иконка-взрыв обёрнута в div (см. elements/boom_icon.css) —
+       div занимает место старого img, картинка заполняет его целиком */
+    .boom-icon {
+        height: 85%;
+        aspect-ratio: 1;
+
+        img {
+            height: 100%;
+        }
+    }
+
     @media (min-width: 2000px) {
         height: 2.4em;
     }

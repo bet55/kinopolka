@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 return True
         return False
 
-    async def download_poster(self, movie, client, max_retries=3):
+    async def _skip_downloading_poster(self, movie):
         kp_id = movie.kp_id
 
         # Skip if poster_local is already set and file exists
@@ -38,18 +38,25 @@ class Command(BaseCommand):
             poster_path = Path(movie.poster_local.path)
             if poster_path.exists():
                 self.stdout.write(f"Skipping movie {kp_id}: poster_local already exists")
-                return kp_id, True
+                return True, kp_id, True
 
         # Check for existing file in media/posters/
         if await self.link_existing_poster(movie, kp_id):
-            return kp_id, True
+            return True, kp_id, True
 
         # Skip if no valid poster URL
         if not movie.poster or movie.poster == QUESTION_MARK_URL:
             self.stdout.write(self.style.WARNING(f"No valid poster URL for movie {kp_id}"))
             movie.poster_local = None
             await sync_to_async(movie.save)()
-            return kp_id, False
+            return True, kp_id, False
+
+        return False, kp_id, False
+
+    async def download_poster(self, movie, client, max_retries=3):
+        skip_downloading, kp_id, is_download = await self._skip_downloading_poster(movie)
+        if skip_downloading:
+            return kp_id, is_download
 
         # Download poster
         for attempt in range(1, max_retries + 1):

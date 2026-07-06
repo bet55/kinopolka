@@ -10,7 +10,7 @@ def create_empty_list():
 
 n_url = "https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
 
-ListDict = Optional[list[dict[str, str]]]
+ListDict = Optional[list[dict]]
 
 
 class KpFilmGenresModel(BaseModel):

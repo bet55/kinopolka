@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import pendulum
 
 from filmoclub.calendar.theme_settings import THEMES_RANGES
@@ -30,9 +32,6 @@ def create_theme_calendar() -> dict[str, str]:
             calendar[day_str.format("DD.MM")] = theme
 
     return calendar
-
-
-from collections import OrderedDict
 
 
 res = create_theme_calendar()

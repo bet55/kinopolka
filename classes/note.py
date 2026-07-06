@@ -2,6 +2,7 @@ from collections import defaultdict
 import logging
 
 from asgiref.sync import sync_to_async
+from pydantic import ValidationError as PydanticValidationError
 from rest_framework.exceptions import ValidationError
 
 from lists.models import Movie, Note, User
@@ -62,9 +63,9 @@ class NoteHandler:
         try:
             modeling = RateMovieRequestModel(**note_body)
             formatted_request = modeling.model_dump(exclude_none=True, exclude_defaults=True, exclude_unset=True)
-        except RateMovieRequestModel.ValidationError as e:
+        except PydanticValidationError as e:
             logger.warning("Некорректные данные заметки: %s", str(e))
-            raise ValidationError("Некорректные данные заметки")
+            raise ValidationError("Некорректные данные заметки") from e
 
         if not all(key in formatted_request for key in ["user", "movie", "rating"]):
             raise ValidationError("Отсутствуют обязательные поля в note_body")

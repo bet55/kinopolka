@@ -1,0 +1,267 @@
+/* =======  Страница фотографий клуба  ======= */
+#photos {
+    max-height: 85vh;
+    overflow: auto;
+
+    h2 {
+        font-weight: bold;
+        color: var(--red-color);
+    }
+}
+
+.hide {
+    display: none;
+}
+
+/* ======= Кнопка добавления (как в баре) ======= */
+#photos .add {
+    background: none;
+    color: grey;
+    border-radius: 6%;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+    margin: 1em;
+
+    &:hover {
+        font-weight: bold;
+        color: black;
+        border-color: rgba(0, 0, 0);
+        background: var(--green-color);
+        box-shadow: 3px 4px 4px;
+    }
+}
+
+/* ======= Форма загрузки ======= */
+#new-photo-form {
+    max-width: 40em;
+    margin: 0 auto var(--spacing-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--black-color);
+    border-radius: var(--border-radius-md);
+    background-color: #ffe5ba;
+
+    .form-header {
+        text-align: right;
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+    }
+
+    .form-row {
+        display: flex;
+        gap: var(--spacing-md);
+    }
+
+    .image-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 8em;
+        height: 8em;
+        border: 2px dashed var(--black-color);
+        border-radius: var(--border-radius-md);
+        cursor: pointer;
+        overflow: hidden;
+
+        span {
+            font-size: 3em;
+            color: grey;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    }
+
+    .text-section {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+
+        input, textarea {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--black-color);
+            border-radius: var(--border-radius-sm);
+        }
+
+        textarea {
+            flex-grow: 1;
+            resize: none;
+        }
+    }
+
+    .submit-btn {
+        margin-top: var(--spacing-md);
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border: 1px solid black;
+        border-radius: var(--border-radius-sm);
+        background-color: var(--green-color);
+        color: var(--white-color);
+
+        &:hover {
+            font-weight: bold;
+            filter: brightness(1.2);
+        }
+    }
+}
+
+/* ======= Галерея: колонки подстраиваются под ширину, вертикальные и
+   горизонтальные фото занимают свою естественную высоту ======= */
+#photos-gallery {
+    columns: 16em;
+    column-gap: var(--spacing-md);
+    padding: var(--spacing-md);
+
+    .no-photos {
+        color: grey;
+    }
+}
+
+/* ======= Карточка с переворотом ======= */
+.photo-card {
+    break-inside: avoid;
+    margin-bottom: var(--spacing-md);
+    position: relative;
+    perspective: 1000px;
+}
+
+.photo-inner {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+
+.photo-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+/* Лицевая сторона — само фото */
+.photo-front {
+    backface-visibility: hidden;
+
+    img {
+        display: block;
+        width: 100%;
+        border-radius: var(--border-radius-md);
+    }
+}
+
+/* Иконки действий поверх фото (появляются при наведении) */
+.photo-actions {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    display: flex;
+    gap: var(--spacing-sm);
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    button {
+        width: 2em;
+        height: 2em;
+        border: none;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.55);
+        color: var(--white-color);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--black-color);
+        }
+    }
+
+    /* Взрыв вместо крестика: сама анимация — в elements/boom_icon.css */
+    .remove {
+        padding: 0.3em;
+    }
+}
+
+.photo-front:hover .photo-actions {
+    opacity: 1;
+}
+
+/* Обратная сторона — описание */
+.photo-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+    overflow: auto;
+
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    background-color: var(--black-color);
+    color: var(--white-color);
+    text-align: left;
+
+    .photo-name {
+        font-weight: bold;
+        color: var(--yellow-color);
+    }
+
+    .photo-description {
+        white-space: pre-line;
+    }
+}
+
+/* Форма редактирования на обратной стороне */
+.photo-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    flex-grow: 1;
+
+    input, textarea {
+        width: 100%;
+        padding: var(--spacing-sm);
+        border: none;
+        border-radius: var(--border-radius-sm);
+    }
+
+    textarea {
+        flex-grow: 1;
+        resize: none;
+    }
+
+    .edit-buttons {
+        display: flex;
+        gap: var(--spacing-sm);
+
+        button {
+            padding: 0.2em 0.8em;
+            border: 1px solid black;
+            border-radius: var(--border-radius-sm);
+        }
+
+        button[type="submit"] {
+            background-color: var(--green-color);
+            color: var(--white-color);
+        }
+    }
+}
+
+.photo-edit-form.hide {
+    display: none;
+}
+
+@media screen and (max-width: 800px) {
+    #new-photo-form .form-row {
+        flex-direction: column;
+        align-items: center;
+    }
+}

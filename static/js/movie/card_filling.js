@@ -25,8 +25,10 @@ const showMoviePoster = (movieInfo) => {
     cardKpLink.href = `https://www.kinopoisk.ru/film/${movieInfo.kp_id}/`;
     cardImdbLink.href = 'https://cataas.com/cat/gif';
 
-    cardKpLink.querySelector('span').textContent = Number(parseFloat(movieInfo.rating_kp).toFixed(1));
-    cardImdbLink.querySelector('span').textContent = Number(parseFloat(movieInfo.rating_imdb).toFixed(1));
+    // toFixed(1) всегда даёт один знак после точки ("7.0", "7.8").
+    // Без обёртки Number(...), иначе "7.0" схлопывается в целое 7.
+    cardKpLink.querySelector('span').textContent = parseFloat(movieInfo.rating_kp).toFixed(1);
+    cardImdbLink.querySelector('span').textContent = parseFloat(movieInfo.rating_imdb).toFixed(1);
 
 
     cardRating.classList.remove('hidden');

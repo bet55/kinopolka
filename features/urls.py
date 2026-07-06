@@ -7,6 +7,8 @@ from features.views import (
     EightBall,
     Gym,
     MoviesStatistic,
+    PhotoDetail,
+    Photos,
     Roulette,
     Slots,
     Tarots,
@@ -23,4 +25,6 @@ urlpatterns = [
     path("statistic/", MoviesStatistic.as_view(), name="statistic"),
     path("tarot/", Tarots.as_view(), name="tarot"),
     path("gym/", Gym.as_view(), name="gym"),
+    path("photos/", Photos.as_view(), name="photos"),
+    path("photos/<int:pk>/", PhotoDetail.as_view(), name="photo-detail"),
 ]

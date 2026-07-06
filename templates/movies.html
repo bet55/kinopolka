@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/elements/filter.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/sort.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/user_requirement_modal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/boom_icon.css' %}">
 {% endblock %}
 
 {% block title %}Кино{% endblock %}
@@ -92,10 +93,19 @@
                              data-bs-title="Оценить">
                     {% endif %}
 
-                    <img class="opt opt-remove" src="{% static 'img/poster_options/boom2.png' %}" alt=""
+                    {# div вместо img: обёртки нужны для анимации (boom_icon.css); #}
+                    {# классы opt/opt-remove первыми — на их порядок завязан select_options.js #}
+                    <div class="opt opt-remove boom-icon"
                          data-bs-toggle="tooltip"
                          data-bs-placement="top"
                          data-bs-title="Удалить">
+                        <span class="boom-glow"></span>
+                        <span class="boom-rumble">
+                            <span class="boom-billow">
+                                <img src="{% static 'img/poster_options/boom2.png' %}" alt="">
+                            </span>
+                        </span>
+                    </div>
                 </div>
 
                 {% include "elements/confirmation_tooltip.html" with title="Удалить фильм?" %}

@@ -4,6 +4,7 @@ from typing import NamedTuple
 from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
 import httpx
+from pydantic import ValidationError as PydanticValidationError
 from rest_framework.exceptions import ValidationError
 
 from classes.kp import KP_Movie
@@ -263,12 +264,12 @@ class MovieHandler:
             formatted_movie = modeling.model_dump(exclude_none=True, exclude_defaults=True, exclude_unset=True)
             logger.debug("Предобработаны данные фильма: kp_id=%s", formatted_movie.get("kp_id"))
             return formatted_movie
-        except KPFilmModel.ValidationError as e:
+        except PydanticValidationError as e:
             logger.warning("Некорректные данные фильма: %s", str(e))
-            raise ValidationError("Некорректные данные фильма")
+            raise ValidationError("Некорректные данные фильма") from e
         except Exception as e:
             logger.error("Неожиданная ошибка при предобработке фильма: %s", str(e))
-            raise ValidationError("Ошибка при предобработке фильма")
+            raise ValidationError("Ошибка при предобработке фильма") from e
 
     @classmethod
     def _persons_preprocess(cls, movie_info: dict) -> dict[str, list[dict]]:
@@ -295,7 +296,7 @@ class MovieHandler:
                             exclude_none=True, exclude_defaults=True, exclude_unset=True
                         )
                     )
-                except (KeyError, KpFilmPersonModel.ValidationError):
+                except (KeyError, PydanticValidationError):
                     logger.debug("Пропущена некорректная персона: %s", person)
                     continue
             logger.debug(
@@ -307,7 +308,7 @@ class MovieHandler:
             return persons
         except Exception as e:
             logger.error("Не удалось предобработать персон: %s", str(e))
-            raise ValidationError("Ошибка при предобработке персон")
+            raise ValidationError("Ошибка при предобработке персон") from e
 
     @classmethod
     def _genres_preprocess(cls, movie_info: dict) -> list[dict]:
@@ -319,12 +320,12 @@ class MovieHandler:
             formatted_genres = modeling.dict().get("genres", [])
             logger.debug("Предобработано %d жанров", len(formatted_genres))
             return formatted_genres
-        except KpFilmGenresModel.ValidationError as e:
+        except PydanticValidationError as e:
             logger.warning("Некорректные данные жанров: %s", str(e))
-            raise ValidationError("Некорректные данные жанров")
+            raise ValidationError("Некорректные данные жанров") from e
         except Exception as e:
             logger.error("Неожиданная ошибка при предобработке жанров: %s", str(e))
-            raise ValidationError("Ошибка при предобработке жанров")
+            raise ValidationError("Ошибка при предобработке жанров") from e
 
     @classmethod
     def extract_genres(cls, movies: list[dict]) -> list[str]:

@@ -14,7 +14,15 @@ QUESTION_MARK_URL = "https://banner2.cleanpng.com/20180715/yag/aavjmwzok.webp"
 
 # Create your models here.
 class User(UserModel):
-    avatar = models.URLField(default=QUESTION_MARK_URL)
+    # CharField, а не URLField: храним и локальные пути (/static/img/avatars/...),
+    # которые URL-валидацию не проходят
+    avatar = models.CharField(
+        max_length=255,
+        default=QUESTION_MARK_URL,
+        validators=[validators.validate_avatar_path],
+        verbose_name="Аватарка",
+        help_text="Путь к файлу из static/img/avatars, например /static/img/avatars/1.jpg",
+    )
 
 
 class Actor(Model):

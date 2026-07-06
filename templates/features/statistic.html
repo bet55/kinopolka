@@ -37,6 +37,18 @@
                 </button>
             </li>
             <li class="nav-item" role="presentation">
+                <button class="nav-link" id="persons-tab" data-bs-toggle="tab"
+                        data-bs-target="#persons" type="button" role="tab">
+                    Люди
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="critics-tab" data-bs-toggle="tab"
+                        data-bs-target="#critics-pane" type="button" role="tab">
+                    Критики
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
                 <button class="nav-link" id="graphs-tab" data-bs-toggle="tab"
                         data-bs-target="#graphs" type="button" role="tab">
                     Графики
@@ -65,7 +77,45 @@
                 {% include "elements/movie_card.html" with position="Худшие" movies_list=movies_rating.kinopolka.bot %}
             </div>
 
-            <!-- 4. Графики -->
+            <!-- 4. Люди: кого мы смотрим чаще всего -->
+            <div class="tab-pane fade" id="persons" role="tabpanel">
+                {% for title, group in persons.items %}
+                    <h2 class="tab-title">
+                        {% if title == "directors" %}Режиссёры{% elif title == "actors" %}Актёры{% else %}Сценаристы{% endif %}
+                    </h2>
+                    <div class="persons-container">
+                        {% for p in group %}
+                            <div class="person">
+                                <img src="{{ p.photo }}" alt="{{ p.name }}" loading="lazy">
+                                <h4>{{ p.name }}</h4>
+                                <span class="films-count">фильмов: {{ p.movies_count }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- 5. Критики: участники киноклуба -->
+            <div class="tab-pane fade" id="critics-pane" role="tabpanel">
+                <h2 class="tab-title">Критики кинополки</h2>
+                <div id="critics">
+                    <table>
+                        {% for u in users_statistic %}
+                            <tr>
+                                <td><img class="critic-avatar" src="{{ u.avatar }}" alt="{{ u.name }}"></td>
+                                <td>{{ u.name }}</td>
+                                <td>{{ u.mean }}</td>
+                                <td>{{ u.count }} оц.</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <h2 class="tab-title">Профиль строгости</h2>
+                {{ graphs.users_box|safe }}
+            </div>
+
+            <!-- 6. Графики -->
             <div class="tab-pane fade" id="graphs" role="tabpanel">
                 <h2 class="tab-title">Распределение оценок на Кинопоиске</h2>
                 {{ graphs.kp_distribution|safe }}
@@ -78,6 +128,9 @@
 
                 <h2 class="tab-title">Топ-10 недооценённых нами</h2>
                 {{ graphs.underrated|safe }}
+
+                <h2 class="tab-title">Кино каких декад мы смотрим</h2>
+                {{ graphs.decades|safe }}
 
                 <h2 class="tab-title">Жанровая карта кинополки</h2>
                 {{ graphs.genres_treemap|safe }}
@@ -98,6 +151,20 @@
                     <tr>
                         <td>{{ stat_name }}</td>
                         <td>{{ stat }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <br>
+
+        <div id="records">
+            <h3>Рекорды</h3>
+            <table>
+                {% for record_name, record in records.items %}
+                    <tr>
+                        <td>{{ record_name }}</td>
+                        <td>{{ record }}</td>
                     </tr>
                 {% endfor %}
             </table>

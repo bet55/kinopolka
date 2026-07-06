@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "utils.middleware.TeaCodeMiddleware",
     # "utils.middleware.RequestLoggerMiddleware"
 ]
 
@@ -185,6 +186,10 @@ TELEGRAM_GROUP_ID = os.getenv("TELEGRAM_GROUP_ID")
 
 # kinopoisk api token
 KP_API_TOKEN = os.getenv("KP_API_TOKEN")
+
+# Код «свой-чужой»: без него блокируются изменяющие запросы (см. TeaCodeMiddleware).
+# Только ASCII (код живёт в куке). Пустой — проверка выключена.
+TEA_CODE = os.getenv("TEA_CODE", "")
 
 
 # настройки логгера

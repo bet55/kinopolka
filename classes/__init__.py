@@ -7,6 +7,7 @@ __all__ = [
     "MovieHandler",
     "MoviesStructure",
     "NoteHandler",
+    "PhotoHandler",
     "PostcardHandler",
     "Statistic",
     "Telegram",
@@ -21,6 +22,7 @@ from .invitation import Invitation
 from .kp import KP_Movie
 from .movie import MovieHandler, MoviesStructure
 from .note import NoteHandler
+from .photo import PhotoHandler
 from .postcard import PostcardHandler
 from .statistic import Statistic
 from .tg import Telegram

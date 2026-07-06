@@ -74,6 +74,12 @@ body {
         font-weight: bold;
         color: var(--white-color);
 
+        /* Аватарка + имя в одну строку по центру, кнопку не растягивают */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4em;
+
         @media screen and (max-width: 800px) {
             text-align: center;
             font-size: 0.7em;
@@ -82,6 +88,18 @@ body {
         &:after {
             content: none;
         }
+    }
+
+    #current-user-avatar {
+        height: 1.4em;
+        width: 1.4em;
+        object-fit: cover;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    #current-user-avatar.hide {
+        display: none;
     }
 
     .dropdown-menu {

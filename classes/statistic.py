@@ -13,6 +13,7 @@ from lists.models import Actor, Director, Genre, Writer
 from .movie import MovieHandler, MoviesStructure
 from .note import NoteHandler
 from .postcard import PostcardHandler
+from .user import UserHandler
 
 
 logger = logging.getLogger(__name__)
@@ -66,11 +67,18 @@ class Statistic:
         """
         archive_movies = await MovieHandler.get_all_movies("rating", is_archive=True)
         notes = await NoteHandler.get_all_notes("list")
+        users = await UserHandler.get_all_users()
 
         # формат dataframe
         genres = await ModelsHandler.get_all(Genre)
         notes = pd.DataFrame(notes)
         archive_movies = pd.DataFrame(archive_movies)
+
+        # участники: отображаемое имя — first_name, если задано, иначе username
+        # (битые аватарки уже подменены в UserHandler)
+        users = pd.DataFrame(users)
+        users["name"] = users["first_name"].replace("", np.nan).fillna(users["username"])
+        self.users = users[["id", "name", "avatar"]]
 
         # Невероятные приключения с исправлением типа для рейтинга.
         # Скорее всего из-за запятых - 3,5 вместо 3.5
@@ -104,17 +112,75 @@ class Statistic:
 
         return self.Rating(top=top_movies, bot=bot_movies)
 
-    async def outstanding_actors(self) -> pd.DataFrame:
-        actors = await ModelsHandler.get_all(Actor)
-        return actors[actors["movies_count"] == self.TOP_PERSONS]
+    @staticmethod
+    def _format_money(amount: float) -> str:
+        if amount >= 1_000_000_000:
+            return f"{amount / 1_000_000_000:.1f} млрд $"
+        if amount >= 1_000_000:
+            return f"{amount / 1_000_000:.0f} млн $"
+        return f"{amount:.0f} $"
 
-    async def outstanding_directors(self) -> pd.DataFrame:
-        directors = await ModelsHandler.get_all(Director)
-        return directors[directors["movies_count"] == self.TOP_PERSONS]
+    @staticmethod
+    def _format_duration(minutes: int) -> str:
+        hours, mins = divmod(int(minutes), 60)
+        return f"{hours} ч {mins} мин" if hours else f"{mins} мин"
 
-    async def outstanding_writers(self) -> pd.DataFrame:
-        writers = await ModelsHandler.get_all(Writer)
-        return writers[writers["movies_count"] == self.TOP_PERSONS]
+    def _top_persons(self, df: pd.DataFrame) -> list[dict]:
+        if df.empty:
+            return []
+        top = df.nlargest(self.TOP_PERSONS, "movies_count")
+        return top[["name", "photo", "movies_count"]].to_dict("records")
+
+    async def outstanding_persons(self) -> dict[str, list[dict]]:
+        """
+        Люди, чьи фильмы мы смотрим чаще всего: режиссёры, актёры, сценаристы
+        """
+        return {
+            "directors": self._top_persons(await ModelsHandler.get_all(Director)),
+            "actors": self._top_persons(await ModelsHandler.get_all(Actor)),
+            "writers": self._top_persons(await ModelsHandler.get_all(Writer)),
+        }
+
+    async def users_statistic(self) -> list[dict]:
+        """
+        Статистика по участникам: сколько оценок поставил и насколько строг
+        """
+        stats = self.notes.groupby("user", as_index=False).agg(count=("rating", "count"), mean=("rating", "mean"))
+        stats["mean"] = stats["mean"].round(2)
+        stats = pd.merge(stats, self.users, left_on="user", right_on="id")
+        stats = stats.sort_values(by="mean", ascending=False)
+        return stats[["name", "avatar", "count", "mean"]].to_dict("records")
+
+    async def records(self) -> dict[str, str]:
+        """
+        Рекорды клуба: касса, хронометраж и возраст просмотренных фильмов
+        """
+        df = self.archive_movies.copy()
+        df["premiere"] = pd.to_datetime(df["premiere"], utc=True, errors="coerce")
+        records = {}
+
+        box_office = df[df["fees"] > 0]
+        if not box_office.empty:
+            top = box_office.loc[box_office["fees"].idxmax()]
+            bot = box_office.loc[box_office["fees"].idxmin()]
+            records["Самый кассовый"] = f"{top['name']} ({self._format_money(top['fees'])})"
+            records["Самый провальный"] = f"{bot['name']} ({self._format_money(bot['fees'])})"
+
+        with_duration = df[df["duration"] > 0]
+        if not with_duration.empty:
+            longest = with_duration.loc[with_duration["duration"].idxmax()]
+            shortest = with_duration.loc[with_duration["duration"].idxmin()]
+            records["Самый длинный"] = f"{longest['name']} ({self._format_duration(longest['duration'])})"
+            records["Самый короткий"] = f"{shortest['name']} ({self._format_duration(shortest['duration'])})"
+
+        with_premiere = df[df["premiere"].notna()]
+        if not with_premiere.empty:
+            oldest = with_premiere.loc[with_premiere["premiere"].idxmin()]
+            newest = with_premiere.loc[with_premiere["premiere"].idxmax()]
+            records["Самый старый"] = f"{oldest['name']} ({oldest['premiere'].year})"
+            records["Самый новый"] = f"{newest['name']} ({newest['premiere'].year})"
+
+        return records
 
     async def outstanding_genres(self) -> str:
         """
@@ -158,8 +224,14 @@ class Statistic:
         df = self.archive_movies
         users_mean_rating = df.rating.mean().round(2)
 
+        # минуты -> "N дн M ч" (дни съедают часы, часы — минуты)
+        total_minutes = int(df["duration"].sum())
+        days, rest = divmod(total_minutes, 60 * 24)
+        hours = rest // 60
+        total_duration = f"{days} дн {hours} ч" if days else self._format_duration(total_minutes)
+
         stats = {
-            "Общая продолжительность": df["duration"].sum(),
+            "Общая продолжительность": total_duration,
             "Количество собраний": len(postcards),
             "Средняя оценка на кинопоиске": df["rating_kp"].mean().round(2),
             "Средняя оценка на imdb": df["rating_imdb"].mean().round(2),
@@ -200,7 +272,7 @@ class Statistic:
             y="rating",
             hover_name="name",
             title="Мы vs Мир: где мы добрее/суровее IMDb",
-            labels={"rating": "Оценка кинопоикой", "rating_imdb": "IMDb"},
+            labels={"rating": "Оценка кинополкой", "rating_imdb": "IMDb"},
             color="diff",
             color_continuous_scale=["#e74c3c", "#95a5a6", "#27ae60"],
             range_x=[5, 10],
@@ -251,6 +323,36 @@ class Statistic:
         )
         fig5.update_layout(title_x=0.5)
 
+        # 6. Профиль строгости участников: разброс оценок каждого
+        named_notes = pd.merge(notes, self.users, left_on="user", right_on="id")
+        fig6 = px.box(
+            named_notes,
+            x="name",
+            y="rating",
+            color="name",
+            points="all",
+            title="Профиль строгости: как оценивает каждый",
+            labels={"name": "", "rating": "Оценка"},
+        )
+        fig6.update_layout(title_x=0.5, showlegend=False)
+
+        # 7. Из каких декад мы смотрим кино
+        premiere_years = pd.to_datetime(self.archive_movies["premiere"], utc=True, errors="coerce").dt.year
+        decades = (premiere_years.dropna().astype(int) // 10 * 10).value_counts().sort_index()
+        decades_df = pd.DataFrame({"decade": [f"{d}-е" for d in decades.index], "count": decades.values})
+
+        fig7 = px.bar(
+            decades_df,
+            x="decade",
+            y="count",
+            title="Кино каких декад мы смотрим",
+            labels={"decade": "", "count": "Количество фильмов"},
+            color="count",
+            color_continuous_scale="Oranges",
+            template="simple_white",
+        )
+        fig7.update_layout(title_x=0.5, coloraxis_showscale=False)
+
         # Конвертируем в HTML div
         def to_div(fig):
             return plotly.offline.plot(fig, output_type="div", include_plotlyjs=False)
@@ -261,6 +363,8 @@ class Statistic:
             "overrated": to_div(fig3),
             "underrated": to_div(fig4),
             "genres_treemap": to_div(fig5),
+            "users_box": to_div(fig6),
+            "decades": to_div(fig7),
         }
 
         return graphs

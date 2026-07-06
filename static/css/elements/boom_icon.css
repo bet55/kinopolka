@@ -1,0 +1,111 @@
+/* Анимированная иконка взрыва (boom2.png): при наведении клубится, дрожит,
+   мерцает огнём и подсвечивается.
+
+   Разметка:
+   <button class="boom-icon">
+       <span class="boom-glow"></span>
+       <span class="boom-rumble">
+           <span class="boom-billow">
+               <img src=".../poster_options/boom2.png" alt="">
+           </span>
+       </span>
+   </button>
+
+   Интенсивность настраивается переменными на контейнере:
+   --boom-amp — размах дрожания (0.55 тихо / 1 норм / 1.7 ядерно),
+   --boom-speed — множитель скорости (меньше = быстрее). */
+
+@keyframes boom-rumble {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(calc(-1.4px * var(--boom-amp, 1)), calc(1px * var(--boom-amp, 1))) rotate(calc(-0.25deg * var(--boom-amp, 1))); }
+    40% { transform: translate(calc(1.2px * var(--boom-amp, 1)), calc(-1px * var(--boom-amp, 1))) rotate(calc(0.2deg * var(--boom-amp, 1))); }
+    60% { transform: translate(calc(-1px * var(--boom-amp, 1)), calc(-1.4px * var(--boom-amp, 1))) rotate(calc(-0.15deg * var(--boom-amp, 1))); }
+    80% { transform: translate(calc(1px * var(--boom-amp, 1)), calc(0.8px * var(--boom-amp, 1))) rotate(calc(0.2deg * var(--boom-amp, 1))); }
+}
+
+@keyframes boom-billow {
+    0%, 100% { transform: scaleX(1) scaleY(1); }
+    35% { transform: scaleX(calc(1 - 0.02 * var(--boom-amp, 1))) scaleY(calc(1 + 0.055 * var(--boom-amp, 1))); }
+    70% { transform: scaleX(calc(1 + 0.035 * var(--boom-amp, 1))) scaleY(calc(1 + 0.02 * var(--boom-amp, 1))); }
+}
+
+@keyframes boom-flicker {
+    0% { filter: brightness(1) saturate(1) contrast(1); }
+    25% { filter: brightness(1.16) saturate(1.25) contrast(1.05); }
+    45% { filter: brightness(0.94) saturate(1.08) contrast(1.02); }
+    65% { filter: brightness(1.22) saturate(1.35) contrast(1.08); }
+    85% { filter: brightness(1.02) saturate(1.12) contrast(1.02); }
+    100% { filter: brightness(1) saturate(1) contrast(1); }
+}
+
+@keyframes boom-glow {
+    0%, 100% { opacity: 0.28; transform: scale(1); }
+    50% { opacity: 0.62; transform: scale(1.12); }
+}
+
+.boom-icon {
+    width: 15%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    .boom-glow {
+        position: absolute;
+        inset: -14%;
+        background: radial-gradient(circle at 50% 42%, rgba(255, 150, 40, 0.9), transparent 66%);
+        filter: blur(10px);
+        border-radius: 50%;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .boom-rumble {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .boom-billow {
+        transform-origin: 50% 100%;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        user-select: none;
+        -webkit-user-drag: none;
+        transition: filter 0.3s ease;
+    }
+
+    &:hover {
+        .boom-rumble {
+            animation: boom-rumble calc(0.42s * var(--boom-speed, 1)) ease-in-out infinite;
+        }
+
+        .boom-billow {
+            animation: boom-billow calc(1.7s * var(--boom-speed, 1)) ease-in-out infinite;
+        }
+
+        .boom-glow {
+            animation: boom-glow calc(1.7s * var(--boom-speed, 1)) ease-in-out infinite;
+        }
+
+        img {
+            animation: boom-flicker calc(0.55s * var(--boom-speed, 1)) ease-in-out infinite;
+        }
+    }
+}

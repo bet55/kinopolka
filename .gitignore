@@ -7,7 +7,7 @@ app_cache
 *cache
 
 db.sqlite3
-start.sh
+env.sh
 requests.http
 
 .ipynb_checkpoints
@@ -25,4 +25,9 @@ media/cocktails/*
 media/ingredients/*
 !media/ingredients/default.png
 
+media/photos/
+
 staticfiles
+
+
+vps_script.txt

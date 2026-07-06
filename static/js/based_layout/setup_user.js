@@ -15,15 +15,20 @@ const changeUserView = () => {
         return null;
     }
 
-    const userName = usersPanel.querySelector(`button[data-user-id="${currentUser}"]`).textContent;
+    const userItem = usersPanel.querySelector(`button[data-user-id="${currentUser}"]`);
 
     // Кривая кука, удалим её
-    if (!userName) {
+    if (!userItem) {
         deleteCookie('user');
         return null;
     }
 
-    usersSetButton.textContent = userName;
+    usersSetButton.querySelector('#current-user-name').textContent = userItem.textContent.trim();
+
+    // Аватарка выбранного пользователя рядом с именем
+    const avatar = usersSetButton.querySelector('#current-user-avatar');
+    avatar.src = userItem.dataset.avatar;
+    avatar.classList.remove('hide');
 
     // Красим кнопку отображения оценок в цвет пользователя
     if(rateToggler) {

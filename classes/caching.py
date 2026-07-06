@@ -104,8 +104,29 @@ class Caching:
             logger.error(self.__error_message)
             return False
 
-    def get_error_message(self) -> str:
-        return self.__error_message
+    def delete_cache(self, key: str | int = None) -> bool:
+        """
+        Удаление данных из кэша (например, для инвалидации после правок в админке).
+        :param key: (int|str) ключ размещения данных в кэше.
+        :return: (bool) True, если ключ был и удалился.
+        """
+        # Проверка параметров
+        if key is None:
+            self.__error_message = "Параметр key не задан."
+            logger.error(self.__error_message)
+            return False
+        if key and type(key) not in [int, str]:
+            self.__error_message = "Переданный key не является целым числом или строкой."
+            logger.error(self.__error_message)
+            return False
+
+        # Удаление данных из кэша
+        try:
+            return self.__cache.delete(key)
+        except Exception:
+            self.__error_message = "При удалении данных из кэша возникла непредвиденная ошибка."
+            logger.error(self.__error_message)
+            return False
 
     def get_status(self) -> bool:
         return self.__initialized

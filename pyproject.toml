@@ -1,38 +1,33 @@
 [project]
 name = "filmoclub"
-version = "0.9.1"
+version = "1.0.0"
 description = "Cinephiles with tea"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "django>=5.1.2",
     "djangorestframework>=3.15.2",
-    "markdown>=3.7",
-    "django-filter>=24.3",
     "pendulum>=3.0.0",
     "httpx[http2]>=0.27.2",
-    "anyio[trio]>=4.6.1",
     "diskcache>=5.6.3",
     "django-cors-headers>=4.5.0",
     "pydantic>=2.9.2",
-    "requests>=2.32.3",
     "adrf>=0.1.8",
     "pandas>=2.2.3",
-    "matplotlib>=3.9.2",
-    "dash>=2.18.2",
+    "numpy>=2.1.3",
+    "plotly>=5.24.1",
     "pillow>=11.0.0",
     "python-telegram-bot>=22.0",
-    "nats-py>=2.10.0",
-    "taskiq>=0.11.16",
-    "taskiq-nats>=0.5.1",
     "python-logging-loki-v2>=0.4.4",
     "drf-yasg>=1.21.10",
     "uvicorn>=0.35.0",
     "colorama>=0.4.6",
+    # не dev: top_secret.py (баннер в start.sh) и management-команды
+    # используют их в проде
+    "cowsay>=6.1",
+    "icecream>=2.1.3",
     "whitenoise>=6.9.0",
     "django-extensions>=4.1",
-    "ipython>=8.34.0",
-    "jupyterlab>=4.3.6",
 ]
 
 [build-system]
@@ -41,9 +36,9 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "icecream>=2.1.3",
-    "cowsay>=6.1",
     "notebook>=7.3.3",
+    "ipython>=8.34.0",
+    "jupyterlab>=4.3.6",
     "ruff>=0.12.8",
     "pre-commit>=4.6.0",
 ]
@@ -87,8 +82,6 @@ select = [
     "PIE", # flake8-pie
     "SIM", # flake8-simplify
     "C901", # Ограничение сложности функций
-    "DJ012", # Требовать on_delete в ForeignKey
-    "DJ013", # Требовать related_name в ForeignKey
     "ASYNC",  # Проверки асинхронного кода
 ]
 
@@ -120,10 +113,8 @@ ignore = [
 
     # ТЕХДОЛГ: реальные замечания, временно отключены, чтобы не блокировать коммиты.
     # Стоит постепенно поправить в коде и убрать отсюда (вернув проверку).
-    "B904",     # raise ... from ... внутри except
     "ASYNC230", # блокирующий open() в async-функции
-    "C901",     # слишком сложные функции (> max-complexity)
-    "E402",     # импорт не в начале файла
+
 ]
 
 [tool.ruff.lint.mccabe]
@@ -133,7 +124,7 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F401"]
 "**/settings.py" = ["F403", "E501"]
-"models.py" = ["DJ01"]
+"**/models.py" = ["DJ01"]
 
 
 # Настройки isort
