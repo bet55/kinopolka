@@ -1,0 +1,98 @@
+{% extends "based_layout.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/elements/confirmation_tooltip.css' %}">
+    <link rel="stylesheet" href="{% static 'css/elements/boom_icon.css' %}">
+    <link rel="stylesheet" href="{% static 'css/features/photos.css' %}">
+{% endblock %}
+
+{% block title %}Фотографии{% endblock %}
+
+{% block center-content %}
+    <div id="photos">
+        <h2>Фотографии клуба</h2>
+        <button class="add">+ добавить</button>
+
+        <!-- Форма загрузки новой фотографии (изначально скрыта) -->
+        <div id="new-photo-form" class="hide">
+            <form id="photo-form" method="post" enctype="multipart/form-data">
+
+                <div class="form-header">
+                    <button type="button" class="close-btn">&times;</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="image-upload">
+                        <label for="photo-image" class="image-upload-label">
+                            <span>+</span>
+                            <img id="photo-image-preview" class="hide" alt="">
+                            <input type="file" id="photo-image" name="image" accept="image/*" required>
+                        </label>
+                    </div>
+                    <div class="form-group text-section">
+                        <input type="text" id="photo-name" name="name" maxlength="255"
+                               placeholder="название (необязательно)">
+                        <textarea id="photo-description" name="description" placeholder="описание"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Загрузить</button>
+            </form>
+        </div>
+
+        <!-- Галерея -->
+        <div id="photos-gallery">
+            {% for p in photos %}
+                <div class="photo-card" data-photo-id="{{ p.id }}">
+                    <div class="photo-inner">
+
+                        <div class="photo-front">
+                            <img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy">
+                            <div class="photo-actions">
+                                <button class="edit" title="Изменить описание">&#9998;</button>
+                                <button class="remove boom-icon" title="Удалить">
+                                    <span class="boom-glow"></span>
+                                    <span class="boom-rumble">
+                                        <span class="boom-billow">
+                                            <img src="{% static 'img/poster_options/boom2.png' %}" alt="удалить">
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="photo-back">
+                            <div class="photo-info">
+                                <h4 class="photo-name">{{ p.name }}</h4>
+                                <p class="photo-description">{{ p.description }}</p>
+                            </div>
+                            <form class="photo-edit-form hide">
+                                <input type="text" name="name" maxlength="255" placeholder="название">
+                                <textarea name="description" placeholder="описание"></textarea>
+                                <div class="edit-buttons">
+                                    <button type="submit">Сохранить</button>
+                                    <button type="button" class="cancel">Отмена</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="confirmation center">
+                        <h4>Удалить фото?</h4>
+                        <button class="confirm-yes">Да</button>
+                        <button class="confirm-no">Нет</button>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="no-photos">Пока ни одной фотографии — добавь первую!</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script type="module" src="{% static 'js/features/photos.js' %}"></script>
+{% endblock %}

@@ -131,4 +131,5 @@ class MovieAddingViewSet(GlobalDataMixin, APIView):
         kp_id = "".join(char for char in str(request.data.get("kp_id", "-1")) if char.isdigit())
 
         result = await MovieHandler.a_download(kp_id)
+        print(result)
         return handle_response(result, {"movie_id": result}, status.HTTP_201_CREATED)

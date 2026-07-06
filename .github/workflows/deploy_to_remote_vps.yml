@@ -3,35 +3,35 @@ name: Deploy to Remote Server
 on:
   push:
     branches:
-      - master    # Triggers on push to master branch
-  pull_request:
-    branches:
-      - master
-    types: [ closed ]  # Срабатывает при закрытии PR (если мержится)
-  workflow_dispatch: # Allows manual trigger
+      - master    # Деплой на каждый пуш в master (мерж PR — это тоже пуш)
+  workflow_dispatch: # Ручной запуск из интерфейса GitHub
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.0
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add known hosts
+        # -p обязателен: ssh на VPS живёт на нестандартном порту,
+        # без него keyscan стучится в 22 и падает
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.REMOTE_PORT }} -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to remote server
+        # Пересоздание контейнера обязательно: команда контейнера гоняет
+        # uv sync + migrate, а start.sh — collectstatic и createsuperuser.
+        # Без него на проде окажется новый код без миграций и статики.
         run: |
-          ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} -p {{ secrets.REMOTE_PORT }} '
+          ssh -p ${{ secrets.REMOTE_PORT }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
             cd ${{ secrets.REMOTE_DIR }} &&
             git fetch origin master &&
-            git reset --hard origin/master
+            git reset --hard origin/master &&
+            (docker compose up -d --force-recreate web \
+              || docker-compose up -d --force-recreate web)
           '

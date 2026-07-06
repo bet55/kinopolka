@@ -53,15 +53,14 @@
 
             <div id="users-panel" class="dropdown">
                 <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Кто?
+                    <img id="current-user-avatar" class="hide" src="" alt="">
+                    <span id="current-user-name">Кто?</span>
                 </button>
                 <ul id="users-selector" class="dropdown-menu">
                     {% for u in users %}
 
                         <li class="user-name">
-{#                            <img src="/static/img/avatars/{{ u.id }}.jpg" alt="">#}
-
-                            <button class="dropdown-item" data-user-id="{{ u.id }}">
+                            <button class="dropdown-item" data-user-id="{{ u.id }}" data-avatar="{{ u.avatar }}">
                                 <img class="user-note" data-user-id="{{ u.id }}" src="/static/img/stickynotes/note{{ u.id }}.png">
                                 {{ u.first_name }}
                             </button>

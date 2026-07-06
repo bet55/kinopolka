@@ -49,8 +49,12 @@ schema_view = get_schema_view(
     public=True,
 )
 
+# Админка живёт на /boss/ (см. также исключение в TeaCodeMiddleware)
+admin.site.site_header = "Кинополка"
+admin.site.site_title = "Кинополка"
+
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("boss/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("movies/", include("lists.urls")),
     path("", include("postcard.urls")),

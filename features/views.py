@@ -1,9 +1,12 @@
 from adrf.views import APIView
 from django.shortcuts import render
+from rest_framework import status
 from rest_framework.request import Request
+from rest_framework.response import Response
 
-from classes import MovieHandler, Statistic
+from classes import MovieHandler, PhotoHandler, Statistic
 from mixins import GlobalDataMixin
+from utils.response_handler import handle_response
 
 
 class Catalog(GlobalDataMixin, APIView):
@@ -28,12 +31,18 @@ class MoviesStatistic(GlobalDataMixin, APIView):
         movies = await statistic.outstanding_movies()
         genres = await statistic.outstanding_genres()
         graphs = await statistic.draw()
+        persons = await statistic.outstanding_persons()
+        users_stat = await statistic.users_statistic()
+        records = await statistic.records()
 
         context = {
             "statistic": common_stats,
             "movies_rating": movies,
             "genres_table": genres,
             "graphs": graphs,
+            "persons": persons,
+            "users_statistic": users_stat,
+            "records": records,
         }
 
         return render(
@@ -109,6 +118,47 @@ class Tarots(GlobalDataMixin, APIView):
             "features/tarot.html",
             context=await self.add_context_data(request, {}),
         )
+
+
+class Photos(GlobalDataMixin, APIView):
+    http_method_names = ["get", "post"]
+
+    async def get(self, request: Request):
+        """
+        Страница с фотографиями клуба
+        """
+        photos = await PhotoHandler.get_all_photos()
+
+        return render(
+            request,
+            "features/photos.html",
+            context=await self.add_context_data(request, {"photos": photos}),
+        )
+
+    async def post(self, request: Request) -> Response:
+        """
+        Загрузка новой фотографии (multipart: image, name, description)
+        """
+        photo = await PhotoHandler.create_photo(request.data)
+        return handle_response(photo, status=status.HTTP_201_CREATED)
+
+
+class PhotoDetail(APIView):
+    http_method_names = ["patch", "delete"]
+
+    async def patch(self, request: Request, pk: int) -> Response:
+        """
+        Обновление названия/описания фотографии
+        """
+        photo = await PhotoHandler.update_photo(pk, request.data)
+        return handle_response(photo)
+
+    async def delete(self, request: Request, pk: int) -> Response:
+        """
+        Удаление фотографии
+        """
+        response_id = await PhotoHandler.delete_photo(pk)
+        return handle_response(response_id, status=status.HTTP_204_NO_CONTENT)
 
 
 class Gym(GlobalDataMixin, APIView):

@@ -1,9 +1,16 @@
 from rest_framework.serializers import DateTimeField, ModelSerializer, ReadOnlyField, SerializerMethodField
 
+from features.models import Photo
 from lists.models import Actor, Director, Genre, Movie, Note, Writer
 
 
 DEFAULT_POSTER = "/media/posters/default.png"
+
+
+class PhotoSerializer(ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ["id", "name", "description", "image", "uploaded_at"]
 
 
 class BaseMovieSerializer(ModelSerializer):
