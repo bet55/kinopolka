@@ -1,7 +1,9 @@
+from typing import NoReturn
+
 from asgiref.sync import async_to_sync
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.core.handlers.wsgi import WSGIRequest
-from django.http import Http404, HttpResponseNotFound, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 from django.urls import Resolver404
 from django.views.decorators.csrf import requires_csrf_token
@@ -15,18 +17,18 @@ from mixins import GlobalDataMixin
 # ======================
 
 
-def is_media_or_static(request):
+def is_media_or_static(request: WSGIRequest) -> bool:
     """Проверяет, запрашивается ли статика или медиа"""
     path = request.path
     return path.startswith("/media") or path.startswith("/static")
 
 
-def is_json_request(request):
+def is_json_request(request: WSGIRequest) -> bool:
     """Определяет, нужно ли вернуть JSON"""
     return request.GET.get("format") == "json" or "application/json" in request.META.get("HTTP_ACCEPT", "")
 
 
-def _handler(request: WSGIRequest, exception, status_code):
+def _handler(request: WSGIRequest, exception: Exception, status_code: int) -> HttpResponse:
     if is_media_or_static(request):
         return HttpResponseNotFound()
 
@@ -44,22 +46,22 @@ def _handler(request: WSGIRequest, exception, status_code):
 
 
 @requires_csrf_token
-def handler400(request, exception=None):
+def handler400(request: WSGIRequest, exception: Exception = None) -> HttpResponse:
     return _handler(request, exception, 400)
 
 
 @requires_csrf_token
-def handler403(request, exception=None):
+def handler403(request: WSGIRequest, exception: Exception = None) -> HttpResponse:
     return _handler(request, exception, 403)
 
 
 @requires_csrf_token
-def handler404(request, exception: Resolver404 = None):
+def handler404(request: WSGIRequest, exception: Resolver404 = None) -> HttpResponse:
     return _handler(request, exception, 404)
 
 
 @requires_csrf_token
-def handler500(request, exception=None):
+def handler500(request: WSGIRequest, exception: Exception = None) -> HttpResponse:
     return _handler(request, exception, 500)
 
 
@@ -68,21 +70,21 @@ def handler500(request, exception=None):
 # ======================
 
 
-def test_400(request):
+def test_400(request: WSGIRequest) -> NoReturn:
     """Генерирует 400 ошибку для тестирования"""
     raise BadRequest("Тестовая 400 ошибка")
 
 
-def test_403(request):
+def test_403(request: WSGIRequest) -> NoReturn:
     """Генерирует 403 ошибку для тестирования"""
     raise PermissionDenied("Тестовая 403 ошибка")
 
 
-def test_404(request):
+def test_404(request: WSGIRequest) -> NoReturn:
     """Генерирует 404 ошибку для тестирования"""
     raise Http404("Тестовая 404 ошибка")
 
 
-def test_500(request):
+def test_500(request: WSGIRequest) -> None:
     """Генерирует 500 ошибку для тестирования"""
     1 / 0  # Это вызовет исключение и приведет к вызову handler500

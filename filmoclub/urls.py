@@ -58,7 +58,6 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("movies/", include("lists.urls")),
     path("", include("postcard.urls")),
-    path("tools/", include("tools.urls")),
     path("features/", include("features.urls")),
     path("bar/", include("bar.urls")),
     # API Documentation Endpoints

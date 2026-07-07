@@ -9,7 +9,7 @@ from rest_framework.views import exception_handler
 logger = logging.getLogger(__name__)
 
 
-def drf_exception_handler(exc, context):
+def drf_exception_handler(exc: Exception, context: dict) -> Response:
     response = exception_handler(exc, context)
 
     custom_response_data = {

@@ -23,6 +23,13 @@
 
     <link rel="icon" href="{% static 'img/icon.png' %}">
     <title>{% block title %}Киноклуб{% endblock %}</title>
+
+    <script>
+        // До первой отрисовки: включаем сохранённую тёмную тему, чтобы страница не мигала светлым
+        if (localStorage.getItem('dark-mode') === '1') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
 </head>
 <body>
 
@@ -69,6 +76,11 @@
                     {% endfor %}
                 </ul>
             </div>
+
+            <div id="light-switch" role="button"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Свет"></div>
 
         </div>
     </div>

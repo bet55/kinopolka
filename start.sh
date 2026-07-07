@@ -26,6 +26,10 @@ fi
 uv run utils/top_secret.py
 echo "== Starting in $ENVIRONMENT mode on port ${APP_PORT:-8000} =="
 
-uv run manage.py runserver 0.0.0.0:"${APP_PORT:-8000}"
-#uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --reload
-#uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --log-level warning --reload
+# В prod --reload не нужен: файловый вотчер зря ест ресурсы и перезапускает
+# приложение при любом изменении файлов (например, при заливке открытки)
+if [ "$ENVIRONMENT" = "prod" ]; then
+  uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --log-level warning
+else
+  uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --reload
+fi

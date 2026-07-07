@@ -2,6 +2,7 @@ import logging
 
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 
 from bar.models import Ingredient
 from bar.serializers import IngredientSerializer
@@ -15,7 +16,7 @@ class IngredientHandler:
     @staticmethod
     @handle_exceptions("Ингредиент")
     @sync_to_async
-    def create_ingredient(data: dict, request=None) -> dict:
+    def create_ingredient(data: dict, request: Request = None) -> dict:
         """
         Создание нового ингредиента
         :param data: словарь с данными (name, is_available, image)
@@ -56,7 +57,7 @@ class IngredientHandler:
 
     @staticmethod
     @handle_exceptions("Ингредиент")
-    async def update_ingredient(ingredient_id: int, data: dict, request=None) -> dict:
+    async def update_ingredient(ingredient_id: int, data: dict, request: Request = None) -> dict:
         """
         Обновление ингредиента
         :param ingredient_id: ID ингредиента

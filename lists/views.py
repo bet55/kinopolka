@@ -1,9 +1,11 @@
 import logging
 
 from adrf.views import APIView
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from classes import MovieHandler, NoteHandler
 from classes.movie import MoviesStructure
@@ -22,7 +24,7 @@ class MoviesViewSet(GlobalDataMixin, APIView):
 
     http_method_names = ["get", "patch", "delete"]
 
-    async def get(self, request: Request, kp_id: int | None = None):
+    async def get(self, request: Request, kp_id: int | None = None) -> HttpResponse:
         """
         Получение списка фильмов или фильма по ID.
         """
@@ -51,7 +53,7 @@ class MoviesViewSet(GlobalDataMixin, APIView):
             context=await self.add_context_data(request, context),
         )
 
-    async def patch(self, request: Request):
+    async def patch(self, request: Request) -> Response:
         """
         Изменение архивного статуса фильма.
         """
@@ -61,7 +63,7 @@ class MoviesViewSet(GlobalDataMixin, APIView):
         result = await MovieHandler.change_movie_status(kp_id, is_archive)
         return handle_response(result, {"kp_id": kp_id, "is_archive": is_archive})
 
-    async def delete(self, request: Request):
+    async def delete(self, request: Request) -> Response:
         """
         Удаление фильма.
         """
@@ -78,7 +80,7 @@ class MovieRatingViewSet(APIView):
 
     http_method_names = ["post", "put", "delete"]
 
-    async def delete(self, request: Request):
+    async def delete(self, request: Request) -> Response:
         """
         Удаление заметки с рейтингом фильма.
         """
@@ -92,7 +94,7 @@ class MovieRatingViewSet(APIView):
             status.HTTP_204_NO_CONTENT,
         )
 
-    async def post(self, request: Request):
+    async def post(self, request: Request) -> Response:
         """
         Создание заметки с рейтингом.
         """
@@ -101,7 +103,7 @@ class MovieRatingViewSet(APIView):
         success = await NoteHandler.create_note(note_data)
         return handle_response(success, note_data, status.HTTP_201_CREATED)
 
-    async def put(self, request: Request):
+    async def put(self, request: Request) -> Response:
         """
         Изменение оценки или текста заметки с рейтингом.
         """
@@ -118,18 +120,17 @@ class MovieAddingViewSet(GlobalDataMixin, APIView):
 
     http_method_names = ["get", "post"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         """
         Форма для добавления фильма.
         """
         return render(request, "add_movie.html", context=await self.add_context_data(request, {}))
 
-    async def post(self, request: Request):
+    async def post(self, request: Request) -> Response:
         """
         Запрос на добавление фильма.
         """
         kp_id = "".join(char for char in str(request.data.get("kp_id", "-1")) if char.isdigit())
 
         result = await MovieHandler.a_download(kp_id)
-        print(result)
         return handle_response(result, {"movie_id": result}, status.HTTP_201_CREATED)

@@ -33,6 +33,14 @@ PRODUCTION = os.getenv("ENVIRONMENT", "dev") == "prod"
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(";")
 
+# Доверенные origin'ы для CSRF-проверки (логин админки /boss/ проверяет CSRF
+# даже при выключенном CsrfViewMiddleware). Без этого за https-прокси Django
+# ждёт http-origin и отдаёт 403, если не включён SECURE_PROXY_SSL_HEADER.
+CSRF_TRUSTED_ORIGINS = [
+    "https://kinopolka.com",
+    "https://xn--80apfbelhai.xn--p1ai",  # kinopolka.рф
+]
+
 # ssl настройки
 SSL_REDIRECT = os.environ.get("SSL_REDIRECT", "False") == "True"
 if SSL_REDIRECT:
@@ -194,7 +202,7 @@ TEA_CODE = os.getenv("TEA_CODE", "")
 
 # настройки логгера
 class LogFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord):
+    def filter(self, record: logging.LogRecord) -> bool:
         """Добавляем в логи данные для фильтрации. Формат: tags: {'thread': 11}"""
         # print(record.__dict__) если нужно посмотреть, что передается в log
 

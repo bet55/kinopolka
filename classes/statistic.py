@@ -1,13 +1,14 @@
 from collections import namedtuple
+from itertools import combinations
 import logging
 
 from asgiref.sync import sync_to_async
+from django.db.models import Count
 import numpy as np
 import pandas as pd
 import plotly
 import plotly.express as px
 
-from features.serializers import ActorSerializer, DirectorSerializer, GenreSerializer, WriterSerializer
 from lists.models import Actor, Director, Genre, Writer
 
 from .movie import MovieHandler, MoviesStructure
@@ -22,31 +23,34 @@ logger = logging.getLogger(__name__)
 class ModelsHandler:
     """Generic handler for fetching and serializing models with ManyToMany relationships to Movie."""
 
-    # Mapping of models to their serializers and related field names
-    MODEL_SERIALIZER = {
-        Genre: GenreSerializer,
-        Actor: ActorSerializer,
-        Director: DirectorSerializer,
-        Writer: WriterSerializer,
+    # Какие поля нужны статистике (у Genre нет photo)
+    MODEL_FIELDS = {
+        Genre: ("name", "movies_count"),
+        Actor: ("kp_id", "name", "photo", "movies_count"),
+        Director: ("kp_id", "name", "photo", "movies_count"),
+        Writer: ("kp_id", "name", "photo", "movies_count"),
     }
 
     @classmethod
     @sync_to_async
     def get_all(cls, model: Genre | Actor | Director | Writer, is_archive: bool = True) -> pd.DataFrame:
         """
-        Fetch instances of the given model and serialize them.
+        Fetch instances of the given model with their movie counts.
 
         :param model: The Django model class (e.g., Genre, Actor).
         :param is_archive: Filter related movies by is_archive (True, False, or None for no filter).
 
-        :returns:List of serialized data.
+        :returns: DataFrame with one row per instance.
         """
-        queryset = model.mgr.all()
-        queryset = queryset.filter(movie__is_archive=is_archive).distinct()
-
-        # Serialize data
-        serializer = cls.MODEL_SERIALIZER[model](queryset, many=True)
-        return pd.DataFrame(serializer.data)
+        # movies_count считается в БД одним запросом (annotate после filter
+        # считает только фильмы из архива). Раньше здесь был DRF-сериализатор,
+        # который делал по два запроса на каждый объект — тысячи запросов на страницу.
+        queryset = (
+            model.mgr.filter(movie__is_archive=is_archive)
+            .annotate(movies_count=Count("movie"))
+            .values(*cls.MODEL_FIELDS[model])
+        )
+        return pd.DataFrame(queryset)
 
 
 class Statistic:
@@ -59,9 +63,11 @@ class Statistic:
     USERS_COUNT = 4
     MOVIES_DISPLAY_COLUMNS = ["kp_id", "poster_local", "name"]
     RATING_PLATFORMS = 11
+    RATING_SPAN = 9  # оценки от 1 до 10 → максимальное расхождение 9
+    MIN_COMMON_MOVIES = 3  # минимум общих фильмов, чтобы сравнивать вкусы пары
     Rating = namedtuple("Rating", ["top", "bot"])
 
-    async def extract_data(self):
+    async def extract_data(self) -> None:
         """
         Загружаем из бд все нужные таблицы и кастуем их в DataFrame
         """
@@ -150,6 +156,57 @@ class Statistic:
         stats = pd.merge(stats, self.users, left_on="user", right_on="id")
         stats = stats.sort_values(by="mean", ascending=False)
         return stats[["name", "avatar", "count", "mean"]].to_dict("records")
+
+    async def taste_compatibility(self) -> list[dict]:
+        """
+        Совместимость вкусов: попарное сравнение оценок участников на общих фильмах.
+        Совпадение — среднее расхождение оценок, переведённое в проценты
+        (0 баллов разницы → 100%, максимальные RATING_SPAN баллов → 0%).
+        """
+        ratings = self.notes.pivot_table(index="movie", columns="user", values="rating")
+        users = self.users.set_index("id")
+
+        pairs = []
+        for user_a, user_b in combinations(ratings.columns, 2):
+            common = ratings[[user_a, user_b]].dropna()
+            if len(common) < self.MIN_COMMON_MOVIES:
+                continue
+
+            avg_diff = (common[user_a] - common[user_b]).abs().mean()
+            pairs.append(
+                {
+                    "name_a": users.loc[user_a, "name"],
+                    "avatar_a": users.loc[user_a, "avatar"],
+                    "name_b": users.loc[user_b, "name"],
+                    "avatar_b": users.loc[user_b, "avatar"],
+                    "similarity": round((1 - avg_diff / self.RATING_SPAN) * 100),
+                    "avg_diff": round(avg_diff, 1),
+                    "movies_count": len(common),
+                }
+            )
+
+        pairs.sort(key=lambda pair: -pair["similarity"])
+        return pairs
+
+    async def controversial_movies(self) -> dict[str, list[dict]]:
+        """
+        Яблоки раздора и полное единодушие: фильмы с максимальным и минимальным
+        разбросом оценок. Считаем только фильмы, оценённые всеми участниками.
+        """
+        spread = self.notes.groupby("movie").agg(rating_min=("rating", "min"), rating_max=("rating", "max"))
+        spread["spread"] = spread["rating_max"] - spread["rating_min"]
+
+        movies = pd.merge(self.archive_movies, spread, left_on="kp_id", right_index=True)
+        movies = movies[movies.user == self.USERS_COUNT]
+
+        controversial = movies.sort_values(by="spread", ascending=False).head(self.TOP_MOVIES)
+        # при равном разбросе интереснее единодушно любимые
+        unanimous = movies.sort_values(by=["spread", "rating"], ascending=[True, False]).head(self.TOP_MOVIES)
+
+        return {
+            "controversial": controversial.to_dict("records"),
+            "unanimous": unanimous.to_dict("records"),
+        }
 
     async def records(self) -> dict[str, str]:
         """
@@ -354,7 +411,7 @@ class Statistic:
         fig7.update_layout(title_x=0.5, coloraxis_showscale=False)
 
         # Конвертируем в HTML div
-        def to_div(fig):
+        def to_div(fig: plotly.graph_objs.Figure) -> str:
             return plotly.offline.plot(fig, output_type="div", include_plotlyjs=False)
 
         graphs = {

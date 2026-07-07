@@ -4,6 +4,7 @@ import logging
 from asgiref.sync import sync_to_async
 from django.db.models import Prefetch
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 
 from lists.models import Movie, Note
 from postcard.models import Postcard
@@ -18,7 +19,7 @@ class PostcardHandler:
     @classmethod
     @handle_exceptions("Открытка")
     @sync_to_async
-    def create_postcard(cls, data: dict, request=None) -> dict:
+    def create_postcard(cls, data: dict, request: Request = None) -> dict:
         """
         Создание новой открытки. Деактивирует все предыдущие открытки.
         :param data: Словарь с данными открытки (title, meeting_date, screenshot, movies).
@@ -54,7 +55,7 @@ class PostcardHandler:
     @classmethod
     @handle_exceptions("Активная открытка")
     @sync_to_async
-    def get_postcard_tmp(cls):
+    def get_postcard_tmp(cls) -> PostcardSerializer:
         """
         Получение активной открытки.
         :return: Сериализованные данные активной открытки или Error.
@@ -91,7 +92,7 @@ class PostcardHandler:
 
     @classmethod
     @sync_to_async
-    def get_all_postcards_with_ratings(cls):
+    def get_all_postcards_with_ratings(cls) -> dict[int, dict]:
         # Все открытки + подгружаем фильмы с нужными полями
         postcards = (
             Postcard.objects.all()
@@ -157,7 +158,7 @@ class PostcardHandler:
 
     @classmethod
     @handle_exceptions("Открытка")
-    async def update_postcard(cls, data: dict, request=None) -> dict:
+    async def update_postcard(cls, data: dict, request: Request = None) -> dict:
         """
         Обновление открытки.
         :param data: Словарь с данными для обновления (должен содержать 'id').

@@ -25,9 +25,10 @@ const createNoteElement = (movieId, userId, rating, comment) => {
     noteDiv.classList.add('note');
     noteDiv.dataset.userId = userId;
 
-    // Создаём обработчик удаления стикера
-    noteContainer.addEventListener('contextmenu', async (e) => {
-        noteContainer.remove();
+    // Правый клик по своему стикеру — удаление оценки
+    noteDiv.addEventListener('contextmenu', async (e) => {
+        e.preventDefault();
+        noteDiv.remove();
         await removeRateRequest(movieId, userId);
     })
 
@@ -37,10 +38,10 @@ const createNoteElement = (movieId, userId, rating, comment) => {
 
 // Удаляем запись с оценкой фильма
 const removeRateRequest = async (movieId, userId) => {
-    const url = '/movies/rate/remove/';
+    const url = '/movies/rate/';
     const sendData = {
-        user: userId,
-        film: movieId
+        user_id: Number(userId),
+        movie_kp_id: Number(movieId)
     }
 
     await Request.delete( {url: url, body: sendData});

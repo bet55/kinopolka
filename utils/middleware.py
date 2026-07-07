@@ -1,10 +1,11 @@
+from collections.abc import Awaitable, Callable
 import logging
 import secrets
 import time
 
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class TeaCodeMiddleware:
     async_capable = True
     sync_capable = True
 
-    def __init__(self, get_response):
+    def __init__(self, get_response: Callable) -> None:
         self.get_response = get_response
         self.async_mode = iscoroutinefunction(get_response)
         if self.async_mode:
@@ -37,12 +38,12 @@ class TeaCodeMiddleware:
         if not settings.TEA_CODE:
             logger.warning("TEA_CODE не задан — изменяющие запросы никак не защищены")
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponse | Awaitable[HttpResponse]:
         if self.async_mode:
             return self.__acall__(request)
         return self._denied_response(request) or self._set_cookie(request, self.get_response(request))
 
-    async def __acall__(self, request):
+    async def __acall__(self, request: HttpRequest) -> HttpResponse:
         return self._denied_response(request) or self._set_cookie(request, await self.get_response(request))
 
     @staticmethod
@@ -51,7 +52,7 @@ class TeaCodeMiddleware:
         # не-ASCII он кидает TypeError
         return bool(code) and secrets.compare_digest(code.encode(), settings.TEA_CODE.encode())
 
-    def _denied_response(self, request) -> JsonResponse | None:
+    def _denied_response(self, request: HttpRequest) -> JsonResponse | None:
         """403, если изменяющий запрос пришёл без верного кода. None — пропускаем."""
         if (
             not settings.TEA_CODE
@@ -71,7 +72,7 @@ class TeaCodeMiddleware:
             json_dumps_params={"ensure_ascii": False},
         )
 
-    def _set_cookie(self, request, response):
+    def _set_cookie(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
         """Верный код из GET-параметра запоминаем в куке — дальше браузер шлёт её сам."""
         code = request.GET.get(TEA_CODE_KEY)
         if settings.TEA_CODE and self._code_is_valid(code) and request.COOKIES.get(TEA_CODE_KEY) != code:
@@ -92,10 +93,10 @@ class RequestLoggerMiddleware:
     Логирует метод, путь, параметры GET/POST и статус ответа.
     """
 
-    def __init__(self, get_response):
+    def __init__(self, get_response: Callable) -> None:
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponse:
         # Логируем входящий запрос
         log_data = {
             "method": request.method,
@@ -126,7 +127,7 @@ class RequestLoggerMiddleware:
         )
         return response
 
-    def process_exception(self, request, exception):
+    def process_exception(self, request: HttpRequest, exception: Exception) -> JsonResponse:
         """
         Логирование исключений, если они возникли во время обработки запроса.
         """

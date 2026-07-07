@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import NamedTuple
 
@@ -61,24 +62,25 @@ class MovieHandler:
         :return: Список сериализованных фильмов.
         """
         raw_films = Movie.mgr.filter(is_archive=is_archive)
+
+        # prefetch под конкретный сериализатор, иначе N+1: жанры и заметки
+        # дёргаются отдельным запросом на каждый фильм
+        if info_type == MoviesStructure.posters:
+            raw_films = raw_films.prefetch_related("genres", "note_set")
+        elif info_type != MoviesStructure.rating:
+            raw_films = raw_films.prefetch_related("genres")
+
         serialisers = {MoviesStructure.posters: MoviePosterSerializer, MoviesStructure.rating: MovieRatingSerializer}
         serializer = serialisers.get(info_type, MovieDictSerializer)
-        movies = serializer(raw_films, many=True)
-
-        # if info_type == MoviesStructure.posters:
-        #     serializer = MoviePosterSerializer(raw_films, many=True)
-        # elif info_type == MoviesStructure.rating:
-        #     serializer = MovieRatingSerializer(raw_films, many=True)
-        # else:
-        #     serializer = MovieDictSerializer(raw_films, many=True)
+        movies = serializer(raw_films, many=True).data
 
         logger.info(
             "Получено %d фильмов (is_archive=%s, info_type=%s)",
-            raw_films.count(),
+            len(movies),
             is_archive,
             info_type,
         )
-        return movies.data
+        return movies
 
     @classmethod
     @handle_exceptions("Фильм")
@@ -134,7 +136,8 @@ class MovieHandler:
             raise ValidationError("Фильм уже существует", 400)
 
         kp_client = KP_Movie()
-        api_response = kp_scheme if kp_scheme else kp_client.get_movie_by_id(kp_id)
+        # запрос к API синхронный (httpx.Client) — уводим в поток, чтобы не блокировать event loop
+        api_response = kp_scheme if kp_scheme else await asyncio.to_thread(kp_client.get_movie_by_id, kp_id)
         if not api_response:
             raise ValidationError("Данные не получены из Kinopoisk API", 500)
 

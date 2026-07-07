@@ -25,15 +25,15 @@ class ErrorHandler:
 
     """
 
-    def __init__(self, message: str, status: int = 400):
+    def __init__(self, message: str, status: int = 400) -> None:
         self.message = message
         self.status = status
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {"error": {"message": self.message, "status": self.status}}
 
-    def __dict__(self):
+    def __dict__(self) -> dict:
         return self.to_dict()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message

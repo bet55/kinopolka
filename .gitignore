@@ -1,5 +1,6 @@
 .venv
 .idea
+.claude
 __pycache__
 caching
 *caching
@@ -14,18 +15,17 @@ requests.http
 
 # media файлы. Но оставим по одному, чтобы были папки
 media/posters/*
-!media/posters/default.png
 
 media/postcards/*
-!media/postcards/screenshot.png
 
 media/cocktails/*
-!media/cocktails/default.png
 
 media/ingredients/*
-!media/ingredients/default.png
 
 media/photos/
+
+# ROM'ы для эмулятора (легальные дампы, в git не кладём)
+media/roms/
 
 staticfiles
 

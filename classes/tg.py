@@ -1,5 +1,8 @@
+import asyncio
+from collections.abc import Callable
 from functools import wraps
 import logging
+from pathlib import Path
 
 from django.conf import settings
 from telegram import Bot
@@ -10,11 +13,11 @@ from utils import ErrorHandler
 logger = logging.getLogger(__name__)
 
 
-def handle_exceptions(func):
+def handle_exceptions(func: Callable) -> Callable:
     """Перехватываем ошибки"""
 
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> str | ErrorHandler:
         try:
             return await func(*args, **kwargs)
         except FileNotFoundError as e:
@@ -28,11 +31,11 @@ def handle_exceptions(func):
 
 
 class Telegram:
-    def __init__(self):
+    def __init__(self) -> None:
         self.is_init = False
         self._create_bot_instance()
 
-    def _create_bot_instance(self):
+    def _create_bot_instance(self) -> bool | ErrorHandler:
         self.bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", None)
         self.group_id = getattr(settings, "TELEGRAM_GROUP_ID", None)
 
@@ -45,9 +48,10 @@ class Telegram:
         return True
 
     @handle_exceptions
-    async def send_image(self, file_path: str):
-        with open(file_path, "rb") as img:
-            await self.bot.send_photo(chat_id=self.group_id, photo=img)
+    async def send_image(self, file_path: str) -> str:
+        # Читаем файл в отдельном потоке, чтобы не блокировать event loop (ASYNC230)
+        img = await asyncio.to_thread(Path(file_path).read_bytes)
+        await self.bot.send_photo(chat_id=self.group_id, photo=img)
 
         logger.info(
             "Telegram image sent to group",

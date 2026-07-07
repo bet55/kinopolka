@@ -208,6 +208,65 @@
     border-radius: 50%;
 }
 
+/* Совместимость вкусов: пары участников */
+#compatibility {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--black-color);
+    font-size: 1.2em;
+}
+
+.compat-pair {
+    width: min(600px, 90%);
+    background-color: burlywood;
+    border: 2px solid black;
+    border-radius: 12px;
+    padding: 10px 16px;
+}
+
+.compat-users {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+.compat-x {
+    color: var(--red-color);
+}
+
+.compat-value {
+    margin-left: auto;
+    color: var(--red-color);
+}
+
+.compat-bar {
+    display: block;
+    height: 10px;
+    background-color: white;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.compat-fill {
+    display: block;
+    height: 100%;
+    background-color: var(--orange-color);
+}
+
+.compat-note {
+    font-size: 0.75em;
+}
+
+@media (max-width: 800px) {
+    #compatibility {
+        font-size: 1em;
+    }
+}
+
 
 /* ============= Правая часть со статистикой ============= */
 #pivotStats {

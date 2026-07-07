@@ -12,6 +12,7 @@ from features.views import (
     Roulette,
     Slots,
     Tarots,
+    Tournament,
 )
 
 
@@ -22,6 +23,7 @@ urlpatterns = [
     path("casino/cards/", Cards.as_view(), name="cards"),
     path("casino/slots/", Slots.as_view(), name="slots"),
     path("casino/8ball/", EightBall.as_view(), name="8ball"),
+    path("casino/tournament/", Tournament.as_view(), name="tournament"),
     path("statistic/", MoviesStatistic.as_view(), name="statistic"),
     path("tarot/", Tarots.as_view(), name="tarot"),
     path("gym/", Gym.as_view(), name="gym"),

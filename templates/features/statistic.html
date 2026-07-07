@@ -111,6 +111,56 @@
                     </table>
                 </div>
 
+                <h2 class="tab-title">Совместимость вкусов</h2>
+                <div id="compatibility">
+                    {% for pair in compatibility %}
+                        <div class="compat-pair">
+                            <div class="compat-users">
+                                <img class="critic-avatar" src="{{ pair.avatar_a }}" alt="{{ pair.name_a }}">
+                                <span>{{ pair.name_a }}</span>
+                                <span class="compat-x">×</span>
+                                <img class="critic-avatar" src="{{ pair.avatar_b }}" alt="{{ pair.name_b }}">
+                                <span>{{ pair.name_b }}</span>
+                                <span class="compat-value">{{ pair.similarity }}%</span>
+                            </div>
+                            <span class="compat-bar"><span class="compat-fill" style="width: {{ pair.similarity }}%"></span></span>
+                            <div class="compat-note">
+                                в среднем расходятся на {{ pair.avg_diff }} балла · общих фильмов: {{ pair.movies_count }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <h2 class="tab-title">Яблоко раздора</h2>
+                <div class="row movies-container">
+                    {% for m in disputes.controversial %}
+                        <div class="movie" data-kp-id="{{ m.kp_id }}">
+                            <div class="poster-container">
+                                <img class="poster" src="{{ m.poster_local }}">
+                                <div class="rating">
+                                    <span>{{ m.rating_min }} ⚡ {{ m.rating_max }}</span>
+                                </div>
+                            </div>
+                            <h4>{{ m.name }}</h4>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <h2 class="tab-title">Полное единодушие</h2>
+                <div class="row movies-container">
+                    {% for m in disputes.unanimous %}
+                        <div class="movie" data-kp-id="{{ m.kp_id }}">
+                            <div class="poster-container">
+                                <img class="poster" src="{{ m.poster_local }}">
+                                <div class="rating">
+                                    <span>🤝 {{ m.rating }}</span>
+                                </div>
+                            </div>
+                            <h4>{{ m.name }}</h4>
+                        </div>
+                    {% endfor %}
+                </div>
+
                 <h2 class="tab-title">Профиль строгости</h2>
                 {{ graphs.users_box|safe }}
             </div>

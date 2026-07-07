@@ -20,7 +20,7 @@ from datetime import timedelta
 import logging
 import time
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
 from pydantic import ValidationError as PydanticValidationError
 
@@ -40,13 +40,13 @@ VOLATILE_FIELDS = DECIMAL_FIELDS + INT_FIELDS
 class Command(BaseCommand):
     help = "Обновляет оценки KP/IMDb, число голосов и кассовые сборы у фильмов с премьерой за последние N лет."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--years", type=int, default=2, help="За сколько последних лет брать фильмы (по премьере).")
         parser.add_argument("--delay", type=float, default=1.0, help="Пауза между запросами к API, сек.")
         parser.add_argument("--limit", type=int, default=0, help="Ограничить число фильмов (0 — без ограничения).")
         parser.add_argument("--dry-run", action="store_true", help="Показать изменения, но не сохранять.")
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         years = options["years"]
         delay = options["delay"]
         limit = options["limit"]
