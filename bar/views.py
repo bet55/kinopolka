@@ -46,7 +46,7 @@ class IngredientDetail(APIView):
         ingredient = await IngredientHandler.get_ingredient_by_id(pk)
         return handle_response(ingredient)
 
-    async def put(self, request: Request, pk: int):
+    async def put(self, request: Request, pk: int) -> Response:
         """
         Обновление ингредиента по ID
         """
@@ -92,7 +92,7 @@ class CocktailDetail(APIView):
         cocktail = await CocktailHandler.update_cocktail(pk, request.data, request)
         return handle_response(cocktail)
 
-    async def delete(self, request: Request, pk: int):
+    async def delete(self, request: Request, pk: int) -> Response:
         """
         Удаление коктейля по ID
         """
@@ -108,7 +108,7 @@ class CocktailListCreate(APIView):
         cocktails = await CocktailHandler.get_all_cocktails()
         return handle_response(cocktails)
 
-    async def post(self, request: Request):
+    async def post(self, request: Request) -> Response:
         """
         Создание нового коктейля
         """

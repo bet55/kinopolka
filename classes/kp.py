@@ -26,7 +26,7 @@ class KP:
     BASE_URL: ClassVar[str] = "https://api.poiskkino.dev/v1.4/"
     headers: ClassVar[dict[str, str]] = None  # Initialized in __post_init__
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize headers with API key from settings."""
         try:
             self.headers = {"X-API-KEY": settings.KP_API_TOKEN}

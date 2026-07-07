@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 AVATARS_DIR = os.path.join("static", "img", "avatars")
 
 
-def validate_avatar_path(value: str):
+def validate_avatar_path(value: str) -> None:
     """
     Аватарка — либо внешний URL, либо путь к существующему файлу в static.
     Django-валидатор (не DRF): срабатывает в формах админки.
@@ -20,11 +20,11 @@ def validate_avatar_path(value: str):
         raise DjangoValidationError(f"Файл не найден. Есть в /static/img/avatars/: {available}")
 
 
-def validate_kp_id(field):
+def validate_kp_id(field: int) -> None:
     if field is None:
         raise ValidationError("kp_id is required")
 
 
-def validate_name(field):
+def validate_name(field: str) -> None:
     if field is None:
         raise ValidationError("Name is required")

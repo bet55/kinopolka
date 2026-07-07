@@ -10,7 +10,7 @@ from lists.models import Movie
 class Command(BaseCommand):
     help = "Remove random suffixes from poster_local filenames and rename files in media/posters/"
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         movies = Movie.mgr.all()
         total = movies.count()
 

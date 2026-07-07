@@ -4,6 +4,7 @@ import logging
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.db.models.fields.files import ImageFieldFile
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -23,7 +24,7 @@ class Invitation:
     Класс для рассылки открыток на будущие мероприятия
     """
 
-    def __init__(self, postcard: Postcard | None = None, is_active: bool = False):
+    def __init__(self, postcard: Postcard | None = None, is_active: bool = False) -> None:
         """
         Initialize an Invitation instance.
 
@@ -105,7 +106,7 @@ class Invitation:
     @classmethod
     def send_email(
         cls,
-        screenshot,
+        screenshot: ImageFieldFile,
         meeting_date: datetime,
         emails: list[str],
     ) -> str:
@@ -162,7 +163,7 @@ class Invitation:
             return f"Ошибка: {e!s}"
 
     @classmethod
-    async def send_telegram(cls, screenshot) -> str:
+    async def send_telegram(cls, screenshot: ImageFieldFile) -> str:
         """
         Отправляем открытку в телеграм группу киноклуба
 

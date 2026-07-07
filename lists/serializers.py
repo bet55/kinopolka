@@ -5,9 +5,9 @@ from rest_framework.serializers import (
     ListSerializer,
     ModelSerializer,
     ReturnDict,
+    SlugRelatedField,
 )
 
-from features.serializers import GenreSerializer
 from lists.models import Movie, Note, User
 
 
@@ -29,15 +29,14 @@ class MovieListSerializer(ListSerializer):
     Класс для изменения типа возвращаемых сериализатором данных: из list в dict
     """
 
-    def to_representation(self, data):
+    def to_representation(self, data: models.manager.BaseManager | list) -> dict:
         iterable = data.all() if isinstance(data, models.manager.BaseManager) else data
 
-        return {
-            self.child.to_representation(item).get("kp_id"): self.child.to_representation(item) for item in iterable
-        }
+        representations = (self.child.to_representation(item) for item in iterable)
+        return {representation.get("kp_id"): representation for representation in representations}
 
     @property
-    def data(self):
+    def data(self) -> ReturnDict:
         ret = BaseSerializer.data.fget(self)
         return ReturnDict(ret, serializer=self)
 
@@ -49,7 +48,7 @@ class MovieDictSerializer(ModelSerializer):
     """
 
     premiere = DateTimeField(format="%d/%m/%Y")
-    genres = GenreSerializer(many=True)
+    genres = SlugRelatedField(slug_field="name", many=True, read_only=True)
 
     class Meta:
         list_serializer_class = MovieListSerializer
@@ -68,10 +67,9 @@ class MovieDictSerializer(ModelSerializer):
             "is_archive",
         ]
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Movie) -> dict:
         representation = super().to_representation(instance)
 
-        representation["genres"] = [genre["name"] for genre in representation["genres"]]
         poster_local = instance.poster_local.url if instance.poster_local else "/media/posters/default.png"
         representation["poster_local"] = instance.poster if "default" in poster_local else poster_local
         return representation
@@ -84,7 +82,7 @@ class MoviePosterSerializer(ModelSerializer):
     Жанры добавлены для сортировки.
     """
 
-    genres = GenreSerializer(many=True)
+    genres = SlugRelatedField(slug_field="name", many=True, read_only=True)
 
     class Meta:
         model = Movie
@@ -95,13 +93,12 @@ class MoviePosterSerializer(ModelSerializer):
             "genres",
         ]
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Movie) -> dict:
         representation = super().to_representation(instance)
         notes = instance.note_set.all()
         poster_local = instance.poster_local
         representation["poster_local"] = poster_local.url if poster_local else DEFAULT_POSTER
         representation["notes"] = NoteSerializer(notes, many=True).data
-        representation["genres"] = [genre["name"] for genre in representation["genres"]]
 
         return representation
 

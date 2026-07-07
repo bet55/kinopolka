@@ -1,4 +1,5 @@
 from adrf.views import APIView
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.request import Request
@@ -12,7 +13,7 @@ from utils.response_handler import handle_response
 class Catalog(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             template_name="features/catalog.html",
@@ -23,7 +24,7 @@ class Catalog(GlobalDataMixin, APIView):
 class MoviesStatistic(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         statistic = Statistic()
         await statistic.extract_data()
 
@@ -55,7 +56,7 @@ class MoviesStatistic(GlobalDataMixin, APIView):
 class Casino(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             "features/casino.html",
@@ -66,7 +67,7 @@ class Casino(GlobalDataMixin, APIView):
 class Roulette(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         movies = await MovieHandler.get_all_movies(info_type="posters")
 
         return render(
@@ -79,7 +80,7 @@ class Roulette(GlobalDataMixin, APIView):
 class Cards(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             "features/casino/cards.html",
@@ -90,7 +91,7 @@ class Cards(GlobalDataMixin, APIView):
 class Slots(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             "features/casino/slots.html",
@@ -101,7 +102,7 @@ class Slots(GlobalDataMixin, APIView):
 class EightBall(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             "features/casino/8ball.html",
@@ -112,7 +113,7 @@ class EightBall(GlobalDataMixin, APIView):
 class Tarots(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             "features/tarot.html",
@@ -123,7 +124,7 @@ class Tarots(GlobalDataMixin, APIView):
 class Photos(GlobalDataMixin, APIView):
     http_method_names = ["get", "post"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         """
         Страница с фотографиями клуба
         """
@@ -164,7 +165,7 @@ class PhotoDetail(APIView):
 class Gym(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         return render(
             request,
             "features/gym.html",

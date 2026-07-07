@@ -35,7 +35,7 @@ class CocktailSerializer(serializers.ModelSerializer):
             "ingredients",
         ]
 
-    def get_is_available(self, obj):
+    def get_is_available(self, obj: Cocktail) -> bool:
         return obj.is_available
 
 
@@ -46,7 +46,7 @@ class CocktailCreateUpdateSerializer(serializers.ModelSerializer):
         model = Cocktail
         fields = ["name", "instructions", "image", "ingredients"]
 
-    def validate_ingredients(self, value):
+    def validate_ingredients(self, value: str) -> list:
         if not value:
             return []
 
@@ -64,7 +64,7 @@ class CocktailCreateUpdateSerializer(serializers.ModelSerializer):
         return ingredients
 
     @staticmethod
-    def _validate_ingredient_item(item):
+    def _validate_ingredient_item(item: dict) -> None:
         """Проверка одного ингредиента из списка (мутирует item: приводит id и amount к int)"""
         if not isinstance(item, dict) or "ingredient" not in item:
             raise serializers.ValidationError("Каждый ингредиент должен быть словарем и содержать поле 'ingredient'")

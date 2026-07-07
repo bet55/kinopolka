@@ -16,7 +16,7 @@ DEFAULT_POSTER = "posters/default.jpg"
 class Command(BaseCommand):
     help = "Link existing posters in media/posters/ to poster_local or download missing posters"
 
-    async def link_existing_poster(self, movie, kp_id):
+    async def link_existing_poster(self, movie: Movie, kp_id: int) -> bool:
         # Check for existing poster file in media/posters/
         for ext in [".jpg", ".png"]:
             poster_path = Path(f"media/posters/poster_{kp_id}{ext}")
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 return True
         return False
 
-    async def _skip_downloading_poster(self, movie):
+    async def _skip_downloading_poster(self, movie: Movie) -> tuple[bool, int, bool]:
         kp_id = movie.kp_id
 
         # Skip if poster_local is already set and file exists
@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
         return False, kp_id, False
 
-    async def download_poster(self, movie, client, max_retries=3):
+    async def download_poster(self, movie: Movie, client: httpx.AsyncClient, max_retries: int = 3) -> tuple[int, bool]:
         skip_downloading, kp_id, is_download = await self._skip_downloading_poster(movie)
         if skip_downloading:
             return kp_id, is_download
@@ -102,10 +102,10 @@ class Command(BaseCommand):
         return kp_id, False
 
     @sync_to_async
-    def get_movie_batch(self, start, end):
+    def get_movie_batch(self, start: int, end: int) -> list[Movie]:
         return list(Movie.mgr.all()[start:end])
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         movies = Movie.mgr.all()
         total = movies.count()
         success_count = 0
@@ -115,7 +115,7 @@ class Command(BaseCommand):
 
         self.stdout.write(f"Starting to process posters for {total} movies...")
 
-        async def process_batch(batch):
+        async def process_batch(batch: list[Movie]) -> list:
             async with httpx.AsyncClient(timeout=10.0) as client:
                 tasks = [self.download_poster(movie, client) for movie in batch]
                 results = await asyncio.gather(*tasks, return_exceptions=True)

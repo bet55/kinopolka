@@ -20,15 +20,15 @@ class Ingredient(models.Model):
         verbose_name_plural = "Ингредиенты"
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if not self.image or self.image == "":
             self.image = self._meta.get_field("image").get_default()
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         # Delete associated image if it exists and is not the default image
         if self.image and "default.png" not in self.image.name and os.path.isfile(self.image.path):
             os.remove(self.image.path)
@@ -61,15 +61,15 @@ class Cocktail(models.Model):
         verbose_name_plural = "Коктейли"
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if not self.image or self.image == "":
             self.image = self._meta.get_field("image").get_default()
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         # Delete associated image if it exists and is not the default image
         if self.image and "default.png" not in self.image.name:
             if os.path.isfile(self.image.path):
@@ -77,14 +77,14 @@ class Cocktail(models.Model):
         super().delete(*args, **kwargs)
 
     @property
-    def is_available(self):
+    def is_available(self) -> bool:
         """Проверяет, все ли ингредиенты коктейля доступны"""
         if not self.ingredients.exists():
             return False
 
         return all(ci.ingredient.is_available for ci in self.ingredient_amounts.all())
 
-    def get_availability_display(self):
+    def get_availability_display(self) -> str:
         """Возвращает текстовое представление доступности"""
         return "Доступен" if self.is_available else "Недоступен"
 
@@ -121,5 +121,5 @@ class CocktailIngredient(models.Model):
         verbose_name_plural = "Ингредиенты коктейлей"
         unique_together = [["cocktail", "ingredient"]]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.amount} {self.get_unit_display()} {self.ingredient.name}"

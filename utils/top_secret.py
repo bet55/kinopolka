@@ -7,7 +7,7 @@ init()
 
 
 # Function to color nipples red
-def color_nipples(text):
+def color_nipples(text: str) -> str:
     nipples = ["⣜⣁⣾", "⡤⣥⣙"]
     for n in nipples:
         text = text.replace(n, f"{Fore.RED}{n}{Style.RESET_ALL}")

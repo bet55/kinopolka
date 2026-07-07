@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.forms import ModelForm
+from django.http import HttpRequest
 from django.utils.html import format_html
 
 from lists.models import Actor, Director, Genre, Movie, Note, User, Writer
@@ -14,13 +16,13 @@ class UserAdmin(admin.ModelAdmin):
     fields = ["username", "first_name", "last_name", "email", "avatar"]
 
     @admin.display(description="Превью")
-    def avatar_preview(self, user):
+    def avatar_preview(self, user: User) -> str:
         return format_html(
             '<img src="{}" style="height: 2em; width: 2em; object-fit: cover; border-radius: 50%;">',
             user.avatar,
         )
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request: HttpRequest, obj: User, form: ModelForm, change: bool) -> None:
         super().save_model(request, obj, form, change)
         # Пользователи кэшируются для всех страниц (GlobalDataMixin) —
         # сбрасываем, чтобы правка аватарки была видна сразу, а не через 15 минут

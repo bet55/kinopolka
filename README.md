@@ -107,9 +107,10 @@ uv run manage.py update_recent_movies
 
 ## Management-команды (по данным БД)
 
-Работают напрямую с базой — запущенное приложение НЕ требуется. Но командам,
-которые ходят в API Кинопоиска (`update_recent_movies`, `download_posters`),
-нужны переменные окружения — сначала `source env.sh` (один раз на сессию терминала).
+Работают напрямую с базой (кроме `update_theme_calendar`) — запущенное приложение
+НЕ требуется. Но командам, которые ходят в API Кинопоиска (`update_recent_movies`,
+`download_posters`), нужны переменные окружения — сначала `source env.sh`
+(один раз на сессию терминала).
 
 Пример: обновить информацию о свежих фильмах —
 ```bash
@@ -123,6 +124,7 @@ uv run manage.py update_recent_movies
 | `uv run manage.py fix_posters_names` | Убирает случайные суффиксы из имён постеров и дедуплицирует файлы. |
 | `uv run manage.py delete_unused_postcards` | Удаляет файлы открыток, которых нет в БД. |
 | `uv run manage.py update_recent_movies` | Обновляет оценки KP/IMDb, голоса и кассовые сборы у фильмов с премьерой за последние N лет (`--years`, `--dry-run`, `--limit`, `--delay`). Нужен `source env.sh`. |
+| `uv run manage.py update_theme_calendar` | Пересобирает календарь тем оформления из `THEMES_RANGES` и печатает его. БД не трогает; результат вручную копируется в `CALENDAR` (`filmoclub/calendar/theme_calendar.py`) — календарь осознанно хранится python-переменной, а не json-файлом. Запускать после изменения `THEMES_RANGES` в `filmoclub/calendar/theme_settings.py`. |
 
 ## Сжатие изображений
 

@@ -3,6 +3,7 @@ import os
 
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 
 from bar.models import Cocktail, CocktailIngredient, Ingredient
 from bar.serializers import (
@@ -20,7 +21,7 @@ class CocktailHandler:
     @staticmethod
     @handle_exceptions("Коктейль")
     @sync_to_async
-    def create_cocktail(data: dict, request=None) -> dict:
+    def create_cocktail(data: dict, request: Request = None) -> dict:
         """
         Создание нового коктейля с существующими ингредиентами
         :param data: словарь с данными (name, instructions, image, ingredients)
@@ -80,7 +81,7 @@ class CocktailHandler:
 
     @staticmethod
     @handle_exceptions("Коктейль")
-    async def update_cocktail(cocktail_id: int, data: dict, request=None) -> dict:
+    async def update_cocktail(cocktail_id: int, data: dict, request: Request = None) -> dict:
         """
         Обновление коктейля
         :param cocktail_id: ID коктейля

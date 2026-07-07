@@ -14,10 +14,10 @@ class Photo(models.Model):
         verbose_name_plural = "Фотографии"
         ordering = ["-uploaded_at"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         # Убираем файл из media вместе с записью
         if self.image and os.path.isfile(self.image.path):
             os.remove(self.image.path)

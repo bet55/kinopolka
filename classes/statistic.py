@@ -2,12 +2,12 @@ from collections import namedtuple
 import logging
 
 from asgiref.sync import sync_to_async
+from django.db.models import Count
 import numpy as np
 import pandas as pd
 import plotly
 import plotly.express as px
 
-from features.serializers import ActorSerializer, DirectorSerializer, GenreSerializer, WriterSerializer
 from lists.models import Actor, Director, Genre, Writer
 
 from .movie import MovieHandler, MoviesStructure
@@ -22,31 +22,34 @@ logger = logging.getLogger(__name__)
 class ModelsHandler:
     """Generic handler for fetching and serializing models with ManyToMany relationships to Movie."""
 
-    # Mapping of models to their serializers and related field names
-    MODEL_SERIALIZER = {
-        Genre: GenreSerializer,
-        Actor: ActorSerializer,
-        Director: DirectorSerializer,
-        Writer: WriterSerializer,
+    # Какие поля нужны статистике (у Genre нет photo)
+    MODEL_FIELDS = {
+        Genre: ("name", "movies_count"),
+        Actor: ("kp_id", "name", "photo", "movies_count"),
+        Director: ("kp_id", "name", "photo", "movies_count"),
+        Writer: ("kp_id", "name", "photo", "movies_count"),
     }
 
     @classmethod
     @sync_to_async
     def get_all(cls, model: Genre | Actor | Director | Writer, is_archive: bool = True) -> pd.DataFrame:
         """
-        Fetch instances of the given model and serialize them.
+        Fetch instances of the given model with their movie counts.
 
         :param model: The Django model class (e.g., Genre, Actor).
         :param is_archive: Filter related movies by is_archive (True, False, or None for no filter).
 
-        :returns:List of serialized data.
+        :returns: DataFrame with one row per instance.
         """
-        queryset = model.mgr.all()
-        queryset = queryset.filter(movie__is_archive=is_archive).distinct()
-
-        # Serialize data
-        serializer = cls.MODEL_SERIALIZER[model](queryset, many=True)
-        return pd.DataFrame(serializer.data)
+        # movies_count считается в БД одним запросом (annotate после filter
+        # считает только фильмы из архива). Раньше здесь был DRF-сериализатор,
+        # который делал по два запроса на каждый объект — тысячи запросов на страницу.
+        queryset = (
+            model.mgr.filter(movie__is_archive=is_archive)
+            .annotate(movies_count=Count("movie"))
+            .values(*cls.MODEL_FIELDS[model])
+        )
+        return pd.DataFrame(queryset)
 
 
 class Statistic:
@@ -61,7 +64,7 @@ class Statistic:
     RATING_PLATFORMS = 11
     Rating = namedtuple("Rating", ["top", "bot"])
 
-    async def extract_data(self):
+    async def extract_data(self) -> None:
         """
         Загружаем из бд все нужные таблицы и кастуем их в DataFrame
         """
@@ -354,7 +357,7 @@ class Statistic:
         fig7.update_layout(title_x=0.5, coloraxis_showscale=False)
 
         # Конвертируем в HTML div
-        def to_div(fig):
+        def to_div(fig: plotly.graph_objs.Figure) -> str:
             return plotly.offline.plot(fig, output_type="div", include_plotlyjs=False)
 
         graphs = {

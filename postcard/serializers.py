@@ -21,7 +21,7 @@ class PostcardSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> Postcard:
         postcard = Postcard(
             title=validated_data["title"],
             meeting_date=validated_data["meeting_date"],
@@ -31,7 +31,7 @@ class PostcardSerializer(serializers.ModelSerializer):
         postcard.movies.set(validated_data["movies"])
         return postcard
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Postcard, validated_data: dict) -> Postcard:
         instance.meeting_date = validated_data["meeting_date"]
         instance.save()
         instance.movies.set(validated_data["movies"])

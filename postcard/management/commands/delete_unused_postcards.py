@@ -10,7 +10,7 @@ from postcard.models import Postcard
 class Command(BaseCommand):
     help = "Delete postcards files in media/posters/ if they don`t exist in database"
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         ic("Удаляем изображения открыток, которых нет в базе ....")
 
         postcard_folder = Path("media/postcards")

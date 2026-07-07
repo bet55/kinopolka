@@ -1,6 +1,7 @@
 import logging
 
 from adrf.views import APIView
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.request import Request
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
     http_method_names = ["get"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         """
         Получение страницы архива всех открыток.
         """
@@ -36,7 +37,7 @@ class PostcardsArchiveViewSet(GlobalDataMixin, APIView):
 class InvitationViewSet(APIView):
     http_method_names = ["post"]
 
-    async def post(self, request: Request):
+    async def post(self, request: Request) -> Response:
         """
         Отправка приглашения для следующего мероприятия.
         """
@@ -48,7 +49,7 @@ class InvitationViewSet(APIView):
 class PostcardViewSet(GlobalDataMixin, APIView):
     http_method_names = ["get", "post", "put", "delete"]
 
-    async def get(self, request: Request):
+    async def get(self, request: Request) -> HttpResponse:
         """
         Получение страницы с текущей активной открыткой.
         Если активной открытки нет отображаем шаблон для заполнения.
@@ -72,21 +73,21 @@ class PostcardViewSet(GlobalDataMixin, APIView):
         context = await self.add_context_data(request, context)
         return render(request, "postcard.html", context=context)
 
-    async def post(self, request: Request):
+    async def post(self, request: Request) -> Response:
         """
         Создание новой открытки.
         """
         postcard_data = await PostcardHandler.create_postcard(request.data, request=request)
         return handle_response(postcard_data, status=status.HTTP_201_CREATED)
 
-    async def put(self, request: Request):
+    async def put(self, request: Request) -> Response:
         """
         Деактивация всех открыток.
         """
         result = await PostcardHandler.deactivate_postcard()
         return handle_response(result, {"message": "Postcards deactivated"})
 
-    async def delete(self, request: Request):
+    async def delete(self, request: Request) -> Response:
         """
         Удаление открытки по ID.
         """

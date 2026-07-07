@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from functools import wraps
 import logging
+from typing import Any
 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError
@@ -18,7 +19,7 @@ def handle_exceptions(resource_name: str) -> Callable:
 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:  # результат func или error-dict
             try:
                 return await func(*args, **kwargs)
             except ValidationError as e:

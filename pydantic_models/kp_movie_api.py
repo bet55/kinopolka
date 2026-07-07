@@ -1,10 +1,10 @@
 from dataclasses import field
 from typing import Optional
 
-from pydantic import AliasChoices, AliasPath, BaseModel, Field, field_serializer
+from pydantic import AliasChoices, AliasPath, BaseModel, Field, FieldSerializationInfo, field_serializer
 
 
-def create_empty_list():
+def create_empty_list() -> list:
     return []
 
 
@@ -17,7 +17,7 @@ class KpFilmGenresModel(BaseModel):
     genres: ListDict = field(default_factory=create_empty_list)
 
     @field_serializer("genres")
-    def serialize_genres(self, genres: list[dict], _info):
+    def serialize_genres(self, genres: list[dict], _info: FieldSerializationInfo) -> list[dict]:
         gr = genres or []
         return gr
 
@@ -53,7 +53,7 @@ class KPFilmModel(BaseModel):
     #     return pendulum.parse(premiere).format('DD/MM/YYYY')
 
     @field_serializer("countries")
-    def serialize_countries(self, countries: list[dict], _info):
+    def serialize_countries(self, countries: list[dict], _info: FieldSerializationInfo) -> list[str]:
         return [c["name"] for c in countries if c.get("name")]
 
 

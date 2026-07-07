@@ -5,7 +5,7 @@ from django.db.models import Model
 from lists import validators
 
 
-def default_countries():
+def default_countries() -> list[str]:
     return ["unknown"]
 
 

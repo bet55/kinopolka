@@ -14,7 +14,7 @@ class Caching:
     Класс для кэширования данных
     """
 
-    def __init__(self, dirname: str = None, ttl: int = None):
+    def __init__(self, dirname: str = None, ttl: int = None) -> None:
         """
         :param dirname: (str) - название папки хранения файла кэша.
         :param ttl: (int) время актуальности кэша в секундах.

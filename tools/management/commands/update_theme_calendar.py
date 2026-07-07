@@ -7,7 +7,7 @@ from utils import create_theme_calendar
 class Command(BaseCommand):
     help = "Обновление календаря с темами. filmoclub/theme_calendar"
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         self.stdout.write(self.style.SUCCESS("Поехали"))
 
         new_calendar = create_theme_calendar()
