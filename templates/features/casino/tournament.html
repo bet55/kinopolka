@@ -1,0 +1,75 @@
+{% extends "features/casino/casino_base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/features/casino/tournament.css' %}">
+{% endblock %}
+
+{% block title %}Турнир{% endblock %}
+
+{% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/Tmnttflogo.webp' %}{% endblock %}
+
+{% block center-content %}
+    <div id="tournament">
+
+        <h2>Турнир четырёх</h2>
+        <p class="tournament-hint">
+            Четыре бота дерутся по турнирной сетке — ставим на бойцов,
+            победитель выбирает фильм вечера.
+        </p>
+
+        <!-- Ставки: кто за какого бойца болеет -->
+        <div id="bets">
+            {% for slot in "1234" %}
+                <div class="bet-slot">
+                    <span class="bet-fighter">Боец {{ slot }}</span>
+                    <select class="bet-user">
+                        <option value="">— кто болеет —</option>
+                        {% for u in users %}
+                            <option value="{{ u.id }}">{{ u.first_name|default:u.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if rom_url %}
+            <div id="game"></div>
+
+            <script>
+                EJS_player = "#game";
+                EJS_core = "nes";
+                EJS_gameUrl = "{{ rom_url }}";
+                EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+                EJS_startOnLoaded = true;
+                EJS_volume = 0.5;
+                {% if state_url %}
+                    /* Сохранение на экране настройки турнира: игра стартует сразу с него */
+                    EJS_loadStateURL = "{{ state_url }}";
+                {% endif %}
+            </script>
+            <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+
+            {% if not state_url %}
+                <p class="tournament-setup-hint">
+                    Save-state не найден: дойди в игре до экрана турнира с четырьмя ботами,
+                    сохрани состояние (меню эмулятора → Save State, в настройках поставь
+                    «Save State Location: Download») и положи файл(ы) <code>*.state</code>
+                    в <code>media/roms/</code> — турнир будет загружаться со случайного
+                    из них.
+                </p>
+            {% endif %}
+        {% else %}
+            <div id="no-rom">
+                <p>ROM не найден.</p>
+                <p>
+                    Положи легальный дамп в <code>media/roms/tmnt-tournament.nes</code>
+                    и обнови страницу.
+                </p>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

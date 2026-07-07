@@ -1,3 +1,6 @@
+from pathlib import Path
+import random
+
 from adrf.views import APIView
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -53,6 +56,35 @@ class MoviesStatistic(GlobalDataMixin, APIView):
         return render(
             request,
             template_name="features/statistic.html",
+            context=await self.add_context_data(request, context),
+        )
+
+
+class Tournament(GlobalDataMixin, APIView):
+    """
+    Турнир TMNT: эмулятор NES с легальным дампом игры. Четыре бота дерутся
+    по турнирной сетке, участники ставят на бойцов — победитель выбирает фильм.
+    ROM и save-state'ы лежат в media/roms/ (вне git, синкается с VPS).
+    """
+
+    http_method_names = ["get"]
+
+    ROM_PATH = Path("media/roms/tmnt-tournament.nes")
+    STATES_DIR = Path("media/roms")
+
+    async def get(self, request: Request) -> HttpResponse:
+        # Стейты — заготовленные расстановки бойцов; каждый раз грузим случайную
+        states = sorted(self.STATES_DIR.glob("*.state"))
+        state_url = f"/{random.choice(states)}" if states else ""
+
+        context = {
+            "rom_url": f"/{self.ROM_PATH}" if self.ROM_PATH.exists() else "",
+            "state_url": state_url,
+        }
+
+        return render(
+            request,
+            "features/casino/tournament.html",
             context=await self.add_context_data(request, context),
         )
 

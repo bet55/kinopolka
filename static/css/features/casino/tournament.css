@@ -1,0 +1,75 @@
+/* Турнир TMNT: эмулятор NES + панель ставок */
+
+#tournament {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    color: var(--black-color);
+
+    h2 {
+        color: var(--red-color);
+        font-weight: bold;
+        margin-top: 0.5em;
+    }
+
+    .tournament-hint {
+        margin: 0;
+        font-size: 1.1em;
+    }
+}
+
+/* Ставки: четыре слота бойцов */
+#bets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8em;
+    width: 100%;
+}
+
+.bet-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.6em 1em;
+    background: #a02020;
+    color: white;
+    border-radius: 8px;
+
+    .bet-fighter {
+        font-weight: bold;
+    }
+
+    .bet-user {
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+}
+
+/* Экран NES: 256x240, держим пропорции и не даём вылезти за колонку */
+#game {
+    width: min(768px, 100%);
+    aspect-ratio: 256 / 240;
+}
+
+#no-rom, .tournament-setup-hint {
+    max-width: 40em;
+    font-size: 1.1em;
+
+    code {
+        color: var(--darkred-color);
+    }
+}
+
+@media (max-width: 800px) {
+    #tournament .tournament-hint {
+        font-size: 0.9em;
+    }
+
+    .bet-slot {
+        padding: 0.4em 0.6em;
+        font-size: 0.9em;
+    }
+}
