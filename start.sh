@@ -27,5 +27,6 @@ uv run utils/top_secret.py
 echo "== Starting in $ENVIRONMENT mode on port ${APP_PORT:-8000} =="
 
 uv run manage.py runserver 0.0.0.0:"${APP_PORT:-8000}"
+#uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --log-level warning --reload
 #uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --reload
 #uv run uvicorn filmoclub.asgi:application --host 0.0.0.0 --port "${APP_PORT:-8000}" --log-level warning --reload

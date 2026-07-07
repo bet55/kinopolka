@@ -1,4 +1,5 @@
 from collections import namedtuple
+from itertools import combinations
 import logging
 
 from asgiref.sync import sync_to_async
@@ -62,6 +63,8 @@ class Statistic:
     USERS_COUNT = 4
     MOVIES_DISPLAY_COLUMNS = ["kp_id", "poster_local", "name"]
     RATING_PLATFORMS = 11
+    RATING_SPAN = 9  # оценки от 1 до 10 → максимальное расхождение 9
+    MIN_COMMON_MOVIES = 3  # минимум общих фильмов, чтобы сравнивать вкусы пары
     Rating = namedtuple("Rating", ["top", "bot"])
 
     async def extract_data(self) -> None:
@@ -153,6 +156,57 @@ class Statistic:
         stats = pd.merge(stats, self.users, left_on="user", right_on="id")
         stats = stats.sort_values(by="mean", ascending=False)
         return stats[["name", "avatar", "count", "mean"]].to_dict("records")
+
+    async def taste_compatibility(self) -> list[dict]:
+        """
+        Совместимость вкусов: попарное сравнение оценок участников на общих фильмах.
+        Совпадение — среднее расхождение оценок, переведённое в проценты
+        (0 баллов разницы → 100%, максимальные RATING_SPAN баллов → 0%).
+        """
+        ratings = self.notes.pivot_table(index="movie", columns="user", values="rating")
+        users = self.users.set_index("id")
+
+        pairs = []
+        for user_a, user_b in combinations(ratings.columns, 2):
+            common = ratings[[user_a, user_b]].dropna()
+            if len(common) < self.MIN_COMMON_MOVIES:
+                continue
+
+            avg_diff = (common[user_a] - common[user_b]).abs().mean()
+            pairs.append(
+                {
+                    "name_a": users.loc[user_a, "name"],
+                    "avatar_a": users.loc[user_a, "avatar"],
+                    "name_b": users.loc[user_b, "name"],
+                    "avatar_b": users.loc[user_b, "avatar"],
+                    "similarity": round((1 - avg_diff / self.RATING_SPAN) * 100),
+                    "avg_diff": round(avg_diff, 1),
+                    "movies_count": len(common),
+                }
+            )
+
+        pairs.sort(key=lambda pair: -pair["similarity"])
+        return pairs
+
+    async def controversial_movies(self) -> dict[str, list[dict]]:
+        """
+        Яблоки раздора и полное единодушие: фильмы с максимальным и минимальным
+        разбросом оценок. Считаем только фильмы, оценённые всеми участниками.
+        """
+        spread = self.notes.groupby("movie").agg(rating_min=("rating", "min"), rating_max=("rating", "max"))
+        spread["spread"] = spread["rating_max"] - spread["rating_min"]
+
+        movies = pd.merge(self.archive_movies, spread, left_on="kp_id", right_index=True)
+        movies = movies[movies.user == self.USERS_COUNT]
+
+        controversial = movies.sort_values(by="spread", ascending=False).head(self.TOP_MOVIES)
+        # при равном разбросе интереснее единодушно любимые
+        unanimous = movies.sort_values(by=["spread", "rating"], ascending=[True, False]).head(self.TOP_MOVIES)
+
+        return {
+            "controversial": controversial.to_dict("records"),
+            "unanimous": unanimous.to_dict("records"),
+        }
 
     async def records(self) -> dict[str, str]:
         """

@@ -30,7 +30,6 @@ class Request {
             return true;
         }
         const user = getCookie('user');
-        console.log(user);
         return !!user;
     }
 
@@ -60,10 +59,6 @@ class Request {
     }
 
     static async send({method, url, body = null, headers = {}, showToast = true}) {
-
-        const EMO = ['ﮩ٨ـﮩﮩ٨ـ🫀ﮩ٨ـﮩﮩ٨ـ', '🦋ꦿ', '🍆🍑🍆💦🥛CUM', '🥛𓂺', '𝖓𝖎𝖌𝖌𝖆 ♱', '𓃵', '୧⍤⃝💐', '🦊', '🐲', 'ඞ'];
-        const successEmo = '🌟';
-        const errorEmo = '☠';
 
         method = method.toUpperCase();
 

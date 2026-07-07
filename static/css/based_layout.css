@@ -155,6 +155,51 @@ body {
     }
 }
 
+/* Рубильник тёмной темы: спрайт-лента 34 кадров по 81x120 (2x в файле).
+   to-dark/to-light — анимация щелчка, is-dark/is-light — крайние положения */
+#light-switch {
+    --switch-frame: 81px;
+    width: var(--switch-frame);
+    height: 120px;
+    margin-left: 0.8em;
+    cursor: pointer;
+    flex-shrink: 0;
+    background-image: url('../img/light_switch_sprite.webp');
+    background-size: calc(var(--switch-frame) * 34) 120px;
+    background-repeat: no-repeat;
+}
+
+#light-switch.is-light {
+    background-position-x: 0;
+}
+
+/* До инициализации JS: в тёмной теме рубильник сразу в верхнем положении */
+html.dark-mode #light-switch {
+    background-position-x: calc(var(--switch-frame) * -13);
+}
+
+#light-switch.is-dark {
+    background-position-x: calc(var(--switch-frame) * -13);
+}
+
+#light-switch.to-dark {
+    animation: switch-to-dark 0.45s steps(13) forwards;
+}
+
+#light-switch.to-light {
+    animation: switch-to-light 0.35s steps(9) forwards;
+}
+
+@keyframes switch-to-dark {
+    from { background-position-x: 0; }
+    to { background-position-x: calc(var(--switch-frame) * -13); }
+}
+
+@keyframes switch-to-light {
+    from { background-position-x: calc(var(--switch-frame) * -24); }
+    to { background-position-x: calc(var(--switch-frame) * -33); }
+}
+
 
 /* Кнопка корзины - выпадающий список с фильмами */
 #cart {

@@ -35,6 +35,8 @@ class MoviesStatistic(GlobalDataMixin, APIView):
         persons = await statistic.outstanding_persons()
         users_stat = await statistic.users_statistic()
         records = await statistic.records()
+        compatibility = await statistic.taste_compatibility()
+        disputes = await statistic.controversial_movies()
 
         context = {
             "statistic": common_stats,
@@ -44,6 +46,8 @@ class MoviesStatistic(GlobalDataMixin, APIView):
             "persons": persons,
             "users_statistic": users_stat,
             "records": records,
+            "compatibility": compatibility,
+            "disputes": disputes,
         }
 
         return render(
