@@ -35,3 +35,12 @@ repos:
     rev: v8.30.0
     hooks:
       - id: gitleaks
+
+  # Тесты Django (env.sh не нужен: у настроек есть дефолты, БД — временная в памяти)
+  - repo: local
+    hooks:
+      - id: django-tests
+        name: django tests
+        entry: uv run manage.py test
+        language: system
+        pass_filenames: false

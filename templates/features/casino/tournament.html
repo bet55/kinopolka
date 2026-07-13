@@ -6,30 +6,43 @@
     <link rel="stylesheet" href="{% static 'css/features/casino/tournament.css' %}">
 {% endblock %}
 
+{% block script %}
+    {{ block.super }}
+    <script type="module" src="{% static 'js/features/casino/tournament.js' %}"></script>
+{% endblock %}
+
 {% block title %}Турнир{% endblock %}
 
 {% block header_img %}{% static 'img/features_catalog/casino/dice_header_stop.webp' %}{% endblock %}
-{% block nav_img %}{% static 'img/features_catalog/casino/Tmnttflogo.webp' %}{% endblock %}
+{% block nav_img %}{% static 'img/features_catalog/casino/tmnt.png' %}{% endblock %}
 
 {% block center-content %}
     <div id="tournament">
 
         <h2>Турнир четырёх</h2>
         <p class="tournament-hint">
-            Четыре бота дерутся по турнирной сетке — ставим на бойцов,
-            победитель выбирает фильм вечера.
+            Четыре бота дерутся по турнирной сетке — каждый ставит на бойца
+            и вешает на него свой фильм из закладок. Чей боец победил,
+            тот фильм и смотрим.
         </p>
 
-        <!-- Ставки: кто за какого бойца болеет -->
+        <!-- Ставки: кто за какого бойца болеет и какой фильм на него повесил -->
         <div id="bets">
             {% for slot in "1234" %}
                 <div class="bet-slot">
-                    <span class="bet-fighter">Боец {{ slot }}</span>
+                    <span class="bet-fighter">
+                        <img class="bet-avatar hide" src="" alt="">
+                        Боец {{ slot }}
+                    </span>
                     <select class="bet-user">
                         <option value="">— кто болеет —</option>
                         {% for u in users %}
-                            <option value="{{ u.id }}">{{ u.first_name|default:u.username }}</option>
+                            <option value="{{ u.id }}" data-avatar="{{ u.avatar }}">{{ u.first_name|default:u.username }}</option>
                         {% endfor %}
+                    </select>
+                    {# Фильмы приезжают из закладок (localStorage) — заполняет tournament.js #}
+                    <select class="bet-movie">
+                        <option value="">— фильм из закладок —</option>
                     </select>
                 </div>
             {% endfor %}
@@ -42,15 +55,16 @@
                 EJS_player = "#game";
                 EJS_core = "nes";
                 EJS_gameUrl = "{{ rom_url }}";
-                EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+                {# EJS_pathtodata не задаём: loader.js сам берёт свою папку. #}
+                {# Явный путь через static нельзя — манифест в проде не знает директорий. #}
                 EJS_startOnLoaded = true;
-                EJS_volume = 0.5;
+                EJS_volume = 0.3;
                 {% if state_url %}
                     /* Сохранение на экране настройки турнира: игра стартует сразу с него */
                     EJS_loadStateURL = "{{ state_url }}";
                 {% endif %}
             </script>
-            <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+            <script src="{% static 'vendor/emulatorjs/data/loader.js' %}"></script>
 
             {% if not state_url %}
                 <p class="tournament-setup-hint">

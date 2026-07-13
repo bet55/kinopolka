@@ -19,22 +19,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
-from .view import (
-    handler400,
-    handler403,
-    handler404,
-    handler500,
-)
+from . import view
 
 
-# Обрабатываем ошибки всего проекта
-handler400 = handler400
-handler403 = handler403
-handler404 = handler404
-handler500 = handler500
+# Обрабатываем ошибки всего проекта: Django ищет эти имена
+# на уровне модуля ROOT_URLCONF
+handler400 = view.handler400
+handler403 = view.handler403
+handler404 = view.handler404
+handler500 = view.handler500
 
 # Пробуем в документацию приложения
 schema_view = get_schema_view(
@@ -54,6 +51,9 @@ admin.site.site_header = "Кинополка"
 admin.site.site_title = "Кинополка"
 
 urlpatterns = [
+    # Для поисковиков; содержимое статичное, поэтому просто шаблоны
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
+    path("sitemap.xml", TemplateView.as_view(template_name="sitemap.xml", content_type="application/xml")),
     path("boss/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("movies/", include("lists.urls")),
@@ -78,3 +78,14 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if not settings.PRODUCTION:
+    # Ручная проверка обработчиков ошибок. Именно not PRODUCTION, а не DEBUG:
+    # обработчики срабатывают только при DEBUG=False (иначе Django рисует свои
+    # отладочные страницы), так что проверять их надо с DEBUG=0 + ENVIRONMENT=dev
+    urlpatterns += [
+        path("test/400/", view.test_400),
+        path("test/403/", view.test_403),
+        path("test/404/", view.test_404),
+        path("test/500/", view.test_500),
+    ]

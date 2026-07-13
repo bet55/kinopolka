@@ -63,8 +63,10 @@ class MoviesStatistic(GlobalDataMixin, APIView):
 class Tournament(GlobalDataMixin, APIView):
     """
     Турнир TMNT: эмулятор NES с легальным дампом игры. Четыре бота дерутся
-    по турнирной сетке, участники ставят на бойцов — победитель выбирает фильм.
-    ROM и save-state'ы лежат в media/roms/ (вне git, синкается с VPS).
+    по турнирной сетке, каждый участник ставит на бойца и вешает на него
+    свой фильм из закладок (клиентская корзина в localStorage, поэтому
+    селекты фильмов заполняет tournament.js) — чей боец победил, тот фильм
+    и смотрим. ROM и save-state'ы лежат в media/roms/ (вне git, синкается с VPS).
     """
 
     http_method_names = ["get"]
