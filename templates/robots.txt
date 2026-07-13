@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /boss/
+Disallow: /api/
+Disallow: /api-auth/
+Disallow: /invitation/
+
+Sitemap: https://kinopolka.com/sitemap.xml

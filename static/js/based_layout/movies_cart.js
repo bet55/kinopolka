@@ -113,4 +113,4 @@ function cartMoviesHandler() {
     })
 }
 
-export {cartMoviesHandler, addToCart, removeFromCart}
+export {cartMoviesHandler, addToCart, removeFromCart, getStorageFilmIds}

@@ -1,5 +1,5 @@
 body {
-    background-image: url('../../static/img/background.jpg');
+    background-image: url('../img/background.jpg');
     background-size: 100%;
 
 
@@ -9,7 +9,7 @@ body {
     padding-right: 4px; /* место для скроллбара */
 
     @media screen and (max-width: 800px) {
-        background-image: url('../../static/img/background_vert.jpg');
+        background-image: url('../img/background_vert.jpg');
     }
 }
 

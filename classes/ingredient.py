@@ -52,7 +52,7 @@ class IngredientHandler:
         :param ingredient_id: ID ингредиента
         :return: сериализованные данные ингредиента
         """
-        ingredient = Ingredient.objects.aget(pk=ingredient_id)
+        ingredient = await Ingredient.objects.aget(pk=ingredient_id)
         return IngredientSerializer(ingredient).data
 
     @staticmethod

@@ -21,14 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
+# Запуск в dev или prod режиме
+PRODUCTION = os.getenv("ENVIRONMENT", "dev") == "prod"
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "")
+# Вне прода (dev без env.sh, тесты в pre-commit) подставляем небоевой дефолт,
+# иначе любое подписывание куки падает с ImproperlyConfigured.
+# В проде пустой ключ по-прежнему роняет приложение — так и задумано.
+SECRET_KEY = os.environ.get("SECRET_KEY") or ("" if PRODUCTION else "django-insecure-dev-only-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "0") == "1"
-
-# Запуск в dev или prod режиме
-PRODUCTION = os.getenv("ENVIRONMENT", "dev") == "prod"
 
 # Список хостов, по которым можно открыть приложение. Но, мы работаем из докера, так что здесь не будет коллизий
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(";")
@@ -158,7 +161,12 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # Для WhiteNoise
+
+# STATICFILES_STORAGE удалён в Django 5.1 — хранилища задаются через STORAGES
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
 
 MEDIA_URL = ""
 MEDIA_ROOT = ""
