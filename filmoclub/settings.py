@@ -163,9 +163,15 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # STATICFILES_STORAGE удалён в Django 5.1 — хранилища задаются через STORAGES
+# Compressed, а НЕ CompressedManifest: манифест дописывает в имя файла хеш
+# содержимого (bookmark4.png → bookmark4.7771fa1ae5c3.png), и любой путь,
+# собранный не через {% static %} (строкой в JS, значением из БД), ведёт в 404.
+# Ловилось только в проде — в DEBUG хеширования нет. Сжатие тут и так основной
+# выигрыш, а вместо годового кеша WhiteNoise ставит max-age=60 с 304 — для
+# клуба на пятерых разница незаметна.
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
 MEDIA_URL = ""
@@ -178,6 +184,13 @@ MEDIA_ROOT = ""
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+    # У API нет авторизации — «свой-чужой» делает TeaCodeMiddleware.
+    # Дефолтная SessionAuthentication опасна побочным эффектом: если в браузере
+    # есть sessionid от админки /boss/, она считает запрос авторизованным и сама
+    # проверяет CSRF-токен (независимо от выключенного CsrfViewMiddleware).
+    # Куки csrftoken нет, фронт токен не шлёт → все POST/PUT/PATCH/DELETE
+    # падают с 403 {"detail": "CSRF Failed..."} у всех, кто заходил в админку.
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
     # 'EXCEPTION_HANDLER': 'utils.drf_exception_handler.drf_exception_handler',
     # 'DEFAULT_RENDERER_CLASSES': [
     #     'rest_framework.renderers.JSONRenderer',

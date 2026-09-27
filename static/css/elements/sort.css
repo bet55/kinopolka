@@ -4,6 +4,10 @@
     align-items: center;
     margin: 0 0 0 1em;
     position: relative;
+
+    @media screen and (max-width: 800px) {
+        margin: 0;
+    }
 }
 
 #sorting-img {
@@ -78,32 +82,30 @@
         font-weight: bold;
     }
 
-}
+    @media screen and (max-width: 800px) {
+        left: -2em;
+    }
 
+    @media (min-width: 2500px) {
 
-@media (min-width: 2500px) {
-    #sorting-list {
         right: 5vw;
         width: 33em;
 
         li {
             font-size: 2em;
         }
+
     }
 
+    @media (min-width: 3000px) {
 
-}
-
-
-@media (min-width: 3000px) {
-    #sorting-list {
         right: 8vw;
         width: 41em;
 
         li {
             font-size: 3em;
         }
-    }
 
+    }
 
 }

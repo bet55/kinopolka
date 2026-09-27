@@ -4,13 +4,15 @@ from typing import NamedTuple
 
 from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
+from django.db import transaction
+from django.db.models import Model
 import httpx
 from pydantic import ValidationError as PydanticValidationError
 from rest_framework.exceptions import ValidationError
 
 from classes.kp import KP_Movie
 from features.serializers import MovieRatingSerializer
-from lists.models import Actor, Director, Genre, Movie, Writer
+from lists.models import QUESTION_MARK_URL, Actor, Director, Genre, Movie, Writer
 from lists.serializers import MovieDictSerializer, MoviePosterSerializer
 from pydantic_models import KpFilmGenresModel, KPFilmModel, KpFilmPersonModel
 from utils.exception_handler import handle_exceptions
@@ -29,6 +31,29 @@ class KPEntities(NamedTuple):
     movie: dict[str, int | str]
     persons: dict[str, list[dict]]
     genres: list[dict]
+
+
+# Данные, которых у фильма может не оказаться. Код → как назвать это человеку.
+# Часть полей пустует законно (у фильма правда нет постера на Кинопоиске), поэтому
+# это повод предупредить, а не повод отказаться сохранять фильм.
+MISSING_LABELS: dict[str, str] = {
+    "genres": "жанры",
+    "directors": "режиссёры",
+    "actors": "актёры",
+    "writers": "сценаристы",
+    "description": "описание",
+    "premiere": "дата премьеры",
+    "duration": "длительность",
+    "rating_kp": "оценка Кинопоиска",
+    "poster": "постер",
+}
+
+# Связи и скалярные поля проверяются по-разному, поэтому разделены.
+MISSING_RELATIONS = ("genres", "directors", "actors", "writers")
+
+DEFAULT_PREMIERE_YEAR = 1900
+DEFAULT_TEXTS = frozenset({"...", "", "Без описания", "Таинственный фильм без названия"})
+DEFAULT_POSTER_LOCAL = "media/posters/default.png"
 
 
 class MovieHandler:
@@ -120,12 +145,14 @@ class MovieHandler:
 
     @classmethod
     @handle_exceptions("Фильм")
-    async def a_download(cls, kp_id: int | str, kp_scheme: dict | None = None) -> int:
+    async def a_download(cls, kp_id: int | str, kp_scheme: dict | None = None) -> dict:
         """
         Асинхронная загрузка данных фильма из Kinopoisk API и сохранение в базу данных.
         :param kp_id: Kinopoisk ID фильма.
         :param kp_scheme: Опциональный ответ API. Если None, данные запрашиваются из API.
-        :return: Кортеж (movie_id, успех).
+        :return: {"movie_id": id, "missing": [человекочитаемые названия пустых полей]}.
+            Неполные данные — не ошибка: у фильма может правда не быть постера или
+            состава на Кинопоиске. Фильм сохраняем, а о пробелах предупреждаем.
         """
         if not kp_id or not isinstance(kp_id, (int, str)) or (isinstance(kp_id, int) and kp_id <= 0):
             raise ValidationError("Некорректный kp_id", 400)
@@ -149,8 +176,19 @@ class MovieHandler:
         if api_response.get("poster", {}).get("url"):
             await cls._download_and_save_poster(movie_model, api_response["poster"]["url"], kp_id)
 
+        # Перечитываем: у объекта из update_or_create поля держат то, что в них
+        # положили (premiere — строка из ответа КП), типы Django приводит только
+        # при чтении из базы. find_missing ждёт нормальную модель.
+        await movie_model.arefresh_from_db()
+        missing = await sync_to_async(cls.find_missing, thread_sensitive=True)(movie_model)
+        if missing:
+            logger.warning("Фильм %s сохранён с пробелами: %s", kp_id, ", ".join(missing))
+
         logger.info("Асинхронно загружен и сохранен фильм %s: success=%s", kp_id, success)
-        return api_response.get("id", -1)
+        return {
+            "movie_id": api_response.get("id", -1),
+            "missing": [MISSING_LABELS[code] for code in missing],
+        }
 
     @classmethod
     async def _download_and_save_poster(cls, movie_model: Movie, poster_url: str, kp_id: str) -> bool:
@@ -180,47 +218,62 @@ class MovieHandler:
     async def _a_save_movie_to_db(cls, movie_info: KPEntities) -> tuple[Movie | None, bool]:
         """
         Асинхронное сохранение данных фильма в базу данных.
+        Обёртка над синхронным `_save_movie_to_db`: транзакция должна жить внутри
+        одного потока, поэтому весь блок уводим в sync_to_async целиком, а не
+        дёргаем ORM по одному await-у.
         """
         try:
-            movie, persons, genres = movie_info
-            movie_model, _ = await Movie.mgr.aupdate_or_create(**movie)
-
-            actors, directors, writers, genres = cls._create_models_constructor_list(persons, genres)
-            await Actor.mgr.abulk_create(
-                actors,
-                update_conflicts=True,
-                update_fields=["photo"],
-                unique_fields=["kp_id"],
-            )
-            await Director.mgr.abulk_create(
-                directors,
-                update_conflicts=True,
-                update_fields=["photo"],
-                unique_fields=["kp_id"],
-            )
-            await Writer.mgr.abulk_create(
-                writers,
-                update_conflicts=True,
-                update_fields=["photo"],
-                unique_fields=["kp_id"],
-            )
-            await Genre.mgr.abulk_create(
-                genres,
-                update_conflicts=True,
-                update_fields=["watch_counter"],
-                unique_fields=["name"],
-            )
-
-            await movie_model.actors.aset(actors)
-            await movie_model.directors.aset(directors)
-            await movie_model.writers.aset(writers)
-            await movie_model.genres.aset(genres)
-
-            logger.debug("Асинхронно сохранен фильм: kp_id=%s", movie.get("kp_id"))
-            return movie_model, True
+            return await sync_to_async(cls._save_movie_to_db, thread_sensitive=True)(movie_info)
         except Exception as e:
             logger.error("Не удалось асинхронно сохранить фильм: %s", str(e))
             return None, False
+
+    @classmethod
+    @transaction.atomic
+    def _save_movie_to_db(cls, movie_info: KPEntities) -> tuple[Movie, bool]:
+        """
+        Сохранение фильма и всех его связей одной транзакцией.
+
+        Без atomic сбой на середине (таймаут API, кривая персона в ответе) оставлял
+        в базе строку фильма без жанров и персон: на сайте он виден, но выпадает
+        из фильтра по жанрам. Теперь либо сохраняется всё, либо ничего.
+        """
+        movie, persons, genres = movie_info
+        movie_model, _ = Movie.mgr.update_or_create(**movie)
+
+        actors, directors, writers, genres = cls._create_models_constructor_list(persons, genres)
+        Actor.mgr.bulk_create(
+            actors,
+            update_conflicts=True,
+            update_fields=["photo"],
+            unique_fields=["kp_id"],
+        )
+        Director.mgr.bulk_create(
+            directors,
+            update_conflicts=True,
+            update_fields=["photo"],
+            unique_fields=["kp_id"],
+        )
+        Writer.mgr.bulk_create(
+            writers,
+            update_conflicts=True,
+            update_fields=["photo"],
+            unique_fields=["kp_id"],
+        )
+        Genre.mgr.bulk_create(
+            genres,
+            update_conflicts=True,
+            update_fields=["watch_counter"],
+            unique_fields=["name"],
+        )
+
+        movie_model.actors.set(actors)
+        movie_model.directors.set(directors)
+        movie_model.writers.set(writers)
+        movie_model.genres.set(genres)
+
+        logger.debug("Сохранен фильм: kp_id=%s", movie.get("kp_id"))
+        return movie_model, True
 
     @classmethod
     def _create_models_constructor_list(
@@ -228,23 +281,38 @@ class MovieHandler:
     ) -> tuple[list[Actor], list[Director], list[Writer], list[Genre]]:
         """
         Создание экземпляров моделей для актеров, режиссеров, сценаристов и жанров.
+
+        Раньше любая осечка возвращала четыре пустых списка разом — фильм сохранялся
+        вообще без связей и выпадал из фильтра по жанрам. Теперь кривая запись
+        отбрасывается поштучно: один битый актёр не уносит с собой жанры.
         """
-        try:
-            actors = [Actor(**pers) for pers in persons.get("actor", [])]
-            directors = [Director(**pers) for pers in persons.get("director", [])]
-            writers = [Writer(**pers) for pers in persons.get("writer", [])]
-            genres = [Genre(**gen) for gen in genres]
-            logger.debug(
-                "Создано %d актеров, %d режиссеров, %d сценаристов, %d жанров",
-                len(actors),
-                len(directors),
-                len(writers),
-                len(genres),
-            )
-            return actors, directors, writers, genres
-        except Exception as e:
-            logger.error("Не удалось создать экземпляры моделей: %s", str(e))
-            return [], [], [], []
+        actors = cls._build_models(Actor, persons.get("actor", []))
+        directors = cls._build_models(Director, persons.get("director", []))
+        writers = cls._build_models(Writer, persons.get("writer", []))
+        genre_models = cls._build_models(Genre, genres)
+
+        logger.debug(
+            "Создано %d актеров, %d режиссеров, %d сценаристов, %d жанров",
+            len(actors),
+            len(directors),
+            len(writers),
+            len(genre_models),
+        )
+        return actors, directors, writers, genre_models
+
+    @staticmethod
+    def _build_models(model: type[Model], raw_items: list[dict]) -> list[Model]:
+        """
+        Собирает модели по одной. Запись, которую не удалось разобрать, пропускается
+        с записью в лог — остальные сохраняются.
+        """
+        built = []
+        for item in raw_items:
+            try:
+                built.append(model(**item))
+            except Exception as e:
+                logger.warning("Пропущена запись %s (%s): %s", model.__name__, item, e)
+        return built
 
     @classmethod
     def _response_preprocess(cls, movie_info: dict) -> KPEntities:
@@ -341,3 +409,39 @@ class MovieHandler:
         for movie in movies:
             genres += movie.get("genres", [])
         return sorted(list(set(genres)))
+
+    @classmethod
+    def find_missing(cls, movie: Movie, counts: dict[str, int] | None = None) -> list[str]:
+        """
+        Коды незаполненных данных фильма — ключи MISSING_LABELS.
+
+        :param movie: Фильм, **прочитанный из базы**. У объекта, только что созданного
+            в памяти, поля держат то, что в них положили: например, premiere будет
+            строкой, а не датой. Django приводит типы только на границе с базой.
+        :param counts: Заранее посчитанные размеры связей {"genres": 3, ...}.
+            Нужны скриптам, которые пробегают всю базу: без них на каждый фильм
+            уйдёт по запросу на связь.
+        :return: Список кодов, пустой если всё на месте.
+        """
+        missing = []
+
+        for relation in MISSING_RELATIONS:
+            amount = counts[relation] if counts else getattr(movie, relation).count()
+            if not amount:
+                missing.append(relation)
+
+        if (movie.description or "").strip() in DEFAULT_TEXTS:
+            missing.append("description")
+
+        if movie.premiere.year <= DEFAULT_PREMIERE_YEAR:
+            missing.append("premiere")
+        if not movie.duration:
+            missing.append("duration")
+        if not movie.rating_kp:
+            missing.append("rating_kp")
+
+        poster_local = str(movie.poster_local or "")
+        if movie.poster == QUESTION_MARK_URL or not poster_local or DEFAULT_POSTER_LOCAL in poster_local:
+            missing.append("poster")
+
+        return missing

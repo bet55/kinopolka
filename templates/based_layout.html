@@ -7,18 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    {# Описание и Open Graph: превью ссылок в мессенджерах и поисковиках. #}
-    {# Текст description и og:description один и тот же, но продублирован: #}
-    {# блок в Django-шаблоне нельзя вставить дважды. #}
-    <meta name="description" content="{% block meta_description %}Чайный киноклуб — смотрим кино с друзьями: выбор фильма, оценки, бар и открытки-приглашения{% endblock %}">
-    <meta property="og:site_name" content="Чайный киноклуб">
-    <meta property="og:title" content="{% block og_title %}Чайный киноклуб{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Чайный киноклуб — смотрим кино с друзьями: выбор фильма, оценки, бар и открытки-приглашения{% endblock %}">
+    <meta name="description"
+          content="{% block meta_description %}Чайный киноклуб — смотрим кино с друзьями: выбор фильма, оценки, бар и открытки-приглашения{% endblock %}">
+    <meta property="og:site_name" content="Кинополка">
+    <meta property="og:title" content="{% block og_title %}Кинополка{% endblock %}">
+    <meta property="og:description"
+          content="{% block og_description %}Чайный киноклуб — смотрим кино с друзьями: выбор фильма, оценки, бар и открытки-приглашения{% endblock %}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     {# og:image требует абсолютный URL — относительные мессенджеры игнорируют #}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/icon.png' %}">
-    {# Канонический домен — kinopolka.com (kinopolka.рф — временное зеркало) #}
     <link rel="canonical" href="https://kinopolka.com{{ request.path }}">
 
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
@@ -26,7 +24,6 @@
 
     <link rel="stylesheet" href="{% static 'css/based_layout.css' %}">
     <link rel="stylesheet" href="{% static 'css/themes/'|add:theme|add:'.css' %}">
-
 
     <link rel="stylesheet" href="{% static 'css/elements/toast.css' %}">
     <link rel="stylesheet" href="{% static 'css/elements/confirmation_tooltip.css' %}">
@@ -62,57 +59,66 @@
 
         <div class="col-md-4 header-options">
 
-            {% block header-button %} {% endblock %}
+            <div class="flexible-header-options">
+                {% block header-button %} {% endblock %}
+            </div>
 
-            <div id="cart">
-                <img id="cart-img" src="{% static 'img/based_options/shopping-cart.png' %}" alt=""
+
+            <div class="permanent-header-options">
+                <div id="cart">
+                    <img id="cart-img" src="{% static 'img/based_options/shopping-cart.png' %}" alt=""
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         data-bs-title="Закладки">
+                    <ul id="cart-list"></ul>
+                </div>
+
+                <div id="users-panel" class="dropdown">
+                    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img id="current-user-avatar" class="hide" src="" alt="">
+                        <span id="current-user-name">Кто?</span>
+                    </button>
+                    <ul id="users-selector" class="dropdown-menu">
+                        {% for u in users %}
+
+                            <li class="user-name">
+                                <button class="dropdown-item" data-user-id="{{ u.id }}" data-avatar="{{ u.avatar }}">
+                                    <img class="user-note" data-user-id="{{ u.id }}"
+                                         src="/static/img/stickynotes/note{{ u.id }}.png">
+                                    {{ u.first_name }}
+                                </button>
+                            </li>
+
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div id="light-switch" role="button"
                      data-bs-toggle="tooltip"
                      data-bs-placement="top"
-                     data-bs-title="Закладки">
-                <ul id="cart-list"></ul>
+                     data-bs-title="Свет">
+                </div>
+
             </div>
 
-            <div id="users-panel" class="dropdown">
-                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img id="current-user-avatar" class="hide" src="" alt="">
-                    <span id="current-user-name">Кто?</span>
-                </button>
-                <ul id="users-selector" class="dropdown-menu">
-                    {% for u in users %}
-
-                        <li class="user-name">
-                            <button class="dropdown-item" data-user-id="{{ u.id }}" data-avatar="{{ u.avatar }}">
-                                <img class="user-note" data-user-id="{{ u.id }}" src="/static/img/stickynotes/note{{ u.id }}.png">
-                                {{ u.first_name }}
-                            </button>
-                        </li>
-
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div id="light-switch" role="button"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Свет"></div>
 
         </div>
     </div>
 
-
     <div class="row second-row">
 
         <div class="col-md-3 container nav-column">
-                <nav class="nav flex-column">
-                    <a class="nav-link" href="/movies/">Фильмы</a>
-                    <a class="nav-link" href="/movies/archive/">Архив</a>
-                    <a class="nav-link" href="/">Церемония</a>
-                    <a class="nav-link" href="/archive/">Открытки</a>
-                    <a class="nav-link" href="/bar/">Бар</a>
-                    <a class="nav-link" href="/movies/add/">Добавление</a>
-                    <a class="nav-link" href="/features/catalog/">Фишки</a>
-                </nav>
-                <img class="align-self-center mt-auto nav-img" src="{% block nav_img %}{{ random.navigation }}{% endblock %}">
+            <nav class="nav flex-column">
+                <a class="nav-link" href="/movies/">Фильмы</a>
+                <a class="nav-link" href="/movies/archive/">Архив</a>
+                <a class="nav-link" href="/">Церемония</a>
+                <a class="nav-link" href="/archive/">Открытки</a>
+                <a class="nav-link" href="/bar/">Бар</a>
+                <a class="nav-link" href="/movies/add/">Добавление</a>
+                <a class="nav-link" href="/features/catalog/">Фишки</a>
+            </nav>
+            <img class="align-self-center mt-auto nav-img"
+                 src="{% block nav_img %}{{ random.navigation }}{% endblock %}">
         </div>
 
         <div class="col-md-6 h-100">
@@ -124,19 +130,17 @@
         </div>
     </div>
 
-
 </div>
 
 {% block fixed %} {% endblock %}
 
 {# для нового года оставим гирлянду #}
-{% if  theme == 'new_year'%}
-	<div class="gir_1" id="gir"></div> Гирлянда
+{% if  theme == 'new_year' %}
+    <div class="gir_1" id="gir"></div> Гирлянда
 {% endif %}
 
 
 {% include "elements/toast.html" %}
-
 
 <script type="module" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script type="module" src="{% static 'js/based_layout.js' %}"></script>

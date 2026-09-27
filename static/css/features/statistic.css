@@ -202,10 +202,10 @@
 }
 
 .critic-avatar {
-    width: 1em;
-    height: 1em;
+    width: 3em;
+    height: 3em;
     object-fit: cover;
-    border-radius: 50%;
+    /*border-radius: 50%;*/
 }
 
 /* Совместимость вкусов: пары участников */

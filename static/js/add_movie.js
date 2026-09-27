@@ -19,7 +19,12 @@ async function sendData() {
     spinner.style.display = 'inline-block';
 
     // Запрос на добавление фильма
-    await Request.post({url: '', body: {kp_id: input.value}});
+    const result = await Request.post({url: '', body: {kp_id: input.value}});
+
+    // Фильм сохранён, но часть данных Кинопоиск не отдал — предупреждаем
+    if (result?.missing?.length) {
+        createToast(`Подгрузилось не всё: ${result.missing.join(', ')}`, 'info');
+    }
 
     // Возвращаем страницу в изначальное состояние
     addButton.disabled = false;

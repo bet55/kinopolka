@@ -132,5 +132,7 @@ class MovieAddingViewSet(GlobalDataMixin, APIView):
         """
         kp_id = "".join(char for char in str(request.data.get("kp_id", "-1")) if char.isdigit())
 
+        # result — {"movie_id": ..., "missing": [...]}: пустые поля не ошибка,
+        # фронт покажет о них отдельный тост
         result = await MovieHandler.a_download(kp_id)
-        return handle_response(result, {"movie_id": result}, status.HTTP_201_CREATED)
+        return handle_response(result, result, status.HTTP_201_CREATED)

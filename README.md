@@ -21,11 +21,7 @@ https://kinopolka.com/
 11. Раздел с фото киноклуба
 12. Наполненность бара
 13. Статистика по просмотру
-
-Может быть:
-1. Игровой выбор фильмов (турнир, квиз по фильмам)
-2. Добавить рубрику "Угадай кино"
-
+14. Игровой выбор фильмов
 
 Логи приложения:
 https://kinopolka.com/application/grafana/
@@ -62,7 +58,7 @@ https://kinopolka.com/application/grafana/
   переопределяет часть переменных для прода (DEBUG, хосты, порт 8000, SSL).
   То есть один и тот же файл по структуре работает и локально, и на VPS —
   различие только в строке `ENVIRONMENT=dev|prod`.
-- **`start.sh`** (в git — секретов не содержит) — только логика запуска:
+- **`start.sh`** логика запуска:
   подключает env.sh, собирает статику, создаёт суперпользователя, стартует сервер.
 
 Management-командам, которым нужны секреты (`update_recent_movies`,
@@ -94,6 +90,10 @@ uv run manage.py update_recent_movies
         ▼                                          nginx/ufw/fail2ban конфиги ──► бэкап вне репо
    media/postcards/ ◄── delete_unused_postcards (удаление сирот)
 
+   db.sqlite3 ──► audit_movies (только чтение) ──► movies_audit.txt
+        ▲                                              │ что дозалить
+        └── fill_missing_data ◄── Kinopoisk API ◄───────┘
+
    static/img/  ──► compress_static.sh (ffmpeg: png/jpg/gif → webp)
                 └─► compress_animated_webp.py (Pillow: анимированные webp)
 ```
@@ -112,8 +112,8 @@ uv run manage.py update_recent_movies
 
 Работают напрямую с базой (кроме `update_theme_calendar`) — запущенное приложение
 НЕ требуется. Но командам, которые ходят в API Кинопоиска (`update_recent_movies`,
-`download_posters`), нужны переменные окружения — сначала `source env.sh`
-(один раз на сессию терминала).
+`download_posters`, `fill_missing_data`), нужны переменные окружения — сначала
+`source env.sh` (один раз на сессию терминала).
 
 Пример: обновить информацию о свежих фильмах —
 ```bash
@@ -128,6 +128,44 @@ uv run manage.py update_recent_movies
 | `uv run manage.py delete_unused_postcards` | Удаляет файлы открыток, которых нет в БД. |
 | `uv run manage.py update_recent_movies` | Обновляет оценки KP/IMDb, голоса и кассовые сборы у фильмов с премьерой за последние N лет (`--years`, `--dry-run`, `--limit`, `--delay`). Нужен `source env.sh`. |
 | `uv run manage.py update_theme_calendar` | Пересобирает календарь тем оформления из `THEMES_RANGES` и печатает его. БД не трогает; результат вручную копируется в `CALENDAR` (`filmoclub/calendar/theme_calendar.py`) — календарь осознанно хранится python-переменной, а не json-файлом. Запускать после изменения `THEMES_RANGES` в `filmoclub/calendar/theme_settings.py`. |
+| `uv run manage.py audit_movies` | Ищет фильмы с недостающими данными и пишет отчёт в файл (`--output`, `--daily-limit`). Только читает БД, в API не ходит — лимит запросов не тратит. |
+| `uv run manage.py fill_missing_data` | Дозаливает найденные пробелы: жанры, персон, пустые поля карточки (`--only`, `--limit`, `--delay`, `--retries`, `--dry-run`). Один фильм — один запрос к API, нужен `source env.sh`. |
+
+## Дозаливка недостающих данных
+
+Пара команд `audit_movies` → `fill_missing_data`. Что считать пробелом — одно
+определение на обе, `MovieHandler.find_missing` (`classes/movie.py`), так что
+отчёт и дозаливка не могут разойтись.
+
+Главное, ради чего всё затевалось: фильм без жанров на странице виден, но
+выпадает из любого фильтра по жанрам — глазами такое не заметишь.
+
+Порядок работы — снять отчёт, залить, снять второй и сравнить:
+
+```bash
+uv run manage.py audit_movies --output movies_audit_before.txt
+
+source env.sh
+uv run manage.py fill_missing_data --dry-run     # посмотреть, что будет запрошено
+uv run manage.py fill_missing_data               # собственно дозаливка
+
+uv run manage.py audit_movies --output movies_audit_after.txt
+diff movies_audit_before.txt movies_audit_after.txt
+```
+
+Отчёты (`movies_audit*.txt`) в `.gitignore` — файлы локальные. Имя задаётся
+через `--output`; без него оба прогона запишутся в один `movies_audit.txt`
+и сравнивать будет не с чем.
+
+Про лимит API: `audit_movies` в шапке отчёта сам считает, сколько фильмов
+требуют запроса и на сколько дней это растянется при `--daily-limit`. Если не
+влезает в сутки — режь запуск через `--limit`, остальное доберётся следующим.
+`--only genres` — самый дешёвый прогон, когда важен только фильтр по жанрам.
+
+Чего команда НЕ трогает: непустые поля, оценки клуба, `watch_date` и
+`is_archive`. Заполняются только пробелы, каждый фильм — своей транзакцией,
+поэтому сбой на одном не рушит остальные. Постеры сюда не входят — это
+`download_posters`, и в отчёте такая строка помечена без `[API]`.
 
 ## Сжатие изображений
 
