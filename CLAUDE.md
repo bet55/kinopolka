@@ -76,5 +76,10 @@ Django admin на **`/boss/`** (не /admin/ — тот отдаёт 404). За�
 Management-команды: `download_posters`, `fix_posters_names`, `delete_unused_postcards`,
 `update_recent_movies` (обновление оценок/сборов у свежих фильмов),
 `update_theme_calendar` (печатает календарь тем из `THEMES_RANGES`; результат
-вручную копируется в `filmoclub/calendar/theme_calendar.py`).
+вручную копируется в `filmoclub/calendar/theme_calendar.py`),
+`audit_movies` (ищет фильмы с недостающими данными и пишет отчёт в файл;
+к API не обращается, лимит запросов не тратит),
+`fill_missing_data` (дозаливает найденные пробелы — по запросу к API на фильм,
+поэтому `--limit`; `--dry-run` в API не ходит).
+Что считать пробелом — одно определение на всех: `MovieHandler.find_missing`.
 Подробнее — раздел «Скрипты и обслуживание» в `README.md`.

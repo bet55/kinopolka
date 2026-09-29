@@ -27,6 +27,10 @@
     left: 0;
     height: 14em;
     width: 100%;
+
+    @media (min-width: 3000px) {
+        height: 85%;
+    }
 }
 
 
@@ -70,6 +74,14 @@
         }
     }
 
+    @media (min-width: 3000px) {
+        height: 6.5em;
+        width: 6.5em;
+
+        h2 {
+            font-size: 3.5em;
+        }
+    }
 
 }
 
@@ -84,6 +96,11 @@
         top: 2em;
         left: 1em;
     }
+
+    @media (min-width: 3000px) {
+        top: 3em;
+        left: 2em;
+    }
 }
 
 .note[data-user-id="3"] {
@@ -93,8 +110,13 @@
     background: var(--yellow-color);
 
     @media (min-width: 2000px) {
-        top: 4em;
+        top: 5em;
         left: 7em;
+    }
+
+    @media (min-width: 3000px) {
+        top: 7em;
+        left: 11em;
     }
 }
 
@@ -108,6 +130,11 @@
         top: 12em;
         left: 1em;
     }
+
+    @media (min-width: 3000px) {
+        top: 16em;
+        left: 2em;
+    }
 }
 
 .note[data-user-id="5"] {
@@ -117,8 +144,13 @@
     background: var(--ligth-green-color);
 
     @media (min-width: 2000px) {
-        top: 12em;
+        top: 14em;
         left: 7em;
+    }
+
+    @media (min-width: 3000px) {
+        top: 19em;
+        left: 11em;
     }
 }
 

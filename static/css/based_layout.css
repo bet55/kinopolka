@@ -18,6 +18,10 @@ body {
     height: 20vh;
     align-items: center;
 
+    @media screen and (max-width: 800px) {
+        height: 14vh;
+    }
+
 
     @media screen and (max-width: 800px) {
         margin-bottom: 2em;
@@ -55,11 +59,24 @@ body {
     align-items: center;
     justify-content: center;
 
+
 }
+
+.flexible-header-options, .permanent-header-options {
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    @media screen and (max-width: 800px) {
+        height: 100%;
+    }
+
+}
+
 
 #users-panel {
     height: 28%;
-    width: 25%;
+    width: 100%;
     display: flex;
     align-items: center;
     align-content: center;
@@ -85,16 +102,17 @@ body {
             font-size: 0.7em;
         }
 
+
         &:after {
             content: none;
         }
     }
 
     #current-user-avatar {
-        height: 1.4em;
-        width: 1.4em;
+        height: 2em;
+        width: 2em;
         object-fit: cover;
-        border-radius: 50%;
+        /*border-radius: 50%;*/
         flex-shrink: 0;
     }
 
@@ -106,6 +124,10 @@ body {
         color: var(--black-color);
         background-color: bisque;
         height: 16em;
+
+        @media (min-width: 3000px) {
+            font-size: 2em;
+        }
     }
 
     .user-name {
@@ -122,6 +144,7 @@ body {
         }
 
     }
+
     .user-note {
         width: 1em;
     }
@@ -130,7 +153,7 @@ body {
     @media (min-width: 2400px) {
         border-radius: 8%;
         height: 29%;
-        width: 29%;
+        width: 100%;
 
         .dropdown-toggle {
             font-size: 1.5em;
@@ -155,18 +178,38 @@ body {
     }
 }
 
-/* Рубильник тёмной темы: спрайт-лента 34 кадров по 81x120 (2x в файле).
-   to-dark/to-light — анимация щелчка, is-dark/is-light — крайние положения */
+/* Рубильник тёмной темы: спрайт-лента 34 кадров, кадр 162x240 в файле.
+   to-dark/to-light — анимация щелчка, is-dark/is-light — крайние положения.
+
+   Размер меняется ОДНОЙ строкой — width. Высоту держит aspect-ratio, а кадры
+   позиционируются в процентах, поэтому пересчитывать px при смене размера не надо:
+   при background-size 3400% один кадр = ровно ширина блока, каким бы он ни был.
+   Шаг между соседними кадрами в процентах — 100%/33 (33 промежутка на 34 кадра). */
 #light-switch {
-    --switch-frame: 81px;
-    width: var(--switch-frame);
-    height: 120px;
+    --switch-step: calc(100% / 33);
+
+    width: 20%;
+    aspect-ratio: 162 / 240;
     margin-left: 0.8em;
     cursor: pointer;
     flex-shrink: 0;
     background-image: url('../img/light_switch_sprite.webp');
-    background-size: calc(var(--switch-frame) * 34) 120px;
+    background-size: 3400% 100%;
     background-repeat: no-repeat;
+
+    @media screen and (max-width: 800px) {
+        width: 15%;
+        margin-left: 0.4em;
+    }
+
+    @media (min-width: 2400px) {
+        width: 20%;
+    }
+
+    /* 162px — родная ширина кадра, на таких экранах лента идёт без масштабирования */
+    @media (min-width: 3000px) {
+        width: 20%;
+    }
 }
 
 #light-switch.is-light {
@@ -175,11 +218,11 @@ body {
 
 /* До инициализации JS: в тёмной теме рубильник сразу в верхнем положении */
 html.dark-mode #light-switch {
-    background-position-x: calc(var(--switch-frame) * -13);
+    background-position-x: calc(13 * var(--switch-step));
 }
 
 #light-switch.is-dark {
-    background-position-x: calc(var(--switch-frame) * -13);
+    background-position-x: calc(13 * var(--switch-step));
 }
 
 #light-switch.to-dark {
@@ -191,13 +234,21 @@ html.dark-mode #light-switch {
 }
 
 @keyframes switch-to-dark {
-    from { background-position-x: 0; }
-    to { background-position-x: calc(var(--switch-frame) * -13); }
+    from {
+        background-position-x: 0;
+    }
+    to {
+        background-position-x: calc(13 * var(--switch-step));
+    }
 }
 
 @keyframes switch-to-light {
-    from { background-position-x: calc(var(--switch-frame) * -24); }
-    to { background-position-x: calc(var(--switch-frame) * -33); }
+    from {
+        background-position-x: calc(24 * var(--switch-step));
+    }
+    to {
+        background-position-x: calc(33 * var(--switch-step));
+    }
 }
 
 
@@ -210,7 +261,7 @@ html.dark-mode #light-switch {
 }
 
 #cart-img {
-    height: 30%;
+    height: 25%;
 
     &:hover {
         cursor: pointer;

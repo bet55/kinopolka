@@ -21,14 +21,8 @@ https://kinopolka.com/
 11. Раздел с фото киноклуба
 12. Наполненность бара
 13. Статистика по просмотру
-
-Может быть:
-1. Игровой выбор фильмов (турнир, квиз по фильмам)
-2. Добавить рубрику "Угадай кино"
-
-
-Логи приложения:
-https://kinopolka.com/application/grafana/
+14. Игровой выбор фильмов
+15. Админ панель
 
 # Настройка на новом устройстве
 1. Скачиваем код проекта из GitHub
@@ -53,50 +47,14 @@ https://kinopolka.com/application/grafana/
 заполни `DJANGO_SUPERUSER_USERNAME` / `DJANGO_SUPERUSER_PASSWORD` в env.sh
 (пустой логин — шаг пропускается). База локальная, поэтому пользователь заведётся
 на каждой машине при первом запуске.
+8. Запускаем командой sh start.sh или через docker compose up -d
 
 ## Переменные окружения и разовые команды
 Разделение ролей:
-- **`env.sh`** (вне git, у каждой машины свой; шаблон `example_env.sh`) — все
-  переменные: секреты, порт, настройки. Устроен так: сначала базовые значения
-  (= dev-режим), затем блок `if [ "$ENVIRONMENT" = "prod" ]`, который
-  переопределяет часть переменных для прода (DEBUG, хосты, порт 8000, SSL).
-  То есть один и тот же файл по структуре работает и локально, и на VPS —
-  различие только в строке `ENVIRONMENT=dev|prod`.
-- **`start.sh`** (в git — секретов не содержит) — только логика запуска:
+- **`env.sh`** переменные окружения
+- **`start.sh`** логика запуска:
   подключает env.sh, собирает статику, создаёт суперпользователя, стартует сервер.
 
-Management-командам, которым нужны секреты (`update_recent_movies`,
-`download_posters`), окружение втягивается вручную:
-```bash
-source env.sh    # один раз на сессию терминала (в докере: . ./env.sh)
-uv run manage.py update_recent_movies
-```
-
-# Разрешение ошибок
-- Если ссылки на дублирующие постеры попали в бд, замените их командой `uv run manage.py fix_posters_names`
-
-# Скрипты и обслуживание
-
-Операционные скрипты лежат в папке `scripts/` (запускать из корня проекта).
-В корне остаются: `start.sh` (точка входа, в git), `env.sh` (переменные
-окружения, вне git — тянется с VPS через sync) и шаблон `example_env.sh`.
-
-## Схема работы (что откуда берётся)
-
-```
-                 Kinopoisk API                        VPS (prod)
-                      │                                    │
-   manage.py         │ download_posters                   │ sync_from_remote.sh
-   ─────────         ▼                                     ▼
-   media/posters/ ◄── постеры фильмов          db.sqlite3 + env.sh + media/* ──► локально
-        │                                                  │ backup_vps_settings.sh
-        │ fix_posters_names (чистка имён/дублей)           ▼
-        ▼                                          nginx/ufw/fail2ban конфиги ──► бэкап вне репо
-   media/postcards/ ◄── delete_unused_postcards (удаление сирот)
-
-   static/img/  ──► compress_static.sh (ffmpeg: png/jpg/gif → webp)
-                └─► compress_animated_webp.py (Pillow: анимированные webp)
-```
 
 ## Скрипты в `scripts/`
 
@@ -108,12 +66,12 @@ uv run manage.py update_recent_movies
 | `compress_animated_webp.py` | Пережимает **анимированные** webp через Pillow (ffmpeg их не декодирует). Вписывает в рамку 432×768, идемпотентно. | `uv run scripts/compress_animated_webp.py static/img/themes` |
 | `reset.sh` | `flush` БД + миграции. Осторожно: стирает данные. | `bash scripts/reset.sh` |
 
-## Management-команды (по данным БД)
+## Management-команды
 
 Работают напрямую с базой (кроме `update_theme_calendar`) — запущенное приложение
 НЕ требуется. Но командам, которые ходят в API Кинопоиска (`update_recent_movies`,
-`download_posters`), нужны переменные окружения — сначала `source env.sh`
-(один раз на сессию терминала).
+`download_posters`, `fill_missing_data`), нужны переменные окружения — сначала
+`source env.sh` (один раз на сессию терминала).
 
 Пример: обновить информацию о свежих фильмах —
 ```bash
@@ -128,21 +86,19 @@ uv run manage.py update_recent_movies
 | `uv run manage.py delete_unused_postcards` | Удаляет файлы открыток, которых нет в БД. |
 | `uv run manage.py update_recent_movies` | Обновляет оценки KP/IMDb, голоса и кассовые сборы у фильмов с премьерой за последние N лет (`--years`, `--dry-run`, `--limit`, `--delay`). Нужен `source env.sh`. |
 | `uv run manage.py update_theme_calendar` | Пересобирает календарь тем оформления из `THEMES_RANGES` и печатает его. БД не трогает; результат вручную копируется в `CALENDAR` (`filmoclub/calendar/theme_calendar.py`) — календарь осознанно хранится python-переменной, а не json-файлом. Запускать после изменения `THEMES_RANGES` в `filmoclub/calendar/theme_settings.py`. |
+| `uv run manage.py audit_movies` | Ищет фильмы с недостающими данными и пишет отчёт в файл (`--output`, `--daily-limit`). Только читает БД, в API не ходит — лимит запросов не тратит. |
+| `uv run manage.py fill_missing_data` | Дозаливает найденные пробелы: жанры, персон, пустые поля карточки (`--only`, `--limit`, `--delay`, `--retries`, `--dry-run`). Один фильм — один запрос к API, нужен `source env.sh`. |
 
-## Сжатие изображений
 
-Два инструмента дополняют друг друга и не пересекаются:
 
-- **`compress_static.sh`** (ffmpeg) — для статичных `png/jpg/jpeg/gif`. ffmpeg
-  не умеет декодировать анимированный webp, поэтому такие файлы он пропускает.
-- **`compress_animated_webp.py`** (Pillow) — для анимированных webp («живые»
-  постеры тем). Уменьшает разрешение под рамку, перекодирует все кадры и
-  применяет результат только при существенном выигрыше (идемпотентность).
+Логи приложения:
+Сейчас не ведутся. Так как докер конейнер с графаной на сервере неактивен.
+Для возобновления работы, нужно поднять соответстующий контейнер на vps.
+Чтобы работало локлаьно, нужно поменять настройки логера в settings.py.
+[Ссылка на логи](https://kinopolka.com/application/grafana/)
 
-Папки тем читаются через `os.listdir` (`classes/tools.py`), поэтому смена
-формата на `.webp` кода не требует. Для картинок, на которые ссылаются по
-точному имени (иконки UI, `mb/`-гифки на странице 404), ссылки нужно править
-вручную — их не конвертируем.
+
+
 
 [kinorium](https://ru.kinorium.com/collections/kinorium/)
 [постеры](https://www.movieposters.com/)
@@ -157,3 +113,5 @@ uv run manage.py update_recent_movies
 Использованы изображения со следующих сайтов:
 https://www.flaticon.com
 https://www.pngwing.com
+
+![](/static/img/mb/mb4.jpg)

@@ -3,8 +3,9 @@
 # чтобы не зависеть от view, БД и внешних API.
 import json
 
+from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import Client, RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from utils.middleware import TEA_CODE_COOKIE_MAX_AGE, TEA_CODE_KEY, UNSAFE_METHODS, TeaCodeMiddleware
 
@@ -154,3 +155,38 @@ class TeaCodeAsyncTests(SimpleTestCase):
     async def test_get_without_code_passes(self) -> None:
         response = await self.middleware(self.factory.get("/lists/movies/"))
         self.assertEqual(response.status_code, 200)
+
+
+@override_settings(TEA_CODE=CODE, SSL_REDIRECT=False)
+class AdminSessionDoesNotBreakApiTests(TestCase):
+    """
+    Кука sessionid от админки не должна ломать API.
+
+    DRF-овая SessionAuthentication (она в дефолтных DEFAULT_AUTHENTICATION_CLASSES)
+    при живой сессии сама проверяет CSRF-токен, даже когда CsrfViewMiddleware
+    выключен. Куки csrftoken нет, фронт токен не шлёт — и у всех, кто хоть раз
+    заходил в /boss/, изменяющие запросы начинали падать с 403
+    {"detail": "CSRF Failed..."}. Лечится пустым DEFAULT_AUTHENTICATION_CLASSES.
+
+    enforce_csrf_checks=True обязателен: обычный тест-клиент CSRF не проверяет
+    и проблему не показывает.
+    """
+
+    def _put_rate(self, client: Client) -> tuple[int, bytes]:
+        client.cookies[TEA_CODE_KEY] = CODE
+        response = client.put("/movies/rate/", data={}, content_type="application/json")
+        return response.status_code, response.content
+
+    def test_request_with_admin_session_is_not_forbidden(self) -> None:
+        User.objects.create_superuser("boss", "boss@example.com", "pwd12345")
+        client = Client(enforce_csrf_checks=True)
+        client.login(username="boss", password="pwd12345")
+
+        status_code, content = self._put_rate(client)
+        self.assertNotEqual(status_code, 403, f"сессия админки снова ломает API: {content!r}")
+        self.assertNotIn(b"CSRF", content)
+
+    def test_request_without_session_is_not_forbidden(self) -> None:
+        # Контроль: без сессии запрос доходил до вьюхи и раньше
+        status_code, content = self._put_rate(Client(enforce_csrf_checks=True))
+        self.assertNotEqual(status_code, 403, content)

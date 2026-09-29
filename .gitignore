@@ -31,3 +31,7 @@ staticfiles
 
 
 vps_script.txt
+
+# отчёты audit_movies — локальные, в git не нужны
+# со звёздочкой, чтобы «до/после» (movies_audit_before.txt) тоже не попадали
+movies_audit*.txt

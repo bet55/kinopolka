@@ -36,6 +36,10 @@
 }
 
 /* Постеры */
+#statsTab {
+    margin-top: 1em;
+}
+
 #statsTabContent {
     overflow: scroll;
     max-height: 60em;
@@ -202,10 +206,10 @@
 }
 
 .critic-avatar {
-    width: 1em;
-    height: 1em;
+    width: 3em;
+    height: 3em;
     object-fit: cover;
-    border-radius: 50%;
+    /*border-radius: 50%;*/
 }
 
 /* Совместимость вкусов: пары участников */
@@ -219,7 +223,7 @@
 }
 
 .compat-pair {
-    width: min(600px, 90%);
+    width: min(600px, 95%);
     background-color: burlywood;
     border: 2px solid black;
     border-radius: 12px;
